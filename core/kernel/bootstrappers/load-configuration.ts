@@ -13,12 +13,7 @@ export default class LoadConfiguration implements BootstrapperInterface {
     const config = new ConfigRepository();
 
     for (const configFilesResolvers of BootstrapConfig.configFiles) {
-      const { default: ResolvedConfig } = await configFilesResolvers();
-
-      if (! ResolvedConfig) {
-        throw new Error(`Config resolver ${configFilesResolvers.name} did not return a valid config class.`);
-      }
-
+      const ResolvedConfig = (await configFilesResolvers()).default;
       config.merge({ [ResolvedConfig.key]: ResolvedConfig.config });
     }
 

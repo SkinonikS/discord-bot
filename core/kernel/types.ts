@@ -4,4 +4,4 @@ export interface BootstrapperInterface {
   bootstrap(app: Application): Promise<void>;
 }
 
-export type BootstrapperResolver = () => Promise<{ default?: new () => BootstrapperInterface }>;
+export type BootstrapperResolver = () => Promise<{ default: new () => BootstrapperInterface }>;

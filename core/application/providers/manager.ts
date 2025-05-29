@@ -29,10 +29,6 @@ export class ServiceProviderManager {
 
       const ServiceProvider = (await serviceProviderResolver()).default;
 
-      if (! ServiceProvider) {
-        throw new Error(`Service provider resolver did not return a valid service provider: ${serviceProviderResolver.name}`);
-      }
-
       const serviceProvider = new ServiceProvider(this._app);
       this._resolvedServiceProviders.push(serviceProvider);
 

@@ -29,5 +29,5 @@ export interface DefineConfigResult<T> {
   config: T;
 }
 
-export type ConfigResolver  = () => Promise<{ default?: DefineConfigResult<unknown> }>;
-export type ServiceProviderResolver  = () => Promise<{ default?: new (app: Application) => ServiceProviderInterface }>;
+export type ConfigResolver  = () => Promise<{ default: DefineConfigResult<unknown> }>;
+export type ServiceProviderResolver  = () => Promise<{ default: new (app: Application) => ServiceProviderInterface }>;
