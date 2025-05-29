@@ -1,6 +1,7 @@
 import { Application } from '#core/application/application';
 import { ServiceProviderInterface } from '#core/application/types';
 import { LoggerFactoryInterface, LoggerInterface } from '#core/application/types';
+import { Client } from 'discord.js';
 
 export abstract class AbstractServiceProvider implements ServiceProviderInterface {
   protected readonly _logger: LoggerInterface;
@@ -13,6 +14,10 @@ export abstract class AbstractServiceProvider implements ServiceProviderInterfac
 
   protected name(): string {
     return this.constructor.name;
+  }
+
+  public get _discord() {
+    return this._app.container.get<Client>('Discord.Client');
   }
 
   protected get _loggerFactory(): LoggerFactoryInterface {
