@@ -5,11 +5,6 @@ import Hooks from '@poppinss/hooks';
 import path from 'node:path';
 import debug from '#core/debug';
 
-export enum Env {
-  Development = 'development',
-  Production = 'production',
-}
-
 export class Path {
   public constructor(
     public readonly appRoot: string,
@@ -39,6 +34,7 @@ export class Application
   public readonly path: Path;
   public readonly container = new Container({ autobind: true });
   protected _isBooted = false;
+  protected _env = 'development';
   protected readonly _serviceProviders = new ServiceProviderManager(this);
   protected readonly _hooks = new Hooks<{
     'shutdown': [[Application], [Application]];
@@ -47,21 +43,30 @@ export class Application
     'booted': [[Application], [Application]];
   }>();
 
-  public constructor(basePath: string, public readonly env: Env = Env.Development) {
+  public constructor(basePath: string) {
     this.path = new Path(basePath);
     this._registerCoreBindings();
+  }
 
-    if (debug.enabled) {
-      debug(`Application initialized with environment: ${this.env}`);
+  public setEnvionment(env: string): void {
+    if (this._isBooted) {
+      debug('Cannot change environment after application has booted');
+      return;
     }
+
+    this._env = env;
+  }
+
+  public get env(): string {
+    return this._env;
   }
 
   public get isDevelopment(): boolean {
-    return this.env === Env.Development;
+    return ['development', 'dev'].includes(this._env);
   }
 
   public get isProduction(): boolean {
-    return this.env === Env.Production;
+    return ['production', 'prod'].includes(this._env);
   }
 
   public onShutdown(callback: (app: Application) => Promise<void>): void {
@@ -69,14 +74,29 @@ export class Application
   }
 
   public onShutingdown(callback: (app: Application) => Promise<void>): void {
+    if (! this._isBooted) {
+      debug('Application is not booted, cannot register shutting down hook');
+      return;
+    }
+
     this._hooks.add('shutingdown', callback);
   }
 
   public onBooting(callback: (app: Application) => Promise<void>): void {
+    if (this._isBooted) {
+      debug('Application is already booted, cannot register booting hook');
+      return;
+    }
+
     this._hooks.add('booting', callback);
   }
 
   public onBooted(callback: (app: Application) => Promise<void>): void {
+    if (this._isBooted) {
+      void callback(this);
+      return;
+    }
+
     this._hooks.add('booted', callback);
   }
 
@@ -90,6 +110,7 @@ export class Application
 
   public async boot(): Promise<void> {
     if (this._isBooted) {
+      debug('Application is already booted');
       return;
     }
 
@@ -105,6 +126,7 @@ export class Application
 
   public async shutdown(): Promise<void> {
     if (! this._isBooted) {
+      debug('Application is not booted, nothing to shutdown');
       return;
     }
 

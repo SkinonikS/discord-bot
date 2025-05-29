@@ -1,8 +1,6 @@
 import { BootstrapperResolver } from '#core/kernel/types';
 import { Application } from '#core/application/application';
-import { fromPromise } from 'neverthrow';
 import { LoggerFactoryInterface, LoggerInterface } from '#core/application/types';
-import { ConfigRepository } from '#core/application/config/config-repository';
 
 export type CleanupCallback = (app: Application) => void | Promise<void>;
 export type StartCallback = (app: Application) => (CleanupCallback | Promise<CleanupCallback>) | (Promise<void> | void);
@@ -28,12 +26,10 @@ export class Kernel {
       return;
     }
 
-    this._logger.info('Booting application');
     this._registerErrorHandlers();
 
     await this._runBootstrappers();
 
-    this._logger.debug('Registering termination signals');
     this._registerTerminationSignals();
 
     if (callback) {
@@ -50,16 +46,7 @@ export class Kernel {
       return;
     }
 
-    this._logger.info('Shutting down application');
-
-    const res = await fromPromise(this._app.shutdown(), (err) => {
-      const errorMessage = err instanceof Error ? err.message : String(err);
-      return new Error(`Failed to shutdown application: ${errorMessage}`);
-    });
-
-    if (res.isErr()) {
-      throw res.error;
-    }
+    await this._app.shutdown();
 
     if (this._cleanupCallback) {
       await this._cleanupCallback(this._app);
@@ -67,9 +54,10 @@ export class Kernel {
   }
 
   protected _registerErrorHandlers(): void {
-    const _terminate = (reason: unknown) => {
+    const _terminate = async (reason: unknown) => {
       const error = reason instanceof Error ? reason : new Error(String(reason));
       this._logger.error(error);
+      await this.terminate();
       process.exit(1);
     };
 
@@ -79,8 +67,8 @@ export class Kernel {
 
   protected _registerTerminationSignals(): void {
     const _terminate = async () => {
-      this._logger.info('Received termination signal, shutting down application');
       await this.terminate();
+      process.exit(0);
     };
 
     process.on('SIGTERM', () => void _terminate());

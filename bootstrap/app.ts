@@ -6,6 +6,5 @@ export default defineConfig({
   ],
   serviceProviders: [
     () => import('#modules/discord/service-provider'),
-    () => import('#modules/slash-commands/service-provider'),
   ],
 });
