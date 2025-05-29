@@ -26,11 +26,10 @@ export class Kernel {
       return;
     }
 
-    this._registerErrorHandlers();
+    this._registerErrorHandler();
+    this._registerTerminationSignals();
 
     await this._runBootstrappers();
-
-    this._registerTerminationSignals();
 
     if (callback) {
       const cleanupCallback = await callback(this._app);
@@ -53,7 +52,7 @@ export class Kernel {
     }
   }
 
-  protected _registerErrorHandlers(): void {
+  protected _registerErrorHandler(): void {
     const _terminate = async (reason: unknown) => {
       const error = reason instanceof Error ? reason : new Error(String(reason));
       this._logger.error(error);
@@ -78,11 +77,6 @@ export class Kernel {
   protected async _runBootstrappers(): Promise<void> {
     for (const bootstrapperResolver of this._bootstrappers) {
       const Bootstrapper = (await bootstrapperResolver()).default;
-
-      if (! Bootstrapper) {
-        throw new Error(`Bootstrapper "${bootstrapperResolver.constructor.name}" does not have a default export`);
-      }
-
       const bootstrapper = new Bootstrapper();
       await bootstrapper.bootstrap(this._app);
     }
