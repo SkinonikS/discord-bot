@@ -12,35 +12,30 @@
 		"@eslint/js": "^9.27.0",
 		"@stylistic/eslint-plugin": "^4.4.0",
 		"eslint": "^9.27.0",
-		"globals": "^16.1.0",
+		"globals": "^16.2.0",
 		"rollup-plugin-copy": "^3.5.0",
 		"rollup-plugin-delete": "^3.0.1",
 		"typescript": "^5.8.3",
-		"typescript-eslint": "^8.32.1"
+		"typescript-eslint": "^8.33.0"
 	},
 	"packageManager": "pnpm@10.6.3+sha512.bb45e34d50a9a76e858a95837301bfb6bd6d35aea2c5d52094fa497a467c43f5c440103ce2511e9e0a2f89c3d6071baac3358fc68ac6fb75e2ceb3d2736065e6",
 	"dependencies": {
 		"@poppinss/hooks": "^7.2.5",
 		"@poppinss/utils": "^6.9.4",
 		"@rollup/plugin-typescript": "^12.1.2",
-		"@types/yargs": "^17.0.33",
 		"chalk": "^5.4.1",
 		"commander": "^14.0.0",
 		"discord.js": "^14.19.3",
 		"dot-prop": "^9.0.0",
 		"dotenv": "^16.5.0",
 		"envalid": "^8.0.0",
-		"inquirer": "^12.6.3",
 		"inversify": "7.0.0-alpha.5",
 		"neverthrow": "^8.2.0",
-		"pino": "^9.7.0",
-		"pino-pretty": "^13.0.0",
 		"reflect-metadata": "^0.2.2",
 		"rollup": "^4.41.1",
 		"rollup-plugin-node-externals": "^8.0.0",
 		"winston": "^3.17.0",
 		"winston-console-format": "^1.0.8",
-		"winston-daily-rotate-file": "^5.0.0",
-		"yargs": "^18.0.0"
+		"winston-daily-rotate-file": "^5.0.0"
 	}
 }
