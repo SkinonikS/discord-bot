@@ -46,6 +46,8 @@ export class Application
   public constructor(basePath: string) {
     this.path = new Path(basePath);
     this._registerCoreBindings();
+
+    debug('Application initialized with base path:', basePath);
   }
 
   public setEnvionment(env: string): void {
@@ -54,6 +56,7 @@ export class Application
       return;
     }
 
+    debug('Setting application environment to:', env);
     this._env = env;
   }
 
@@ -70,33 +73,28 @@ export class Application
   }
 
   public onShutdown(callback: (app: Application) => Promise<void>): void {
+    debug('Registering shutdown hook');
     this._hooks.add('shutdown', callback);
   }
 
   public onShutingdown(callback: (app: Application) => Promise<void>): void {
-    if (! this._isBooted) {
-      debug('Application is not booted, cannot register shutting down hook');
-      return;
-    }
-
+    debug('Registering shutting down hook');
     this._hooks.add('shutingdown', callback);
   }
 
   public onBooting(callback: (app: Application) => Promise<void>): void {
-    if (this._isBooted) {
-      debug('Application is already booted, cannot register booting hook');
-      return;
-    }
-
+    debug('Registering booting hook');
     this._hooks.add('booting', callback);
   }
 
   public onBooted(callback: (app: Application) => Promise<void>): void {
     if (this._isBooted) {
+      debug('Application is already booted, executing callback immediately');
       void callback(this);
       return;
     }
 
+    debug('Registering booted hook');
     this._hooks.add('booted', callback);
   }
 
@@ -105,6 +103,7 @@ export class Application
   }
 
   public async registerServiceProvider(serviceProviderResolvers: (ServiceProviderResolver | ServiceProviderInterface)[]): Promise<void> {
+    debug('Registering service providers');
     await this._serviceProviders.register(serviceProviderResolvers);
   }
 
@@ -114,6 +113,8 @@ export class Application
       return;
     }
 
+    debug('Booting application...');
+
     await this._hooks.runner('booting').run(this);
     this._hooks.clear('booting');
 
@@ -122,6 +123,8 @@ export class Application
 
     await this._hooks.runner('booted').run(this);
     this._hooks.clear('booted');
+
+    debug('Application booted successfully');
   }
 
   public async shutdown(): Promise<void> {
@@ -129,6 +132,8 @@ export class Application
       debug('Application is not booted, nothing to shutdown');
       return;
     }
+
+    debug('Shutting down application...');
 
     await this._hooks.runner('shutingdown').run(this);
     this._hooks.clear('shutingdown');
@@ -138,6 +143,8 @@ export class Application
 
     await this._hooks.runner('shutdown').run(this);
     this._hooks.clear('shutdown');
+
+    debug('Application shutdown successfully');
   }
 
   private _registerCoreBindings(): void {
