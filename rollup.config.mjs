@@ -18,7 +18,9 @@ export default defineConfig({
     rollupCopy({
       targets: [
         { src: 'logs', dest: 'build' },
-        { src: '.env', dest: 'build' },
+        { src: '.env.example', dest: 'build', rename: '.env' },
+        { src: 'package.json', dest: 'build' },
+        { src: 'pnpm-lock.yaml', dest: 'build' },
       ]
     })
   ],
