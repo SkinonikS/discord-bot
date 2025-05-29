@@ -16,7 +16,7 @@ export class WinstonLogger implements LoggerInterface {
   }
 
   warn(message: string, ...args: unknown[]): void {
-    this._log('warn', message, ...args);
+    this._log('warning', message, ...args);
   }
 
   error(message: string | object, ...args: unknown[]): void {
