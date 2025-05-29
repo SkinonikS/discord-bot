@@ -1,9 +1,5 @@
 import { Application } from '#core/application/application';
 
-export interface CoreServiceProvider {
-  register(): void;
-}
-
 export interface LoggerInterface {
   info(message: string, ...args: unknown[]): void;
   warn(message: string, ...args: unknown[]): void;
