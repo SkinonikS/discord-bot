@@ -1,0 +1,51 @@
+{
+  "compilerOptions": {
+    "outDir": "./build",
+    "rootDir": ".",
+    "target": "ESNext",
+    "module": "Preserve",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "removeComments": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "paths": {
+      "#core": [
+        "./core"
+      ],
+      "#core/*": [
+        "./core/*"
+      ],
+      "#modules": [
+        "./modules"
+      ],
+      "#modules/*": [
+        "./modules/*"
+      ],
+      "#bootstrap": [
+        "./bootstrap"
+      ],
+      "#bootstrap/*": [
+        "./bootstrap/*"
+      ],
+      "#config": [
+        "./config"
+      ],
+      "#config/*": [
+        "./config/*"
+      ],
+    },
+  },
+  "include": [
+    "./**/*",
+  ],
+  "exclude": [
+    "node_modules",
+    "build",
+  ]
+}
