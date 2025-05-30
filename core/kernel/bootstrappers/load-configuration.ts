@@ -12,8 +12,8 @@ export default class LoadConfiguration implements BootstrapperInterface {
   protected async _loadConfig(): Promise<ConfigRepository> {
     const config = new ConfigRepository();
 
-    for (const configFilesResolvers of BootstrapConfig.configFiles) {
-      const ResolvedConfig = (await configFilesResolvers()).default;
+    for (const configFilesResolver of BootstrapConfig.configFiles) {
+      const ResolvedConfig = (await configFilesResolver()).default;
       config.merge({ [ResolvedConfig.key]: ResolvedConfig.config });
     }
 
