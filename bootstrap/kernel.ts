@@ -5,9 +5,10 @@ import path from 'node:path';
 const app = new Application(
   path.resolve(import.meta.dirname, '..'),
 );
+Application.setInstance(app);
 
 await app.registerServiceProvider([
-  () => import('#core/application/logger/service-provider'),
+  () => import('#modules/logger/service-provider'),
 ]);
 
 const kernel = new Kernel(app);

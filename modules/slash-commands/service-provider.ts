@@ -1,10 +1,18 @@
+import { Application } from '#core/application/application';
 import { ConfigRepository } from '#core/application/config/config-repository';
-import { AbstractServiceProvider } from '#core/application/providers/abstract-service-provider';
+import { ServiceProviderInterface } from '#core/application/types';
+import { getDiscordClient } from '#modules/discord/get-client';
+import { createLogger } from '#modules/logger/create-logger';
 import SlashCommandManager from '#modules/slash-commands/manager';
 import { SlashCommandConfig } from '#modules/slash-commands/types';
 import { Events } from 'discord.js';
 
-export default class SlashCommandServiceProvider extends AbstractServiceProvider {
+export default class SlashCommandServiceProvider implements ServiceProviderInterface {
+  protected readonly _logger = createLogger('SlashCommands');
+  protected readonly _discord = getDiscordClient();
+
+  public constructor(protected readonly _app: Application) { }
+
   public register(): void {
     this._app.container.bind('Discord.SlashCommands').toDynamicValue((ctx) => {
       return new SlashCommandManager(

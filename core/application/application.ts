@@ -1,5 +1,5 @@
 import { Container } from 'inversify';
-import { ServiceProviderManager } from '#core/application/providers/manager';
+import { ServiceProviderManager } from '#core/application/service-provider-manager';
 import { ServiceProviderInterface, ServiceProviderResolver } from '#core/application/types';
 import Hooks from '@poppinss/hooks';
 import path from 'node:path';
@@ -43,11 +43,27 @@ export class Application
     'booted': [[Application], [Application]];
   }>();
 
+  public static _instance: Application | null = null;
+
   public constructor(basePath: string) {
     this.path = new Path(basePath);
     this._registerCoreBindings();
 
     debug('Application initialized with base path:', basePath);
+  }
+
+  public static setInstance(app: Application): void {
+    debug('Application instance set successfully');
+    this._instance = app;
+  }
+
+  public static getInstance(): Application {
+    if (! this._instance) {
+      debug('Application instance is not initialized');
+      throw new Error('Application instance is not initialized');
+    }
+
+    return this._instance;
   }
 
   public setEnvionment(env: string): void {

@@ -1,7 +1,7 @@
-import { createLogger, format, transports, config, Logger } from 'winston';
-import { LoggerInterface, LoggerFactoryInterface } from '#core/application/types';
-import DailyRotateFile from 'winston-daily-rotate-file';
 import { Application } from '#core/application/application';
+import { LoggerInterface, LoggerFactoryInterface } from '#modules/logger/types';
+import { createLogger, format, transports, config, Logger } from 'winston';
+import DailyRotateFile from 'winston-daily-rotate-file';
 import path from 'node:path';
 
 export class WinstonLogger implements LoggerInterface {

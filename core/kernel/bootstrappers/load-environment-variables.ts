@@ -8,12 +8,14 @@ export default class LoadEnvironmentVariables implements BootstrapperInterface {
       path: app.path.resolve('.env'),
     });
 
-    // Ensure that the environment variables are loaded before any other bootstrapper
-    await import('#bootstrap/env');
+    const { Env } = await import('#bootstrap/env');
 
-    // Set the environment in the application
-    if (process.env.NODE_ENV) {
-      app.setEnvionment(process.env.NODE_ENV);
+    const nodeEnv = Object.hasOwn(Env, 'NODE_ENV')
+      ? Env.NODE_ENV
+      : process.env.NODE_ENV;
+
+    if (nodeEnv) {
+      app.setEnvionment(nodeEnv);
     }
   }
 }

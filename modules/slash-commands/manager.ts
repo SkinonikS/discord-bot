@@ -1,7 +1,7 @@
 import { ChatInputCommandInteraction, Client, Collection, Routes } from 'discord.js';
 import { SlashCommandInterface, SlashCommandResolver } from '#modules/slash-commands/types';
 import { Application } from '#core/application/application';
-import { LoggerInterface } from '#core/application/types';
+import { LoggerInterface } from '#modules/logger/types';
 
 export default class SlashCommandManager {
   public readonly commands = new Collection<string, SlashCommandInterface>();

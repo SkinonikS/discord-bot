@@ -1,6 +1,7 @@
 import { BootstrapperResolver } from '#core/kernel/types';
 import { Application } from '#core/application/application';
-import { LoggerFactoryInterface, LoggerInterface } from '#core/application/types';
+import app from '#bootstrap/app';
+import { LoggerInterface } from '#modules/logger/types';
 
 export type CleanupCallback = (app: Application) => void | Promise<void>;
 export type StartCallback = (app: Application) => (CleanupCallback | Promise<CleanupCallback>) | (Promise<void> | void);
@@ -55,7 +56,14 @@ export class Kernel {
   protected _registerErrorHandler(): void {
     const _terminate = async (reason: unknown) => {
       const error = reason instanceof Error ? reason : new Error(String(reason));
-      this._logger.error(error);
+
+      if (this._app.container.isBound('Logger')) {
+        const logger = this._app.container.get<LoggerInterface>('Logger');
+        logger.error(error);
+      } else {
+        console.error(error);
+      }
+
       await this.terminate();
       process.exit(1);
     };
@@ -66,6 +74,15 @@ export class Kernel {
 
   protected _registerTerminationSignals(): void {
     const _terminate = async () => {
+      const reason = 'Termination signal received, shutting down gracefully...';
+
+      if (this._app.container.isBound('Logger')) {
+        const logger = this._app.container.get<LoggerInterface>('Logger');
+        logger.info(reason);
+      } else {
+        console.log(reason);
+      }
+
       await this.terminate();
       process.exit(0);
     };
@@ -80,11 +97,6 @@ export class Kernel {
       const bootstrapper = new Bootstrapper();
       await bootstrapper.bootstrap(this._app);
     }
-  }
-
-  protected get _logger(): LoggerInterface {
-    const loggerFactory = this._app.container.get<LoggerFactoryInterface>('Logger.Factory');
-    return loggerFactory.createLogSource('KERNEL');
   }
 }
 
