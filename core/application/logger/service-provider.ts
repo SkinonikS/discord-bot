@@ -1,6 +1,6 @@
 import { Application } from '#core/application/application';
 import { ServiceProviderInterface } from '#core/application/types';
-import { WinstonLoggerFactory } from './winston';
+import { WinstonLoggerFactory } from '#core/application/logger/winston';
 
 export default class LoggerServiceProvider implements ServiceProviderInterface {
   public constructor(

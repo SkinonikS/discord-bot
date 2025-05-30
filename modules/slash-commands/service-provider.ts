@@ -1,8 +1,8 @@
 import { ConfigRepository } from '#core/application/config/config-repository';
 import { AbstractServiceProvider } from '#core/application/providers/abstract-service-provider';
 import SlashCommandManager from '#modules/slash-commands/manager';
+import { SlashCommandConfig } from '#modules/slash-commands/types';
 import { Events } from 'discord.js';
-import { SlashCommandConfig } from './types';
 
 export default class SlashCommandServiceProvider extends AbstractServiceProvider {
   public register(): void {
