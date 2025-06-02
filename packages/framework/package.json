@@ -1,0 +1,48 @@
+{
+  "private": true,
+  "name": "@package/framework",
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "tsdown",
+    "build:watch": "tsdown --watch"
+  },
+  "license": "MIT",
+  "packageManager": "pnpm@10.6.3",
+  "devDependencies": {
+    "@package/module-logger": "workspace:*",
+    "@eslint/js": "^9.28.0",
+    "@stylistic/eslint-plugin": "^4.4.0",
+    "@types/node": "^22.15.29",
+    "eslint": "^9.28.0",
+    "eslint-plugin-import-x": "^4.15.0",
+    "tsdown": "^0.12.6",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.33.0"
+  },
+  "dependencies": {
+    "@adonisjs/ace": "^13.3.0",
+    "@adonisjs/fold": "^10.1.3",
+    "@poppinss/hooks": "^7.2.5",
+    "dot-prop": "^9.0.0",
+    "dotenv": "^16.5.0",
+    "envalid": "^8.0.0",
+    "ts-typetools": "^1.1.0"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "node": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./kernel/bootstrappers/*": {
+      "import": "./dist/src/kernel/bootstrappers/*.js",
+      "node": "./dist/src/kernel/bootstrappers/*.js",
+      "types": "./dist/src/kernel/bootstrappers/*.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts"
+}

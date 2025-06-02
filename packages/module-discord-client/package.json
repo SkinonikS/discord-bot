@@ -1,0 +1,33 @@
+{
+  "private": true,
+  "name": "@package/module-discord-client",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsdown",
+    "build:watch": "tsdown --watch"
+  },
+  "license": "MIT",
+  "packageManager": "pnpm@10.6.3",
+  "dependencies": {
+    "discord.js": "^14.19.3",
+    "@package/framework": "workspace:*",
+    "@package/module-logger": "workspace:*"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "node": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./service-provider": {
+      "import": "./dist/src/service-provider.js",
+      "node": "./dist/src/service-provider.js",
+      "types": "./dist/src/service-provider.d.ts"
+    },
+    "./package.json": "./package.json"
+  }
+}

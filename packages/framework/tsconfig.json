@@ -1,0 +1,38 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "./",
+    "outDir": "./dist",
+    "paths": {
+      "#": [
+        "./src/"
+      ],
+      "#/*": [
+        "./src/*"
+      ],
+      "#application": [
+        "./src/application"
+      ],
+      "#application/*": [
+        "./src/application/*"
+      ],
+      "#kernel": [
+        "./src/kernel"
+      ],
+      "#kernel/*": [
+        "./src/kernel/*"
+      ],
+      "#config": [
+        "./src/config"
+      ],
+      "#config/*": [
+        "./src/config/*"
+      ],
+    }
+  },
+  "exclude": [
+    "*.d.ts",
+    "node_modules",
+    "dist",
+  ]
+}

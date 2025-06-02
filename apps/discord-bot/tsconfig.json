@@ -1,0 +1,37 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "./",
+    "outDir": "./dist",
+    "paths": {
+      "#": [
+        "./"
+      ],
+      "#/*": [
+        "./*"
+      ],
+      "#start": [
+        "./start"
+      ],
+      "#start/*": [
+        "./start/*"
+      ],
+      "#config": [
+        "./config"
+      ],
+      "#config/*": [
+        "./config/*"
+      ],
+      "#bootstrap": [
+        "./bootstrap"
+      ],
+      "#bootstrap/*": [
+        "./bootstrap/*"
+      ],
+    }
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+  ]
+}

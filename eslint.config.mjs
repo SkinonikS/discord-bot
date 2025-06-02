@@ -1,36 +1,25 @@
-import eslint from '@eslint/js';
-import tseslint from 'typescript-eslint';
 import stylistic from '@stylistic/eslint-plugin';
-import globals from 'globals';
+import { defineConfig } from 'eslint/config';
+import eslintPluginImportX from 'eslint-plugin-import-x';
+import tseslint from 'typescript-eslint';
 
-export default tseslint.config(
-  {
-    files: ['**/*.ts', '**/*.mjs'],
-    ignores: ['node_modules', 'dist'],
-    languageOptions: {
-      globals: {
-        ...globals.node,
-      },
-    },
-  },
-  eslint.configs.recommended,
-  tseslint.configs.strictTypeChecked,
-  tseslint.configs.stylisticTypeChecked,
-  {
-    languageOptions: {
-      parserOptions: {
-        projectService: true,
-        tsconfigRootDir: import.meta.dirname,
-      },
-    },
-  },
+export default defineConfig([
+  tseslint.configs.strict,
+  tseslint.configs.recommended,
   {
     plugins: {
       '@stylistic': stylistic,
+      'import-x': eslintPluginImportX,
     },
     rules: {
-      '@typescript-eslint/consistent-type-imports': ['error', { disallowTypeAnnotations: true, prefer: 'no-type-imports' }],
-      '@typescript-eslint/consistent-type-exports': ['off', { fixMixedExportsWithInlineTypeSpecifier: false }],
+      'import-x/order': ['error', {
+        alphabetize: {
+          order: 'asc',
+          caseInsensitive: true,
+        },
+      }],
+      '@typescript-eslint/consistent-type-imports': ['error', { disallowTypeAnnotations: true, fixStyle: 'separate-type-imports', prefer: 'type-imports' }],
+      '@typescript-eslint/consistent-type-exports': ['off', { fixMixedExportsWithInlineTypeSpecifier: true }],
       '@stylistic/space-unary-ops': [1, { overrides: { '!': true } }],
       '@stylistic/eol-last': ['error', 'always'],
       '@stylistic/no-trailing-spaces': ['error'],
@@ -44,4 +33,4 @@ export default tseslint.config(
       '@stylistic/no-extra-semi': ['error'],
     },
   },
-);
+]);

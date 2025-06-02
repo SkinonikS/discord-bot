@@ -1,0 +1,35 @@
+{
+  "private": true,
+  "type": "module",
+  "name": "@package/module-http-api",
+  "version": "1.0.0",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsdown",
+    "build:watch": "tsdown --watch"
+  },
+  "author": "Vadim SkinonikS.#",
+  "license": "MIT",
+  "packageManager": "pnpm@10.6.3",
+  "dependencies": {
+    "@package/framework": "workspace:*",
+    "@package/module-logger": "workspace:*",
+    "discord.js": "^14.19.3",
+    "h3": "^1.15.3"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "node": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./service-provider": {
+      "import": "./dist/src/service-provider.js",
+      "node": "./dist/src/service-provider.js",
+      "types": "./dist/src/service-provider.d.ts"
+    },
+    "./package.json": "./package.json"
+  }
+}
