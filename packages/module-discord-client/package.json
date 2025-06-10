@@ -3,6 +3,9 @@
   "name": "@package/module-discord-client",
   "version": "1.0.0",
   "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsdown",
     "build:watch": "tsdown --watch"
@@ -10,23 +13,26 @@
   "license": "MIT",
   "packageManager": "pnpm@10.6.3",
   "dependencies": {
-    "discord.js": "^14.19.3",
+    "@discordjs/opus": "^0.10.0",
+    "@discordjs/voice": "^0.18.0",
+    "@distube/spotify": "^2.0.2",
+    "@distube/youtube": "^1.0.4",
     "@package/framework": "workspace:*",
-    "@package/module-logger": "workspace:*"
+    "@package/module-logger": "workspace:*",
+    "discord.js": "^14.19.3",
+    "distube": "^5.0.7",
+    "ffmpeg-static": "^5.2.0"
   },
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "import": "./dist/index.js",
       "node": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
-    "./service-provider": {
-      "import": "./dist/src/service-provider.js",
-      "node": "./dist/src/service-provider.js",
-      "types": "./dist/src/service-provider.d.ts"
+    "./module": {
+      "import": "./dist/src/module.js",
+      "node": "./dist/src/module.js",
+      "types": "./dist/src/module.d.ts"
     },
     "./package.json": "./package.json"
   }

@@ -3,7 +3,7 @@ import { defineConfig } from 'tsdown/config';
 export default defineConfig({
   entry: [
     'index.ts',
-    'src/kernel/bootstrappers/*.ts',
+    'src/bootstrappers/*.ts',
     '!src/debug.ts',
     '!src/types.ts',
   ],

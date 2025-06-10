@@ -1,7 +1,7 @@
 import { defineConfig } from 'tsdown/config';
 
 export default defineConfig({
-  entry: ['index.ts', 'src/service-provider.ts'],
+  entry: ['index.ts', 'src/module.ts'],
   outDir: 'dist',
   format: 'esm',
   dts: true,

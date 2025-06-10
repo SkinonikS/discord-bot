@@ -1,3 +1,4 @@
 export * from '#/types';
-export * from '#/create-log-source';
-export * from '#/winston-logger';
+export * from '#/helpers';
+export { default as WinstonLogger } from '#/winston-logger';
+export { default as WinstonLoggerFactory } from '#/winston-logger-factory';

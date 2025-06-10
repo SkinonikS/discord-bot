@@ -1,11 +1,7 @@
-import path from 'node:path';
-import type { Application } from '@package/framework';
 import type { Logger } from 'winston';
-import { createLogger, format, transports, config } from 'winston';
-import DailyRotateFile from 'winston-daily-rotate-file';
-import type { LoggerInterface, LoggerFactoryInterface } from '#/types';
+import type { LoggerInterface } from '#/types';
 
-export class WinstonLogger implements LoggerInterface {
+export default class WinstonLogger implements LoggerInterface {
   public constructor(
     protected readonly _logger: Logger,
   ) {
@@ -48,59 +44,3 @@ export class WinstonLogger implements LoggerInterface {
     }
   }
 }
-
-export class WinstonLoggerFactory implements LoggerFactoryInterface {
-  public constructor(
-    protected readonly _app: Application,
-    protected readonly _directory: string,
-  ) {
-    //
-  }
-
-  public createLogSource(source: string): LoggerInterface {
-    const winstonLogger = createLogger({
-      levels: config.syslog.levels,
-      level: this._app.isDevelopment ? 'debug' : 'info',
-      format: format.combine(
-        format.errors({ stack: true }),
-        format.timestamp({ format: 'HH:mm:ss' }),
-        format.printf(({ level, message, label, timestamp, stack }) => {
-          return `${timestamp} ${label ? `[${label}] ` : ''}${level}: ${message}${stack ? `\n${stack}` : ''}`;
-        }),
-      ),
-      transports: [
-        this._createConsoleTransport(source),
-        this._createFileTransport(source),
-      ],
-    });
-
-    return new WinstonLogger(winstonLogger);
-  }
-
-  protected _createFileTransport(source: string): DailyRotateFile {
-    return new DailyRotateFile({
-      datePattern: 'YYYY-MM-DD-HH',
-      zippedArchive: true,
-      maxSize: '20m',
-      maxFiles: '14d',
-      dirname: this._directory,
-      filename: source,
-      extension: '.log',
-      auditFile: path.resolve(this._directory, 'audit.json'),
-    });
-  }
-
-  protected _createConsoleTransport(source: string): transports.ConsoleTransportInstance {
-    return new transports.Console({
-      format: format.combine(
-        format.colorize(),
-        format.label({ label: source }),
-        format.printf(({ level, message, label, timestamp, stack }) => {
-          return `${timestamp} ${label ? `[${label}] ` : ''}${level}: ${message}${stack ? `\n${stack}` : ''}`;
-        }),
-      ),
-    });
-  }
-}
-
-export default { WinstonLogger, WinstonLoggerFactory } as const;

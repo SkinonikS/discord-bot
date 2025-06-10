@@ -1,0 +1,41 @@
+{
+  "private": true,
+  "name": "@package/module-music",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsdown",
+    "build:watch": "tsdown --watch"
+  },
+  "dependencies": {
+    "@package/framework": "workspace:*",
+    "@package/module-discord-client": "workspace:*",
+    "@package/module-logger": "workspace:*",
+    "@package/module-slash-commands": "workspace:*",
+    "discord.js": "^14.19.3",
+    "distube": "^5.0.7"
+  },
+  "license": "MIT",
+  "packageManager": "pnpm@10.6.3",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "node": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./commands": {
+      "import": "./dist/src/commands/*.js",
+      "node": "./dist/src/commands/*.js",
+      "types": "./dist/src/commands/*.d.ts"
+    },
+    "./module": {
+      "import": "./dist/src/module.js",
+      "node": "./dist/src/module.js",
+      "types": "./dist/src/module.d.ts"
+    },
+    "./package.json": "./package.json"
+  }
+}
