@@ -1,3 +1,11 @@
 packages:
-- 'packages/*'
-- 'apps/*'
+  - packages/*
+  - apps/*
+onlyBuiltDependencies:
+  - '@discordjs/opus'
+  - esbuild
+  - protobufjs
+  - unrs-resolver
+syncInjectedDepsAfterScripts:
+  - build
+injectWorkspacePackages: true
