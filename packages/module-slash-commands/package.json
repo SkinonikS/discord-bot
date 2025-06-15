@@ -16,11 +16,6 @@
       "node": "./dist/src/module.js",
       "types": "./dist/src/module.d.ts"
     },
-    "./commands/*": {
-      "import": "./dist/src/commands/*.js",
-      "node": "./dist/src/commands/*.js",
-      "types": "./dist/src/commands/*.d.ts"
-    },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
@@ -37,9 +32,12 @@
     "@framework/core": "workspace:*",
     "@module/discord": "workspace:*",
     "@module/logger": "workspace:*",
-    "@types/luxon": "^3.6.2",
+    "@poppinss/utils": "^6.9.4",
     "discord.js": "^14.19.3",
     "luxon": "^3.6.1"
+  },
+  "devDependencies": {
+    "@types/luxon": "^3.6.2"
   },
   "packageManager": "pnpm@10.6.3"
 }

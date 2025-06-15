@@ -1,3 +1,4 @@
+import { importDefault } from '@poppinss/utils';
 import type Application from '#/application';
 import type { BaseConfig, ConfigFilesLoaderInterface } from '#/types';
 
@@ -7,11 +8,7 @@ export default class LazyConfigFileLoader implements ConfigFilesLoaderInterface 
 
   public load(app: Application): Promise<BaseConfig<Record<string, unknown>>[]> {
     const modules = this._resolvers.map(async (resolver) => {
-      const nodeModule = await resolver(app);
-      if ('default' in nodeModule) {
-        return nodeModule.default;
-      }
-      return nodeModule;
+      return importDefault(() => resolver(app));
     });
 
     return Promise.all(modules);

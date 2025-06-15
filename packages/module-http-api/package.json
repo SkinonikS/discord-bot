@@ -16,10 +16,7 @@
   "dependencies": {
     "@framework/core": "workspace:*",
     "@module/logger": "workspace:*",
-    "@module/prometheus": "workspace:*",
-    "discord.js": "^14.19.3",
-    "h3": "^1.15.3",
-    "prom-client": "^15.1.3"
+    "h3": "^1.15.3"
   },
   "files": [
     "dist"

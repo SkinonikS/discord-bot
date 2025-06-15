@@ -9,7 +9,6 @@ import type { HttpApiConfig } from '#/types';
 declare module '@framework/core' {
   interface ContainerBindings {
     'http.api.app': ReturnType<typeof createApp>;
-    'http.api.router': ReturnType<typeof createRouter>;
     'http.api.server': ReturnType<typeof createServer>;
     'http.api.logger': LoggerInterface;
   }
@@ -34,10 +33,6 @@ export default class HttpApiModule implements ModuleInterface {
   public constructor(protected readonly _app: Application) { }
 
   public register(): void {
-    this._app.container.singleton('http.api.router', () => {
-      return createRouter();
-    });
-
     this._app.container.singleton('http.api.app', () => {
       return createApp({
         onRequest: (event) => {
@@ -48,10 +43,7 @@ export default class HttpApiModule implements ModuleInterface {
     });
 
     this._app.container.singleton('http.api.server', async (container) => {
-      const router = await container.make('http.api.router');
       const app = await container.make('http.api.app');
-      app.use(router);
-
       return createServer(toNodeListener(app));
     });
 
@@ -63,11 +55,17 @@ export default class HttpApiModule implements ModuleInterface {
     this._app.onBooted(async (app) => {
       const server = await app.container.make('http.api.server');
       const logger = await app.container.make('http.api.logger');
+      const h3 = await app.container.make('http.api.app');
       const config: ConfigRepository = await app.container.make('config');
       const httpApiConfig = config.get('http.api');
 
       if (! httpApiConfig) {
         throw new ConfigNotFoundException([this.id]);
+      }
+
+      const routes = await httpApiConfig.routes.load(app);
+      for (const route of routes) {
+        h3.use(route);
       }
 
       server.on('error', (error) => {
@@ -89,103 +87,9 @@ export default class HttpApiModule implements ModuleInterface {
       const server = await app.container.make('http.api.server');
       const logger = await app.container.make('http.api.logger');
 
-      server.close();
-      logger.info('HTTP API server closed');
+      server.close(() => {
+        logger.info('HTTP API server closed');
+      });
     });
-  }
-
-  public async boot(): Promise<void> {
-    const router = await this._app.container.make('http.api.router');
-
-    router.get('/ping', defineLazyEventHandler(() => {
-      return import('./handlers/ping').then(m => m.default);
-    }));
-
-    router.get('/metrics', defineLazyEventHandler(() => {
-      return import('./handlers/metrics').then(m => m.default);
-    }));
-
-    // router.get('/metrics', defineEventHandler(async ({ context }) => {
-    //   const discord: Client = await context.container.make('discord.client');
-    //   const config: ConfigRepository = await context.container.make('config');
-    //   const logger = await context.container.make('http.api.logger');
-
-    //   try {
-    //     // Discord bot metrics
-    //     const botMetrics = {
-    //       isReady: discord.isReady(),
-    //       uptime: (discord.uptime ?? 0) / 1000, // in seconds
-    //       ping: discord.ws.ping,
-    //       shardCount: discord.options.shardCount ?? 1,
-    //       guilds: {
-    //         count: discord.guilds.cache.size,
-    //       },
-    //       users: {
-    //         count: discord.users.cache.size,
-    //       },
-    //       channels: {
-    //         count: discord.channels.cache.size,
-    //         voice: discord.channels.cache.filter(c => c?.type === 2).size,
-    //         text: discord.channels.cache.filter(c => c?.type === 0).size,
-    //       },
-    //     };
-
-    //     // Process metrics
-    //     const processMetrics = {
-    //       memory: {
-    //         rss: process.memoryUsage().rss / 1024 / 1024, // in MB
-    //         heapTotal: process.memoryUsage().heapTotal / 1024 / 1024, // in MB
-    //         heapUsed: process.memoryUsage().heapUsed / 1024 / 1024, // in MB
-    //         external: process.memoryUsage().external / 1024 / 1024, // in MB
-    //         arrayBuffers: process.memoryUsage().arrayBuffers / 1024 / 1024, // in MB
-    //       },
-    //       cpu: {
-    //         user: process.cpuUsage().user / 1000000, // in seconds
-    //         system: process.cpuUsage().system / 1000000, // in seconds
-    //       },
-    //       uptime: process.uptime(), // in seconds
-    //       versions: {
-    //         node: process.version,
-    //         v8: process.versions.v8,
-    //       },
-    //       platform: process.platform,
-    //       arch: process.arch,
-    //     };
-
-    //     // System metrics
-    //     const systemMetrics = {
-    //       hostname: os.hostname(),
-    //       platform: os.platform(),
-    //       arch: os.arch(),
-    //       release: os.release(),
-    //       uptime: os.uptime(), // in seconds
-    //       memory: {
-    //         total: os.totalmem() / 1024 / 1024, // in MB
-    //         free: os.freemem() / 1024 / 1024, // in MB
-    //         used: (os.totalmem() - os.freemem()) / 1024 / 1024, // in MB
-    //         usagePercentage: ((os.totalmem() - os.freemem()) / os.totalmem()) * 100, // percentage
-    //       },
-    //       cpu: {
-    //         cores: os.cpus().length,
-    //         model: os.cpus()[0].model,
-    //         load: os.loadavg(),
-    //       },
-    //     };
-
-    //     return {
-    //       timestamp: new Date().toISOString(),
-    //       bot: botMetrics,
-    //       process: processMetrics,
-    //       system: systemMetrics,
-    //     };
-    //   } catch (error) {
-    //     logger.error('Error generating metrics', error);
-
-    //     return {
-    //       error: 'Failed to generate metrics',
-    //       timestamp: new Date().toISOString(),
-    //     };
-    //   }
-    // }));
   }
 }

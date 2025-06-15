@@ -5,7 +5,6 @@ export default defineConfig({
     'index.ts',
     'src/bootstrappers/*.ts',
     '!src/debug.ts',
-    '!src/types.ts',
   ],
   outDir: 'dist',
   format: 'esm',

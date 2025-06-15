@@ -2,7 +2,7 @@ services:
   app:
     image: app/bot:latest
     ports:
-      - 8081:8081
+      - 3333:3333
     networks:
       - grafana
   loki:

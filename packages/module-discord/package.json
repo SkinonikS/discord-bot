@@ -31,8 +31,7 @@
   "dependencies": {
     "@framework/core": "workspace:*",
     "@module/logger": "workspace:*",
-    "discord.js": "^14.19.3",
-    "prom-client": "^15.1.3"
+    "discord.js": "^14.19.3"
   },
   "packageManager": "pnpm@10.6.3"
 }

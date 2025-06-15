@@ -31,8 +31,6 @@
   "dependencies": {
     "@discordjs/opus": "^0.10.0",
     "@discordjs/voice": "^0.18.0",
-    "@distube/soundcloud": "^2.0.4",
-    "@distube/youtube": "^1.0.4",
     "@framework/core": "workspace:*",
     "@module/logger": "workspace:*",
     "discord.js": "^14.19.3",

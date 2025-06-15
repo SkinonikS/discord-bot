@@ -11,6 +11,7 @@ RUN pnpm run -r build
 RUN pnpm deploy --filter=@app/bot --prod /prod/bot
 
 FROM base AS bot
+RUN apk add ffmpeg
 COPY --from=build /prod/bot /prod/bot
 WORKDIR /prod/bot
 

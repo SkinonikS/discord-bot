@@ -1,7 +1,7 @@
 import { defineBaseConfig } from '@framework/core';
-import NullCommandsLoader from '#/commands-loaders/null-commands-loader';
+import NullCommandLoader from '#/command-loaders/null-command-loader';
 import type { SlashCommandConfig } from '#/types';
 
 export const defineSlashCommandsConfig = (config: Partial<SlashCommandConfig>) => defineBaseConfig<SlashCommandConfig>('slash-commands', {
-  commands: config.commands ?? new NullCommandsLoader(),
+  commands: config.commands ?? new NullCommandLoader(),
 });

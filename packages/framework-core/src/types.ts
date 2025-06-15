@@ -18,9 +18,9 @@ export interface EventMap {
 
 export type HooksState<T> = [T[], T[]];
 export type HooksMap = {
-  'booting': HooksState<Application>;
-  'booted': HooksState<Application>;
-  'shutdown': HooksState<Application>;
+  booting: HooksState<Application>;
+  booted: HooksState<Application>;
+  shutdown: HooksState<Application>;
 };
 
 export interface ContainerBindings {
@@ -67,5 +67,5 @@ export type CleanupCallback = (app: Application) => void | Promise<void>;
 export type StartCallback = (app: Application) => (CleanupCallback | Promise<CleanupCallback>) | (Promise<void> | void);
 
 export type KernelConfigResolver = () => Promise<{ default: KernelConfig }>;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 export type EnvVariablesResolver = () => Promise<{ Env: CleanedEnv<any> }>;

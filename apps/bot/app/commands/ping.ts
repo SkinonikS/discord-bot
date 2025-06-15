@@ -1,6 +1,6 @@
+import type { SlashCommandInterface } from '@module/slash-commands';
 import type { ChatInputCommandInteraction } from 'discord.js';
 import { SlashCommandBuilder, MessageFlags } from 'discord.js';
-import type { SlashCommandInterface } from '#/types';
 
 export default class PingCommand implements SlashCommandInterface {
   public readonly name = 'ping';

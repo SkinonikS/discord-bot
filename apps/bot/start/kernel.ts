@@ -7,13 +7,13 @@ export const createKernel = async (app: Application): Promise<Kernel> => {
 
   return new Kernel(app, new LazyBootstrapperLoader([
     () => import('@framework/core/bootstrappers/load-environment-variables').then(({ default: LoadEnvironmentVariables }) => {
-      return new LoadEnvironmentVariables(() => import('#bootstrap/env'));
+      return { default: new LoadEnvironmentVariables(() => import('#bootstrap/env')) };
     }),
     () => import('@framework/core/bootstrappers/load-configuration').then(({ default: LoadConfiguration }) => {
-      return new LoadConfiguration(() => import('#bootstrap/kernel'));
+      return { default: new LoadConfiguration(() => import('#bootstrap/kernel')) };
     }),
     () => import('@framework/core/bootstrappers/register-modules').then(({ default: RegisterModules }) => {
-      return new RegisterModules(() => import('#bootstrap/kernel'));
+      return { default: new RegisterModules(() => import('#bootstrap/kernel')) };
     }),
     () => import('@framework/core/bootstrappers/boot-modules'),
   ]));

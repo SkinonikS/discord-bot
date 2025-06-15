@@ -1,14 +1,12 @@
-import { Application } from '@framework/core';
 import { defineLoggerConfig, LazyTransportLoader } from '@module/logger';
 import { transports, format } from 'winston';
 import WinstionLoki from 'winston-loki';
 import pkg from '../package.json';
-
-const level = Application.getInstance().isEnvironment('development') ? 'debug' : 'info';
+import { Env } from '#/bootstrap/env';
 
 export default defineLoggerConfig({
   label: pkg.name,
-  level: level,
+  level: 'info',
   transports: new LazyTransportLoader([
     () => new transports.Console({
       format: format.combine(
@@ -20,7 +18,7 @@ export default defineLoggerConfig({
       ),
     }),
     ({ module }) => new WinstionLoki({
-      host: 'http://localhost:3100',
+      host: Env.LOKI_HOST,
       labels: { app: pkg.name, module },
       format: format.json(),
       json: true,

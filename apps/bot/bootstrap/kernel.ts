@@ -7,13 +7,13 @@ export default defineKernelConfig({
     () => import('#config/logger'),
     () => import('#config/distube'),
     () => import('#config/http-api'),
+    () => import('#config/prometheus'),
   ]),
   modules: new LazyModuleLoader([
     () => import('@module/discord/module'),
     () => import('@module/http-api/module'),
     () => import('@module/slash-commands/module'),
     () => import('@module/distube/module'),
-    () => import('@module/music/module'),
     () => import('@module/prometheus/module'),
   ]),
 });

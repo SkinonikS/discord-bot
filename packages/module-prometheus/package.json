@@ -3,20 +3,18 @@
   "name": "@module/prometheus",
   "version": "1.0.0",
   "type": "module",
+  "author": "Vadim SkinonikS.#",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "author": "Vadim SkinonikS.#",
   "scripts": {
     "build": "tsdown",
     "build:watch": "tsdown --watch"
   },
   "dependencies": {
-    "@adonisjs/fold": "^10.2.0",
     "@framework/core": "workspace:*",
-    "@module/discord": "workspace:*",
     "@module/logger": "workspace:*",
-    "discord.js": "^14.19.3",
+    "@poppinss/utils": "^6.9.4",
     "prom-client": "^15.1.3"
   },
   "files": [

@@ -5,8 +5,8 @@ import { DateTime } from 'luxon';
 import type { CommandsLoaderInterface, SlashCommandInterface } from '#/types';
 
 export default class SlashCommandManager {
-  public readonly commands = new Collection<string, SlashCommandInterface>();
-  public readonly cooldowns = new Collection<string, Collection<string, number>>();
+  protected readonly _commands = new Collection<string, SlashCommandInterface>();
+  protected readonly _cooldowns: Collection<string, Collection<string, number>> = new Collection();
 
   public constructor(
     protected readonly _app: Application,
@@ -20,25 +20,25 @@ export default class SlashCommandManager {
     const commands = await commandsLoader.load(this._app);
 
     for (const command of commands) {
-      this.commands.set(command.name, command);
+      this._commands.set(command.name, command);
       this._logger.debug(`Registered command: ${command.name}`);
     }
   }
 
   public async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-    const command = this.commands.get(interaction.commandName);
+    const command = this._commands.get(interaction.commandName);
 
     if (! command) {
       this._logger.warn(`Unknown command: ${interaction.commandName}`);
       return;
     }
 
-    if (! this.cooldowns.has(command.name)) {
-      this.cooldowns.set(command.name, new Collection());
+    if (! this._cooldowns.has(command.name)) {
+      this._cooldowns.set(command.name, new Collection());
     }
 
     const now = DateTime.now().toMillis();
-    const timestamps = this.cooldowns.get(command.name) as Collection<string, number>;
+    const timestamps: Collection<string, number> = this._cooldowns.get(command.name) ?? new Collection();
     const cooldownAmount = command.cooldown * 1_000;
 
     if (timestamps.has(interaction.user.id)) {
@@ -66,7 +66,7 @@ export default class SlashCommandManager {
   }
 
   public async autocomplete(interaction: AutocompleteInteraction): Promise<void> {
-    const command = this.commands.get(interaction.commandName);
+    const command = this._commands.get(interaction.commandName);
 
     if (! command) {
       this._logger.warn(`Unknown command: ${interaction.commandName}`);
@@ -85,10 +85,10 @@ export default class SlashCommandManager {
     }
 
     for (const guild of guilds) {
-      await guild.commands.set(this.commands.map((command) => command.build()));
+      await guild.commands.set(this._commands.map((command) => command.build()));
       this._logger.debug(`Deployed commands to guild: ${guild.name} (${guild.id})`);
     }
 
-    this._logger.info(`Deployed ${this.commands.size} commands to ${guilds.length} guild(s)`);
+    this._logger.info(`Deployed ${this._commands.size} commands to ${guilds.length} guild(s)`);
   }
 }

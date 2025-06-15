@@ -1,7 +1,7 @@
 import { type Application, type ConfigRepository, type ModuleInterface, ConfigNotFoundException } from '@framework/core';
 import type { LoggerFactoryInterface, LoggerInterface } from '@module/logger';
 import type { Client } from 'discord.js';
-import { checkFFmpeg, DisTube, Events } from 'distube';
+import { DisTube, Events } from 'distube';
 import pkg from '../package.json';
 import Controller from '#/controller';
 import type { DisTubeConfig } from '#/types';
@@ -22,7 +22,7 @@ export default class DistubeModule implements ModuleInterface {
   public readonly author = pkg.author;
   public readonly version = pkg.version;
 
-  public constructor(private readonly _app: Application) { }
+  public constructor(protected readonly _app: Application) { }
 
   public register(): void {
     this._app.container.singleton(DisTube, async () => {
@@ -34,13 +34,12 @@ export default class DistubeModule implements ModuleInterface {
         throw new ConfigNotFoundException([this.id]);
       }
 
-      const ffmpegPath = distubeConfig.ffmpegPath ?? undefined;
       return new DisTube(discord, {
         emitNewSongOnly: true,
         plugins: distubeConfig.plugins,
         nsfw: distubeConfig.nsfw,
         ffmpeg: {
-          path: ffmpegPath,
+          path: distubeConfig.ffmpegPath,
         },
       });
     });
