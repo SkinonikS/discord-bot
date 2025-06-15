@@ -1,0 +1,40 @@
+{
+  "private": true,
+  "name": "@module/prometheus",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "author": "Vadim SkinonikS.#",
+  "scripts": {
+    "build": "tsdown",
+    "build:watch": "tsdown --watch"
+  },
+  "dependencies": {
+    "@adonisjs/fold": "^10.2.0",
+    "@framework/core": "workspace:*",
+    "@module/discord": "workspace:*",
+    "@module/logger": "workspace:*",
+    "discord.js": "^14.19.3",
+    "prom-client": "^15.1.3"
+  },
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "packageManager": "pnpm@10.6.3",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "node": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./module": {
+      "import": "./dist/src/module.js",
+      "node": "./dist/src/module.js",
+      "types": "./dist/src/module.d.ts"
+    },
+    "./package.json": "./package.json"
+  }
+}
