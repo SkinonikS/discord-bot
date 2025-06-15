@@ -1,7 +1,6 @@
-import type { Application } from '@package/framework';
-import type { LoggerInterface } from '@package/module-logger';
-import type { AutocompleteInteraction, ChatInputCommandInteraction, Client, Guild } from 'discord.js';
-import { Collection, MessageFlags } from 'discord.js';
+import type { Application } from '@framework/core';
+import type { LoggerInterface } from '@module/logger';
+import { type AutocompleteInteraction, type ChatInputCommandInteraction, type Client, type Guild, Collection, MessageFlags } from 'discord.js';
 import { DateTime } from 'luxon';
 import type { CommandsLoaderInterface, SlashCommandInterface } from '#/types';
 

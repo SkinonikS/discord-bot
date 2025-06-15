@@ -1,12 +1,11 @@
-import { type ConfigRepository, type ModuleInterface } from '@package/framework';
-import type { Application } from '@package/framework';
-import type { LoggerFactoryInterface, LoggerInterface } from '@package/module-logger';
-import type { Client } from 'discord.js';
-import { Events } from 'discord.js';
+import type { ConfigRepository, ModuleInterface, Application } from '@framework/core';
+import type { LoggerFactoryInterface, LoggerInterface } from '@module/logger';
+import { type Client, Events } from 'discord.js';
+import pkg from '../package.json';
 import SlashCommandManager from '#/slash-command-manager';
 import type { SlashCommandConfig } from '#/types';
 
-declare module '@package/framework' {
+declare module '@framework/core' {
   interface ContainerBindings {
     'slash-commands': SlashCommandManager;
     'slash-commands.logger': LoggerInterface;
@@ -18,7 +17,9 @@ declare module '@package/framework' {
 }
 
 export default class SlashCommandModule implements ModuleInterface {
-  public readonly id = 'slash-commands';
+  public readonly id = pkg.name;
+  public readonly author = pkg.author;
+  public readonly version = pkg.version;
 
   public constructor(protected readonly _app: Application) { }
 
@@ -33,11 +34,8 @@ export default class SlashCommandModule implements ModuleInterface {
     });
 
     this._app.container.singleton('slash-commands.logger', async (container) => {
-      const factory = await container.make('logger.factory') as LoggerFactoryInterface;
-      return factory.createLogger({
-        name: this.id,
-        level: 'debug', // TODO: make this configurable
-      });
+      const factory: LoggerFactoryInterface = await container.make('logger.factory');
+      return factory.createLogger(this.id);
     });
   }
 
@@ -63,6 +61,9 @@ export default class SlashCommandModule implements ModuleInterface {
 
     const config: ConfigRepository = await this._app.container.make('config');
     const slashCommandConfig = config.get('slash-commands');
-    await manager.register(slashCommandConfig.commands);
+
+    if (slashCommandConfig) {
+      await manager.register(slashCommandConfig.commands);
+    }
   }
 }

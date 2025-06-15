@@ -1,5 +1,5 @@
-import type { Application } from '@package/framework';
-import type { AutocompleteInteraction, ChatInputCommandInteraction, SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandSubcommandGroupBuilder } from 'discord.js';
+import type { Application } from '@framework/core';
+import type { AutocompleteInteraction, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 export type SlashCommandResolver = () => Promise<{ default: new (...args: unknown[]) => SlashCommandInterface }>;
 

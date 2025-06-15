@@ -1,4 +1,6 @@
-import type { Application } from '@package/framework';
+import type { Application } from '@framework/core';
+import { transports } from 'winston';
+import type TransportStream from 'winston-transport';
 
 export interface LoggerInterface {
   info(message: string | object, ...args: unknown[]): void;
@@ -10,16 +12,60 @@ export interface LoggerInterface {
   emergency(message: string | object, ...args: unknown[]): void;
 }
 
-export interface LoggerOptions {
-  name: string;
-  level: string;
-}
-
 export interface LoggerFactoryInterface {
-  createLogger(options: LoggerOptions): LoggerInterface;
+  createLogger(module: string): Promise<LoggerInterface>;
 }
 
-export interface LoggerConfig extends Record<string, unknown> {
-  name: string;
-  level: ((app: Application) => string) | string;
+export interface BaseTransportConfig<T extends string = string> {
+  driver: T;
+}
+
+export interface TransformableInfo {
+  level: string;
+  message: unknown;
+  label?: string;
+  timestamp?: string;
+  stack?: string;
+}
+
+export interface ConsoleTransportConfig extends BaseTransportConfig<'console'> {
+  colorize?: boolean;
+  printf?: (info: TransformableInfo) => string;
+}
+
+export interface DailyRotateFileTransportConfig extends BaseTransportConfig<'dailyRotateFile'> {
+  maxSize?: string | number;
+  maxFiles?: string | number;
+  datePattern: string;
+  zippedArchive: boolean;
+  filename: string;
+  auditFilename: string;
+  directory: string;
+}
+
+export interface LokiTransportConfig extends BaseTransportConfig<'loki'> {
+  host: string;
+  labels: Record<string, string>;
+}
+
+export interface KnownTransports {
+  console: ConsoleTransportConfig;
+  loki: LokiTransportConfig;
+  dailyRotateFile: DailyRotateFileTransportConfig;
+}
+
+export interface LoggerConfig {
+  label: string;
+  defaultMeta: Record<string, string>;
+  level: 'debug' | 'info' | 'notice' | 'warning' | 'error' | 'critical' | 'emergency';
+  transports: TransportLoaderInterface;
+}
+
+export interface TransportLoaderOptions {
+  app: Application;
+  module: string;
+}
+
+export interface TransportLoaderInterface {
+  load(options: TransportLoaderOptions): Promise<TransportStream[]>;
 }

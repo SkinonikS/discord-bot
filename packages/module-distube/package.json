@@ -1,0 +1,42 @@
+{
+  "private": true,
+  "name": "@module/distube",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": "Vadim SkinonikS.#",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "node": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./module": {
+      "import": "./dist/src/module.js",
+      "node": "./dist/src/module.js",
+      "types": "./dist/src/module.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "build:watch": "tsdown --watch"
+  },
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@discordjs/opus": "^0.10.0",
+    "@discordjs/voice": "^0.18.0",
+    "@distube/soundcloud": "^2.0.4",
+    "@distube/youtube": "^1.0.4",
+    "@framework/core": "workspace:*",
+    "@module/logger": "workspace:*",
+    "discord.js": "^14.19.3",
+    "distube": "^5.0.7"
+  },
+  "packageManager": "pnpm@10.6.3"
+}

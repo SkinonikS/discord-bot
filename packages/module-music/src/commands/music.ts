@@ -1,11 +1,7 @@
-import type { LoggerInterface } from '@package/module-logger';
-import type { SlashCommandInterface } from '@package/module-slash-commands';
-import { GuildMember } from 'discord.js';
-import { type ChatInputCommandInteraction, MessageFlags } from 'discord.js';
-import { SlashCommandBuilder } from 'discord.js';
-import type { DisTubeError } from 'distube';
-import { DisTube } from 'distube';
-import { fromPromise } from 'neverthrow';
+import type { LoggerInterface } from '@module/logger';
+import type { SlashCommandInterface } from '@module/slash-commands';
+import { type ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder, GuildMember } from 'discord.js';
+import { DisTube, DisTubeError } from 'distube';
 
 export default class MusicCommand implements SlashCommandInterface {
   static containerInjections = {
@@ -32,8 +28,8 @@ export default class MusicCommand implements SlashCommandInterface {
         .setName('play')
         .setDescription('Add a song or playlist to the current queue.')
         .addStringOption(option =>
-          option.setName('query')
-            .setDescription('The name or URL of the song/playlist.')
+          option.setName('url')
+            .setDescription('The URL of the song or playlist.')
             .setRequired(true)),
       )
       .addSubcommand((subcommand) => subcommand
@@ -54,15 +50,6 @@ export default class MusicCommand implements SlashCommandInterface {
       .addSubcommand((subcommand) => subcommand
         .setName('queue')
         .setDescription('View the current music queue.'),
-      )
-      .addSubcommand((subcommand) => subcommand
-        .setName('volume')
-        .setDescription('Change the volume of the music.')
-        .addIntegerOption((option) => option
-          .setName('level')
-          .setDescription('Volume level (1-100%).')
-          .setRequired(true),
-        ),
       );
 
     return builder;
@@ -103,26 +90,35 @@ export default class MusicCommand implements SlashCommandInterface {
 
     switch (subcommand) {
       case 'play': {
-        const query = interaction.options.getString('query', true);
+        const url = interaction.options.getString('url', true);
 
-        const res = await fromPromise<unknown, DisTubeError | Error>(this._distube.play(interaction.member.voice.channel, query, {
-          textChannel: interaction.channel ?? undefined,
-          member: interaction.member,
-        }), (error) => {
-          if (! (error instanceof Error)) {
-            return new Error('An unknown error occurred while trying to play the song.');
+        try {
+          await this._distube.play(interaction.member.voice.channel, url, {
+            textChannel: interaction.channel ?? undefined,
+            member: interaction.member,
+          });
+
+        } catch (e) {
+          let message: string;
+          if (! (e instanceof DisTubeError)) {
+            message = 'An unexpected error occurred while trying to play the music.';
+          } else {
+            message = e.message;
           }
 
-          return error;
-        });
-
-        if (res.isErr()) {
-          this._logger.error(res.error.message);
-          await deferReply.edit(`❌ Error: ${res.error.message}`);
-          return;
+          this._logger.error(message);
+          await deferReply.edit(message);
         }
 
-        await deferReply.edit(`🎵 Playing: ${query}`);
+        let name: string;
+        if (queue) {
+          const song = queue.songs[0];
+          name = `${song?.name} (${song.formattedDuration})`;
+        } else {
+          name = url;
+        }
+
+        await deferReply.edit(`🎵 Add: ${name}`);
         break;
       }
       case 'pause': {
@@ -172,22 +168,6 @@ export default class MusicCommand implements SlashCommandInterface {
         }
         const queueString = queue.songs.map((song, index) => `${index + 1}. ${song.name} (${song.formattedDuration})`).join('\n');
         await deferReply.edit(`📜 **Music Queue:**\n${queueString}`);
-        break;
-      }
-      case 'volume': {
-        const level = interaction.options.getInteger('level', true);
-        if (! queue) {
-          deferReply.edit('There is no music playing to change the volume!');
-          return;
-        }
-
-        if (level < 1 || level > 100) {
-          deferReply.edit('Volume level must be between 1 and 100!');
-          return;
-        }
-
-        await queue.setVolume(level);
-        await deferReply.edit(`🔊 Changed the volume to ${level}%.`);
         break;
       }
       default: {

@@ -18,6 +18,7 @@ export default defineConfig([
           caseInsensitive: true,
         },
       }],
+      '@typescript-eslint/no-explicit-any': ['off'],
       '@typescript-eslint/consistent-type-imports': ['error', { disallowTypeAnnotations: true, fixStyle: 'separate-type-imports', prefer: 'type-imports' }],
       '@typescript-eslint/consistent-type-exports': ['off', { fixMixedExportsWithInlineTypeSpecifier: true }],
       '@stylistic/space-unary-ops': [1, { overrides: { '!': true } }],

@@ -1,11 +1,12 @@
 {
   "private": true,
-  "name": "@package/module-logger",
+  "name": "@module/logger",
   "type": "module",
   "version": "1.0.0",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "author": "Vadim SkinonikS.#",
   "scripts": {
     "build": "tsdown",
     "build:watch": "tsdown --watch"
@@ -13,10 +14,16 @@
   "license": "MIT",
   "packageManager": "pnpm@10.6.3",
   "dependencies": {
-    "@package/framework": "workspace:*",
+    "@framework/core": "workspace:*",
+    "@poppinss/manager": "^5.0.2",
     "winston": "^3.17.0",
-    "winston-daily-rotate-file": "^5.0.0"
+    "winston-daily-rotate-file": "^5.0.0",
+    "winston-loki": "^6.1.3",
+    "winston-transport": "^4.9.0"
   },
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "import": "./dist/index.js",

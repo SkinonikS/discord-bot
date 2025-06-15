@@ -1,23 +1,10 @@
 {
-  "version": "1.0.0",
   "private": true,
-  "type": "module",
-  "name": "@package/module-slash-commands",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "scripts": {
-    "build": "tsdown",
-    "build:watch": "tsdown --watch"
-  },
+  "name": "@module/slash-commands",
+  "version": "1.0.0",
   "license": "MIT",
-  "packageManager": "pnpm@10.6.3",
-  "dependencies": {
-    "@package/framework": "workspace:*",
-    "@package/module-discord-client": "workspace:*",
-    "@package/module-logger": "workspace:*",
-    "discord.js": "^14.19.3"
-  },
+  "author": "Vadim SkinonikS.#",
+  "type": "module",
   "exports": {
     ".": {
       "import": "./dist/index.js",
@@ -35,5 +22,24 @@
       "types": "./dist/src/commands/*.d.ts"
     },
     "./package.json": "./package.json"
-  }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "build:watch": "tsdown --watch"
+  },
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@framework/core": "workspace:*",
+    "@module/discord": "workspace:*",
+    "@module/logger": "workspace:*",
+    "@types/luxon": "^3.6.2",
+    "discord.js": "^14.19.3",
+    "luxon": "^3.6.1"
+  },
+  "packageManager": "pnpm@10.6.3"
 }

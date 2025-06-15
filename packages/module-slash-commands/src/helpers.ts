@@ -1,4 +1,4 @@
-import { defineBaseConfig } from '@package/framework';
+import { defineBaseConfig } from '@framework/core';
 import NullCommandsLoader from '#/commands-loaders/null-commands-loader';
 import type { SlashCommandConfig } from '#/types';
 

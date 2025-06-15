@@ -1,10 +1,11 @@
-import type { Application, ModuleInterface } from '@package/framework';
-import { LazyCommandsLoader, type SlashCommandManager } from '@package/module-slash-commands';
-import type DisTube from 'distube';
-import { Events } from 'distube';
+import type { Application, ModuleInterface } from '@framework/core';
+import { LazyCommandsLoader, type SlashCommandManager } from '@module/slash-commands';
+import pkg from '../package.json';
 
 export default class MusicModule implements ModuleInterface {
-  readonly id = 'music';
+  public readonly id = pkg.name;
+  public readonly author = pkg.author;
+  public readonly version = pkg.version;
 
   public constructor(protected readonly _app: Application) { }
 
@@ -13,6 +14,7 @@ export default class MusicModule implements ModuleInterface {
 
     await slashCommands.register(new LazyCommandsLoader([
       () => import('#/commands/music'),
+      () => import('#/commands/record'),
     ]));
   }
 }
