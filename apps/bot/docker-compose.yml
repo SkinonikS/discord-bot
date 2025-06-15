@@ -1,0 +1,54 @@
+services:
+  app:
+    image: app/bot:latest
+    ports:
+      - 8081:8081
+    networks:
+      - grafana
+  loki:
+    image: grafana/loki:latest
+    ports:
+      - 3100:3100
+      - 9095:9095
+    volumes:
+      - loki-storage:/loki
+      - ./loki-config.yaml:/etc/loki/local-config.yaml
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - grafana
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - 3001:3000
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    networks:
+      - grafana
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - 9090:9090
+    volumes:
+      - prometheus-storage:/prometheus
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    networks:
+      - grafana
+
+networks:
+  grafana:
+    driver: bridge
+
+volumes:
+  prometheus-storage:
+    driver: local
+  loki-storage:
+    driver: local
+  grafana-storage:
+    driver: local
