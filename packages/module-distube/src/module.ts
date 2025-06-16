@@ -25,7 +25,7 @@ export default class DistubeModule implements ModuleInterface {
   public constructor(protected readonly _app: Application) { }
 
   public register(): void {
-    this._app.container.singleton(DisTube, async () => {
+    this._app.container.singleton('distube', async () => {
       const discord: Client = await this._app.container.make('discord.client');
       const config: ConfigRepository = await this._app.container.make('config');
       const distubeConfig = config.get('distube');
@@ -48,8 +48,6 @@ export default class DistubeModule implements ModuleInterface {
       const factory: LoggerFactoryInterface = await container.make('logger.factory');
       return factory.createLogger(this.id);
     });
-
-    this._app.container.alias('distube', DisTube);
   }
 
   public async boot(): Promise<void> {

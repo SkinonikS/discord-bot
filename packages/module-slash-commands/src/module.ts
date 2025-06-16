@@ -24,8 +24,7 @@ export default class SlashCommandModule implements ModuleInterface {
   public constructor(protected readonly _app: Application) { }
 
   public register(): void {
-    this._app.container.alias('slash-commands', SlashCommandManager);
-    this._app.container.singleton(SlashCommandManager, async (container) => {
+    this._app.container.singleton('slash-commands', async (container) => {
       return new SlashCommandManager(
         await container.make('app'),
         await container.make('discord.client'),

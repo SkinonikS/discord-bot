@@ -18,8 +18,7 @@ export default class LoadConfiguration implements BootstrapperInterface {
   public async bootstrap(app: Application): Promise<void> {
     const config = await this._loadConfigFiles(app);
 
-    app.container.bindValue(ConfigRepository, config);
-    app.container.alias('config', ConfigRepository);
+    app.container.bindValue('config', config);
   }
 
   protected async _loadConfigFiles(app: Application): Promise<ConfigRepository> {

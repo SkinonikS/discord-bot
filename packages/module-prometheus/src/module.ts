@@ -21,11 +21,9 @@ export default class PrometheusModule implements ModuleInterface{
   public constructor(protected _app: Application) { }
 
   public register(): void {
-    this._app.container.singleton(Registry, () => {
+    this._app.container.singleton('prometheus', () => {
       return new Registry();
     });
-
-    this._app.container.alias('prometheus', Registry);
   }
 
   public async boot(): Promise<void> {

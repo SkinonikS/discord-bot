@@ -26,10 +26,8 @@ export default class Application
     this._version = version || 'Unknown';
     this.path = new Path(basePath);
 
-    this.container.bindValue(Application, this);
-    this.container.bindValue(Container, this.container);
-    this.container.alias('app', Application);
-    this.container.alias('container', Container);
+    this.container.bindValue('app', this);
+    this.container.bindValue('container', this.container);
 
     this.events.setMaxListeners(Infinity);
     debug('Application initialized with base path:', basePath);

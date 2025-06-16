@@ -24,7 +24,7 @@ export default class DiscordModule implements ModuleInterface {
   public constructor(protected readonly _app: Application) { }
 
   public register(): void {
-    this._app.container.singleton(Client, async (container) => {
+    this._app.container.singleton('discord.client', async (container) => {
       const config: ConfigRepository = await container.make('config');
       const discordConfig = config.get('discord');
 
@@ -42,8 +42,6 @@ export default class DiscordModule implements ModuleInterface {
       const factory: LoggerFactoryInterface = await container.make('logger.factory');
       return factory.createLogger(this.id);
     });
-
-    this._app.container.alias('discord.client', Client);
 
     this._app.onBooted(async (app) => {
       const discord = await app.container.make('discord.client');
