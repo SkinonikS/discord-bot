@@ -1,0 +1,44 @@
+{
+  "private": true,
+  "name": "@module/redis-commands",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": "Vadim SkinonikS.#",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "node": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./module": {
+      "import": "./dist/src/module.js",
+      "node": "./dist/src/module.js",
+      "types": "./dist/src/module.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "build:watch": "tsdown --watch"
+  },
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@framework/core": "workspace:*",
+    "@module/discord": "workspace:*",
+    "@module/logger": "workspace:*",
+    "@poppinss/utils": "^6.9.4",
+    "neverthrow": "^8.2.0",
+    "redis": "^5.5.6",
+    "zod": "^3.25.64"
+  },
+  "devDependencies": {
+    "@types/luxon": "^3.6.2"
+  },
+  "packageManager": "pnpm@10.6.3"
+}
