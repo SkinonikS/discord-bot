@@ -2,6 +2,6 @@ import { defineSlashCommandsConfig, LazyCommandLoader } from '@module/slash-comm
 
 export default defineSlashCommandsConfig({
   commands: new LazyCommandLoader([
-    () => import('#/app/commands/ping'),
+    () => import('#/app/slash-commands/ping'),
   ]),
 });
