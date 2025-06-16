@@ -2,6 +2,7 @@ import type { Application } from '@framework/core';
 import { type ConfigRepository, type ModuleInterface, ConfigNotFoundException } from '@framework/core';
 import type { LoggerFactoryInterface, LoggerInterface } from '@module/logger';
 import { Client, Events } from 'discord.js';
+import { debug } from '../debug';
 import pkg from '../package.json';
 import type { DiscordConfig } from '#/types';
 
@@ -50,6 +51,7 @@ export default class DiscordModule implements ModuleInterface {
 
       if (discordConfig) {
         await discord.login();
+        debug('Discord client has been logged in');
       }
     });
 
@@ -57,13 +59,18 @@ export default class DiscordModule implements ModuleInterface {
       const discord = await app.container.make('discord.client');
       const logger = await app.container.make('discord.logger');
 
+      debug('Shutting down Discord module...');
       if (discord.isReady()) {
         await discord.destroy();
         logger.info('Discord client has been destroyed');
+        debug('Discord client has been destroyed');
       } else {
         logger.warn('Discord client was not ready, nothing to destroy');
+        debug('Discord client was not ready, nothing to destroy');
       }
     });
+
+    debug('Discord module has been registered');
   }
 
   public async boot(): Promise<void> {
@@ -93,5 +100,7 @@ export default class DiscordModule implements ModuleInterface {
     discord.on(Events.Error, (error) => {
       logger.error('Discord client encountered an error:', error);
     });
+
+    debug('Discord module has been booted');
   }
 }
