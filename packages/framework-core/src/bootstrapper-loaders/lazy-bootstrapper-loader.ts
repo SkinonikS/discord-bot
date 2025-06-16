@@ -9,7 +9,7 @@ export default class LazyBootstrapperLoader implements BootstrapperLoaderInterfa
   public async load(app: Application): Promise<BootstrapperInterface[]> {
     const modules = this._resolvers.map(async (resolver) => {
       const Bootstrapper = await importDefault(() => resolver(app));
-      return Bootstrapper instanceof Function ? app.container.make(Bootstrapper) : Bootstrapper;
+      return Bootstrapper instanceof Function ? new Bootstrapper() : Bootstrapper;
     });
 
     return Promise.all(modules);
