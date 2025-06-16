@@ -33,7 +33,7 @@
     "@module/discord": "workspace:*",
     "@module/logger": "workspace:*",
     "@poppinss/utils": "^6.9.4",
-    "discord.js": "^14.19.3",
+    "discord.js": "^14.20.0",
     "luxon": "^3.6.1"
   },
   "devDependencies": {

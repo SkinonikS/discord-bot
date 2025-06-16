@@ -31,7 +31,7 @@
   "dependencies": {
     "@framework/core": "workspace:*",
     "@module/logger": "workspace:*",
-    "discord.js": "^14.19.3"
+    "discord.js": "^14.20.0"
   },
   "packageManager": "pnpm@10.6.3"
 }
