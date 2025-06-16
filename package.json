@@ -14,7 +14,7 @@
   "devDependencies": {
     "@eslint/js": "^9.29.0",
     "@stylistic/eslint-plugin": "^4.4.1",
-    "@types/node": "^22.15.31",
+    "@types/node": "^22.15.32",
     "eslint": "^9.29.0",
     "eslint-plugin-import-x": "^4.15.2",
     "tsdown": "^0.12.7",
