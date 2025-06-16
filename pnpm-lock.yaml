@@ -65,7 +65,7 @@ importers:
         version: link:../../packages/module-prometheus
       '@module/redis-commands':
         specifier: workspace:*
-        version: link:../../packages/module-redis-commands
+        version: file:packages/module-redis-commands
       '@module/slash-commands':
         specifier: workspace:*
         version: link:../../packages/module-slash-commands
@@ -232,8 +232,29 @@ importers:
         specifier: ^5.5.6
         version: 5.5.6
       zod:
-        specifier: ^3.25.64
-        version: 3.25.64
+        specifier: ^3.25.65
+        version: 3.25.65
+
+  packages/module-rl:
+    dependencies:
+      '@framework/core':
+        specifier: workspace:*
+        version: link:../framework-core
+      '@module/discord':
+        specifier: workspace:*
+        version: link:../module-discord
+      '@module/logger':
+        specifier: workspace:*
+        version: link:../module-logger
+      '@poppinss/utils':
+        specifier: ^6.9.4
+        version: 6.9.4
+      discord.js:
+        specifier: ^14.20.0
+        version: 14.20.0
+      luxon:
+        specifier: ^3.6.1
+        version: 3.6.1
     devDependencies:
       '@types/luxon':
         specifier: ^3.6.2
@@ -415,6 +436,9 @@ packages:
     resolution: {integrity: sha512-vBZP4NlzfOlerQTnba4aqZoMhE/a9HY7HRqoOPaETQcSQuWEIyZMHGfVu6w9wGtGK5fED5qRs2DteVCjOH60sA==}
     engines: {node: '>=14'}
 
+  '@framework/core@file:packages/framework-core':
+    resolution: {directory: packages/framework-core, type: directory}
+
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
     engines: {node: '>=18.18.0'}
@@ -464,6 +488,15 @@ packages:
   '@lukeed/ms@2.0.2':
     resolution: {integrity: sha512-9I2Zn6+NJLfaGoz9jN3lpwDgAYvfGeNYdbAIjJOqzs4Tpc+VU3Jqq4IofSUBKajiDS8k9fZIg18/z13mpk1bsA==}
     engines: {node: '>=8'}
+
+  '@module/discord@file:packages/module-discord':
+    resolution: {directory: packages/module-discord, type: directory}
+
+  '@module/logger@file:packages/module-logger':
+    resolution: {directory: packages/module-logger, type: directory}
+
+  '@module/redis-commands@file:packages/module-redis-commands':
+    resolution: {directory: packages/module-redis-commands, type: directory}
 
   '@napi-rs/snappy-android-arm-eabi@7.2.2':
     resolution: {integrity: sha512-H7DuVkPCK5BlAr1NfSU8bDEN7gYs+R78pSHhDng83QxRnCLmVIZk33ymmIwurmoA1HrdTxbkbuNl+lMvNqnytw==}
@@ -2006,6 +2039,9 @@ packages:
   zod@3.25.64:
     resolution: {integrity: sha512-hbP9FpSZf7pkS7hRVUrOjhwKJNyampPgtXKc3AN6DsWtoHsg2Sb4SQaS4Tcay380zSwd2VPo9G9180emBACp5g==}
 
+  zod@3.25.65:
+    resolution: {integrity: sha512-kMyE2qsXK1p+TAvO7zsf5wMFiCejU3obrUDs9bR1q5CBKykfvp7QhhXrycUylMoOow0iEUSyjLlZZdCsHwSldQ==}
+
 snapshots:
 
   '@adonisjs/fold@10.2.0':
@@ -2227,6 +2263,17 @@ snapshots:
 
   '@fastify/busboy@2.1.1': {}
 
+  '@framework/core@file:packages/framework-core':
+    dependencies:
+      '@adonisjs/fold': 10.2.0
+      '@module/logger': file:packages/module-logger
+      '@poppinss/exception': 1.2.1
+      '@poppinss/hooks': 7.2.5
+      '@poppinss/utils': 6.9.4
+      dot-prop: 9.0.0
+      dotenv: 16.5.0
+      envalid: 8.0.0
+
   '@humanfs/core@0.19.1': {}
 
   '@humanfs/node@0.16.6':
@@ -2264,6 +2311,37 @@ snapshots:
       '@jridgewell/sourcemap-codec': 1.5.0
 
   '@lukeed/ms@2.0.2': {}
+
+  '@module/discord@file:packages/module-discord':
+    dependencies:
+      '@framework/core': file:packages/framework-core
+      '@module/logger': file:packages/module-logger
+      discord.js: 14.20.0
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+
+  '@module/logger@file:packages/module-logger':
+    dependencies:
+      '@framework/core': file:packages/framework-core
+      '@poppinss/manager': 5.0.2
+      winston: 3.17.0
+      winston-daily-rotate-file: 5.0.0(winston@3.17.0)
+      winston-loki: 6.1.3
+      winston-transport: 4.9.0
+
+  '@module/redis-commands@file:packages/module-redis-commands':
+    dependencies:
+      '@framework/core': file:packages/framework-core
+      '@module/discord': file:packages/module-discord
+      '@module/logger': file:packages/module-logger
+      '@poppinss/utils': 6.9.4
+      neverthrow: 8.2.0
+      redis: 5.5.6
+      zod: 3.25.64
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
 
   '@napi-rs/snappy-android-arm-eabi@7.2.2':
     optional: true
@@ -3699,3 +3777,5 @@ snapshots:
   yocto-queue@0.1.0: {}
 
   zod@3.25.64: {}
+
+  zod@3.25.65: {}
