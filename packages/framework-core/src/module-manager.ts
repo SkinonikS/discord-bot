@@ -34,7 +34,7 @@ export default class ModuleManager {
       debug(`Registered module '${module.id}'`);
 
       if (this._app.isBooted) {
-        this._bootModule(module);
+        await this._bootModule(module);
         debug(`Booted module '${module.id}' after registration`);
       }
     }
@@ -48,19 +48,19 @@ export default class ModuleManager {
 
     debug('Booting modules');
     for (const module of Object.values(this._resolvedModules)) {
-      this._bootModule(module);
+      await this._bootModule(module);
       debug(`Booted module '${module.id}'`);
     }
   }
 
-  protected _bootModule(module: ModuleInterface): void {
+  protected async _bootModule(module: ModuleInterface): Promise<void> {
     if (this.isBooted(module.id)) {
       debug(`Module '${module.id}' is already booted`);
       return;
     }
 
     if (module.boot) {
-      module.boot();
+      await module.boot();
       debug(`Booted module '${module.id}'`);
     } else {
       debug(`Module '${module.id}' does not have a boot method, skipping boot`);
