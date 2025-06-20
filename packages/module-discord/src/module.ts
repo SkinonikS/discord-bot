@@ -1,9 +1,11 @@
+import { ConfigNotFoundException } from '@framework/core';
 import type { Application } from '@framework/core';
-import { type ConfigRepository, type ModuleInterface, ConfigNotFoundException } from '@framework/core';
+import type { ConfigRepository, ModuleInterface } from '@framework/core';
 import type { LoggerFactoryInterface, LoggerInterface } from '@module/logger';
 import { Client, Events } from 'discord.js';
 import { debug } from '../debug';
 import pkg from '../package.json';
+import Controller from '#/controller';
 import type { DiscordConfig } from '#/types';
 
 declare module '@framework/core' {
@@ -18,89 +20,74 @@ declare module '@framework/core' {
 }
 
 export default class DiscordModule implements ModuleInterface {
-  public readonly id = pkg.name;
-  public readonly author = pkg.author;
-  public readonly version = pkg.version;
+  readonly id = pkg.name;
+  readonly author = pkg.author;
+  readonly version = pkg.version;
 
-  public constructor(protected readonly _app: Application) { }
-
-  public register(): void {
-    this._app.container.singleton('discord.client', async (container) => {
+  public register(app: Application): void {
+    app.container.singleton('discord.client', async (container) => {
       const config: ConfigRepository = await container.make('config');
       const discordConfig = config.get('discord');
 
       if (! discordConfig) {
-        throw new ConfigNotFoundException([this.id]);
+        throw new ConfigNotFoundException('discord');
       }
 
       return new Client({
         intents: discordConfig.intents,
         presence: discordConfig.richPresence,
+        shardCount: 1,
+        shards: 0,
       });
     });
 
-    this._app.container.singleton('discord.logger', async (container) => {
+    app.container.singleton('discord.logger', async (container) => {
       const factory: LoggerFactoryInterface = await container.make('logger.factory');
       return factory.createLogger(this.id);
-    });
-
-    this._app.onBooted(async (app) => {
-      const discord = await app.container.make('discord.client');
-      const config: ConfigRepository = await app.container.make('config');
-      const discordConfig = config.get('discord');
-
-      if (discordConfig) {
-        await discord.login();
-        debug('Discord client has been logged in');
-      }
-    });
-
-    this._app.onShutdown(async (app) => {
-      const discord = await app.container.make('discord.client');
-      const logger = await app.container.make('discord.logger');
-
-      debug('Shutting down Discord module...');
-      if (discord.isReady()) {
-        await discord.destroy();
-        logger.info('Discord client has been destroyed');
-        debug('Discord client has been destroyed');
-      } else {
-        logger.warn('Discord client was not ready, nothing to destroy');
-        debug('Discord client was not ready, nothing to destroy');
-      }
     });
 
     debug('Discord module has been registered');
   }
 
-  public async boot(): Promise<void> {
-    const discord = await this._app.container.make('discord.client');
-    const logger = await this._app.container.make('discord.logger');
+  public async boot(app: Application): Promise<void> {
+    const discord = await app.container.make('discord.client');
+    const logger = await app.container.make('discord.logger');
 
-    discord.on(Events.ShardReady, (shardId) => {
-      logger.info(`Shard ${String(shardId)} is reconnecting`);
-    });
+    const controller = new Controller(logger);
+    discord.on(Events.Debug, (message) => controller.debug(message));
+    discord.on(Events.ShardReady, (message) => controller.shardReady(message));
+    discord.on(Events.ShardReconnecting, (shardId) => controller.shardReconnecting(shardId));
+    discord.on(Events.ShardResume, (shardId, replayedEvents) => controller.shardResume(shardId, replayedEvents));
+    discord.on(Events.ShardDisconnect, (event, shardId) => controller.shardDisconnect(event, shardId));
+    discord.on(Events.ClientReady, (client) => controller.clientReady(client));
+    discord.on(Events.Error, (error) => controller.error(error));
+  }
 
-    discord.on(Events.ShardReconnecting, (shardId) => {
-      logger.info(`Shard ${String(shardId)} is reconnecting`);
-    });
+  public async start(app: Application): Promise<void> {
+    const discord = await app.container.make('discord.client');
+    const config: ConfigRepository = await app.container.make('config');
+    const discordConfig = config.get('discord');
 
-    discord.on(Events.ShardResume, (shardId, replayedEvents) => {
-      logger.info(`Shard ${String(shardId)} resumed with ${replayedEvents} events replayed`);
-    });
+    if (! discordConfig) {
+      throw new ConfigNotFoundException('discord');
+    }
 
-    discord.on(Events.ShardDisconnect, (event, shardId) => {
-      logger.warn(`Shard ${String(shardId)} disconnected: ${event.code}`);
-    });
+    await discord.login();
+    debug('Discord client has been logged in');
+  }
 
-    discord.on(Events.ClientReady, (client) => {
-      logger.info(`Discord client is ready as ${client.user.tag}`);
-    });
+  public async shutdown(app: Application): Promise<void> {
+    const discord = await app.container.make('discord.client');
+    const logger = await app.container.make('discord.logger');
 
-    discord.on(Events.Error, (error) => {
-      logger.error('Discord client encountered an error:', error);
-    });
-
-    debug('Discord module has been booted');
+    debug('Shutting down Discord module...');
+    if (discord.isReady()) {
+      await discord.destroy();
+      logger.info('Discord client has been destroyed');
+      debug('Discord client has been destroyed');
+    } else {
+      logger.warn('Discord client was not ready, nothing to destroy');
+      debug('Discord client was not ready, nothing to destroy');
+    }
   }
 }

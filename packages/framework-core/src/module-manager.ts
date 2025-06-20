@@ -1,10 +1,10 @@
 import type Application from '#/application';
 import debug from '#/debug';
-import type { ModuleInterface, ModuleLoaderInterface } from '#/types';
+import { importModule } from '#/helpers';
+import type { ModuleInterface, ModuleResolver } from '#/types';
 
 export default class ModuleManager {
   protected _resolvedModules: Record<string, ModuleInterface> = {};
-  protected _bootedModules: string[] = [];
 
   public constructor(protected readonly _app: Application) { }
 
@@ -12,60 +12,77 @@ export default class ModuleManager {
     return Object.values(this._resolvedModules);
   }
 
-  public isBooted(id: string): boolean {
-    return this._bootedModules.includes(id);
-  }
-
-  public async register(loader: ModuleLoaderInterface): Promise<void> {
+  public async register(modules: ModuleResolver[]): Promise<void> {
     debug('Registering modules');
 
-    const modules = await loader.load(this._app);
-    for (const module of modules) {
+    for (const moduleResolver of modules) {
+      const resolvedModule = await importModule(() => moduleResolver());
+
+      const module = resolvedModule instanceof Function
+        ? new resolvedModule()
+        : resolvedModule;
+
       if (Object.hasOwn(this._resolvedModules, module.id)) {
         debug(`Module '${module.id}' is already registered`);
         continue;
       }
 
-      if (module.register) {
-        module.register();
-      }
-
-      this._resolvedModules[module.id] = module;
-      debug(`Registered module '${module.id}'`);
+      await this._registerModule(module);
 
       if (this._app.isBooted) {
         await this._bootModule(module);
-        debug(`Booted module '${module.id}' after registration`);
       }
+
+      if (this._app.isStarted) {
+        await this._startModule(module);
+      }
+    }
+  }
+
+  public async start(): Promise<void> {
+    debug('Starting modules');
+    for (const module of Object.values(this._resolvedModules)) {
+      await this._startModule(module);
     }
   }
 
   public async boot(): Promise<void> {
-    if (this._app.isBooted) {
-      debug('Application is already booted, cannot boot modules again');
-      return;
-    }
-
     debug('Booting modules');
     for (const module of Object.values(this._resolvedModules)) {
       await this._bootModule(module);
-      debug(`Booted module '${module.id}'`);
     }
   }
 
+  public async shutdown(): Promise<void> {
+    debug('Shutting down');
+    for (const module of Object.values(this._resolvedModules).reverse()) {
+      await this._shutdownModule(module);
+    }
+  }
+
+  protected async _registerModule(module: ModuleInterface): Promise<void> {
+    await this._callModuleMethod(module, 'register');
+    this._resolvedModules[module.id] = module;
+  }
+
+  protected async _shutdownModule(module: ModuleInterface): Promise<void> {
+    return this._callModuleMethod(module, 'shutdown');
+  }
+
+  protected async _startModule(module: ModuleInterface): Promise<void> {
+    return this._callModuleMethod(module, 'start');
+  }
+
   protected async _bootModule(module: ModuleInterface): Promise<void> {
-    if (this.isBooted(module.id)) {
-      debug(`Module '${module.id}' is already booted`);
-      return;
-    }
+    return this._callModuleMethod(module, 'boot');
+  }
 
-    if (module.boot) {
-      await module.boot();
-      debug(`Booted module '${module.id}'`);
+  protected async _callModuleMethod(module: ModuleInterface, method: 'boot' | 'start' | 'shutdown' | 'register'): Promise<void> {
+    if (module[method]) {
+      await module[method](this._app);
+      debug(`Called '${method}' on module '${module.id}'`);
     } else {
-      debug(`Module '${module.id}' does not have a boot method, skipping boot`);
+      debug(`Module '${module.id}' does not have a '${method}' method, skipping call`);
     }
-
-    this._bootedModules.push(module.id);
   }
 }

@@ -1,6 +1,5 @@
 import { ConfigNotFoundException, type Application, type ConfigRepository, type ModuleInterface } from '@framework/core';
 import pkg from '../package.json';
-import TransportFactory from '#/transport-factory';
 import type { LoggerInterface, LoggerFactoryInterface, LoggerConfig } from '#/types';
 import WinstonLoggerFactory from '#/winston-logger-factory';
 
@@ -20,27 +19,25 @@ export default class LoggerModule implements ModuleInterface {
   public readonly author = pkg.author;
   public readonly version = pkg.version;
 
-  public constructor(protected readonly _app: Application) { }
-
-  public register(): void {
-    this._app.container.singleton('logger.factory', async (container) => {
+  public register(app: Application): void {
+    app.container.singleton('logger.factory', async (container) => {
       const config: ConfigRepository = await container.make('config');
       const loggerConfig = config.get('logger');
 
       if (! loggerConfig) {
-        throw new ConfigNotFoundException([this.id]);
+        throw new ConfigNotFoundException('logger');
       }
 
       const app = await container.make('app');
       return new WinstonLoggerFactory(app, loggerConfig, loggerConfig.transports);
     });
 
-    this._app.container.singleton('logger', async (container) => {
+    app.container.singleton('logger', async (container) => {
       const config: ConfigRepository = await container.make('config');
       const loggerConfig = config.get('logger');
 
       if (! loggerConfig) {
-        throw new ConfigNotFoundException([this.id]);
+        throw new ConfigNotFoundException('logger');
       }
 
       const factory = await container.make('logger.factory');

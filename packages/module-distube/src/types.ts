@@ -1,7 +1,14 @@
-import type { DisTubePlugin } from 'distube';
+import type { Application } from '@framework/core';
+import type { ExtractorPlugin } from 'distube';
 
-export type DisTubeConfig = {
+export interface DisTubeConfig {
   nsfw: boolean;
-  plugins: DisTubePlugin[];
-  ffmpegPath?: string;
-};
+  plugins: ExtractorFactoryInterface[];
+  ffmpeg?: {
+    path?: string;
+  };
+}
+
+export interface ExtractorFactoryInterface {
+  create(app: Application): Promise<ExtractorPlugin> | ExtractorPlugin;
+}

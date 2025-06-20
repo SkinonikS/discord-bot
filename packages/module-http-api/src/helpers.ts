@@ -1,8 +1,7 @@
 import type { Server } from 'node:http';
 import { Application, defineBaseConfig } from '@framework/core';
 import type { App, Router } from 'h3';
-import NullRouteLoader from './route-loaders/null-route-loader';
-import type { HttpApiConfig } from './types';
+import type { HttpApiConfig } from '#/types';
 
 export const getH3App = (app?: Application): Promise<App> => {
   app ??= Application.getInstance();
@@ -22,5 +21,5 @@ export const getH3Server = (app?: Application): Promise<Server> => {
 export const defineHttpApiConfig = (config: Partial<HttpApiConfig>) => defineBaseConfig<HttpApiConfig>('http.api', {
   port: config.port ?? 8080,
   host: config.host ?? '127.0.0.1',
-  routes: config.routes ?? new NullRouteLoader(),
+  routes: config.routes ?? [],
 });

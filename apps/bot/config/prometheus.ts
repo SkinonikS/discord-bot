@@ -1,7 +1,7 @@
-import { LazyMetricLoader, definePrometheusConfig } from '@module/prometheus';
+import { definePrometheusConfig } from '@module/prometheus';
 
 export default definePrometheusConfig({
-  metrics: new LazyMetricLoader([
-    () => import('#/app/metrics/discord/ping-gauge'),
-  ]),
+  metrics: [
+    () => import('#/app/metrics/discord/ping'),
+  ],
 });

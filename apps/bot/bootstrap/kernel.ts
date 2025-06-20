@@ -1,19 +1,21 @@
-import { defineKernelConfig, LazyModuleLoader, LazyConfigFileLoader } from '@framework/core';
+import { defineKernelConfig } from '@framework/core';
 
 export default defineKernelConfig({
-  configFiles: new LazyConfigFileLoader([
-    () => import('#config/discord'),
-    () => import('#config/slash-commands'),
+  configFiles: [
     () => import('#config/logger'),
-    () => import('#config/distube'),
+    () => import('#config/discord'),
     () => import('#config/http-api'),
+    () => import('#config/slash-commands'),
+    () => import('#config/distube'),
     () => import('#config/prometheus'),
-  ]),
-  modules: new LazyModuleLoader([
+    () => import('#config/redis-actions'),
+  ],
+  modules: [
     () => import('@module/discord/module'),
     () => import('@module/http-api/module'),
-    () => import('@module/slash-commands/module'),
-    () => import('@module/distube/module'),
     () => import('@module/prometheus/module'),
-  ]),
+    () => import('@module/distube/module'),
+    () => import('@module/slash-commands/module'),
+    () => import('@module/redis-actions/module'),
+  ],
 });

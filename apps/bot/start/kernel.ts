@@ -1,20 +1,20 @@
-import { Kernel, LazyBootstrapperLoader, LazyModuleLoader, type Application } from '@framework/core';
+import type { Application, KernelConfig } from '@framework/core';
+import { RegisterModulesBootstrapper, BootModuleBootstrapper, HandleErrorsBootstrapper, Kernel, LoadConfigurationBootstrapper, LoadEnvironmentVariablesBootstrapper } from '@framework/core';
 
-export const createKernel = async (app: Application): Promise<Kernel> => {
-  await app.register(new LazyModuleLoader([
+export const createKernel = async (app: Application, config: KernelConfig): Promise<Kernel> => {
+  await app.register([
     () => import('@module/logger/module'),
-  ]));
+  ]);
 
-  return new Kernel(app, new LazyBootstrapperLoader([
-    () => import('@framework/core/bootstrappers/load-environment-variables').then(({ default: LoadEnvironmentVariables }) => {
-      return { default: new LoadEnvironmentVariables(() => import('#bootstrap/env')) };
-    }),
-    () => import('@framework/core/bootstrappers/load-configuration').then(({ default: LoadConfiguration }) => {
-      return { default: new LoadConfiguration(() => import('#bootstrap/kernel')) };
-    }),
-    () => import('@framework/core/bootstrappers/register-modules').then(({ default: RegisterModules }) => {
-      return { default: new RegisterModules(() => import('#bootstrap/kernel')) };
-    }),
-    () => import('@framework/core/bootstrappers/boot-modules'),
-  ]));
+  const kernel = new Kernel(app);
+
+  await kernel.bootstrapWith([
+    new LoadEnvironmentVariablesBootstrapper(() => import('#bootstrap/env')),
+    new LoadConfigurationBootstrapper(config.configFiles),
+    new RegisterModulesBootstrapper(config.modules),
+    new HandleErrorsBootstrapper(),
+    new BootModuleBootstrapper(),
+  ]);
+
+  return kernel;
 };

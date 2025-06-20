@@ -10,5 +10,7 @@ export const getDistube = (app?: Application): Promise<DisTube> => {
 export const defineDistubeConfig = (config: Partial<DisTubeConfig>): BaseConfig<DisTubeConfig> => defineBaseConfig('distube', {
   nsfw: config.nsfw ?? false,
   plugins: config.plugins ?? [],
-  ffmpegPath: config.ffmpegPath,
+  ffmpeg: {
+    path: config.ffmpeg?.path,
+  },
 });

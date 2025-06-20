@@ -9,6 +9,7 @@ export default defineDiscordConfig({
     'Guilds',
     'GuildMessages',
     'GuildVoiceStates',
+    'DirectMessages',
   ]),
   richPresence: {
     afk: false,

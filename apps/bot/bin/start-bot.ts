@@ -1,11 +1,18 @@
-import path from 'node:path';
+import path from 'path';
 import { Application } from '@framework/core';
 import pkg from '../package.json';
+import kernelConfig from '#/bootstrap/kernel';
 import { createKernel } from '#start/kernel';
 import 'reflect-metadata';
 
-const app = new Application(path.resolve(import.meta.dirname, '..'), pkg.version);
+const app = new Application({
+  appRoot: path.resolve(import.meta.dirname, '..'),
+  version: pkg.version,
+  environment: 'development',
+});
 Application.setInstance(app);
 
-const kernel = await createKernel(app);
-void kernel.run();
+const kernel = await createKernel(app, kernelConfig);
+void kernel.run(async (app) => {
+  app.start();
+});

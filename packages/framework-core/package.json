@@ -32,10 +32,20 @@
     "@module/logger": "workspace:*",
     "@poppinss/exception": "^1.2.1",
     "@poppinss/hooks": "^7.2.5",
-    "@poppinss/utils": "^6.9.4",
+    "@poppinss/utils": "^6.10.0",
+    "async-exit-hook": "^2.0.1",
     "dot-prop": "^9.0.0",
     "dotenv": "^16.5.0",
-    "envalid": "^8.0.0"
+    "envalid": "^8.0.0",
+    "log-process-errors": "^12.0.1",
+    "neverthrow": "^8.2.0",
+    "object-path": "^0.11.8",
+    "signal-exit": "^4.1.0",
+    "typedots": "^0.1.0"
   },
-  "packageManager": "pnpm@10.6.3"
+  "packageManager": "pnpm@10.6.3",
+  "devDependencies": {
+    "@types/async-exit-hook": "^2.0.2",
+    "@types/object-path": "^0.11.4"
+  }
 }

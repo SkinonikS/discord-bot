@@ -1,43 +1,30 @@
-import { getProperty, setProperty, hasProperty } from 'dot-prop';
-import type { ConfigBindings, ConfigPathValue } from '#/types';
+import type { ConfigBindings } from '#/types';
 
 export default class ConfigRepository
 {
-  protected _config: ConfigBindings = {};
+  protected readonly _config: Record<string, unknown> = {};
 
-  constructor(config: ConfigBindings = {}) {
-    this._config = config;
+  public get<K extends keyof ConfigBindings | string = keyof ConfigBindings>(key: K): K extends keyof ConfigBindings ? ConfigBindings[K] | undefined : unknown {
+    return this._config[key] as K extends keyof ConfigBindings ? ConfigBindings[K] : unknown;
   }
 
-  get<K extends string>(key: K): ConfigPathValue<ConfigBindings, K> | undefined;
-  get<K extends string>(key: K, defaultValue: ConfigPathValue<ConfigBindings, K>): ConfigPathValue<ConfigBindings, K>;
-  get<K extends keyof ConfigBindings | string = keyof ConfigBindings>(
-    key: K extends keyof ConfigBindings ? K : string,
-    defaultValue?: K extends keyof ConfigBindings ? ConfigPathValue<ConfigBindings, K> : unknown,
-  ): ConfigPathValue<ConfigBindings, K> {
-    return getProperty(this._config, key, defaultValue) as ConfigPathValue<ConfigBindings, K>;
+  public set<K extends keyof ConfigBindings | string = keyof ConfigBindings>(key: K, value: K extends keyof ConfigBindings ? [K] : unknown): this {
+    this._config[key] = value;
+    return this;
   }
 
-  set<K extends keyof ConfigBindings | string = keyof ConfigBindings>(
-    key: K extends keyof ConfigBindings ? K : string,
-    value: K extends keyof ConfigBindings ? ConfigPathValue<ConfigBindings, K> : unknown,
-  ): void {
-    setProperty(this._config, key, value);
+  public has<K extends keyof ConfigBindings | string = keyof ConfigBindings>(key: K): boolean {
+    return Object.hasOwn(this._config, key);
   }
 
-  has<K extends keyof ConfigBindings | string = keyof ConfigBindings>(
-    key: K extends keyof ConfigBindings ? K : string,
-  ): boolean {
-    return hasProperty(this._config, key);
-  }
-
-  merge(config: Partial<ConfigBindings>): void {
+  public merge(config: Partial<ConfigBindings>): this {
     for (const [key, value] of Object.entries(config)) {
-      this.set(key as keyof ConfigBindings, value as ConfigPathValue<ConfigBindings, keyof ConfigBindings>);
+      this.set(key, value);
     }
+    return this;
   }
 
-  all(): ConfigBindings {
+  public all(): ConfigBindings {
     return this._config;
   }
 }

@@ -29,12 +29,15 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
+    "@adonisjs/fold": "^10.2.0",
     "@framework/core": "workspace:*",
     "@module/discord": "workspace:*",
     "@module/logger": "workspace:*",
-    "@poppinss/utils": "^6.9.4",
+    "@poppinss/exception": "^1.2.1",
+    "@poppinss/utils": "^6.10.0",
     "discord.js": "^14.20.0",
-    "luxon": "^3.6.1"
+    "luxon": "^3.6.1",
+    "neverthrow": "^8.2.0"
   },
   "devDependencies": {
     "@types/luxon": "^3.6.2"

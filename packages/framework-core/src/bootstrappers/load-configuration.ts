@@ -1,33 +1,29 @@
 import type Application from '#/application';
 import ConfigRepository from '#/config-repository';
-import type { BootstrapperInterface, KernelConfigResolver } from '#/types';
+import { importModule } from '#/helpers';
+import type { BootstrapperInterface, ConfigFileResolver } from '#/types';
 
 declare module '@framework/core' {
   interface ContainerBindings {
-    'config': ConfigRepository;
+    config: ConfigRepository;
   }
 }
 
-export default class LoadConfiguration implements BootstrapperInterface {
+export default class LoadConfigurationBootstrapper implements BootstrapperInterface {
   public constructor(
-    protected readonly _kernelConfigResolver: KernelConfigResolver,
+    protected readonly _configFiles: ConfigFileResolver[],
   ) {
     //
   }
 
   public async bootstrap(app: Application): Promise<void> {
-    const config = await this._loadConfigFiles(app);
+    const config = new ConfigRepository();
+
+    for (const configFileResolver of this._configFiles) {
+      const configFile = await importModule(() => configFileResolver());
+      config.set(configFile.key, configFile.config);
+    }
 
     app.container.bindValue('config', config);
-  }
-
-  protected async _loadConfigFiles(app: Application): Promise<ConfigRepository> {
-    const kernelConfig = (await this._kernelConfigResolver()).default;
-    const configFiles = await kernelConfig.configFiles.load(app);
-
-    return configFiles.reduce((carry, value) => {
-      carry.set(value.key, value.config);
-      return carry;
-    }, new ConfigRepository());
   }
 }

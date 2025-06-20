@@ -16,6 +16,7 @@
   "dependencies": {
     "@framework/core": "workspace:*",
     "@module/logger": "workspace:*",
+    "@poppinss/utils": "^6.10.0",
     "h3": "^1.15.3"
   },
   "files": [

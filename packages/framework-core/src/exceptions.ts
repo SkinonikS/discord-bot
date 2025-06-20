@@ -1,0 +1,28 @@
+import { Exception } from '@poppinss/exception';
+
+export class ConfigNotFoundException extends Exception {
+  public static status = 500;
+  public static code = 'E_CONFIG_NOT_FOUND';
+
+  public constructor(public readonly configName: string, cause?: Error) {
+    super(`Configuration for '${configName}' is missing. Maybe you forgot to add it into 'bootstrap/kernel.ts'?`, { cause });
+  }
+}
+
+export class ImportNotFoundException extends Exception {
+  public static status = 500;
+  public static code = 'E_IMPORT_NOT_FOUND';
+
+  public constructor(public readonly moduleName: string, cause?: Error) {
+    super(`Module '${moduleName}' could not be imported. Maybe it is missing or the path is incorrect?`, { cause });
+  }
+}
+
+export class InvalidStateTransitionException extends Exception {
+  public static status = 500;
+  public static code = 'E_INVALID_STATE_TRANSITION';
+
+  public constructor(public readonly currentState: string, public readonly targetState: string, cause?: Error) {
+    super(`Invalid state transition from '${currentState}' to '${targetState}'.`, { cause });
+  }
+}

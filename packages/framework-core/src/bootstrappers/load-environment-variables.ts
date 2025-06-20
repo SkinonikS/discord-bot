@@ -4,7 +4,7 @@ import type Application from '#/application';
 import debug from '#/debug';
 import type { BootstrapperInterface, EnvVariablesResolver } from '#/types';
 
-export default class LoadEnvironmentVariables implements BootstrapperInterface {
+export default class LoadEnvironmentVariablesBootstrapper implements BootstrapperInterface {
   public constructor(
     protected readonly _envVariablesResolver: EnvVariablesResolver,
   ) {
@@ -13,6 +13,7 @@ export default class LoadEnvironmentVariables implements BootstrapperInterface {
 
   public async bootstrap(app: Application): Promise<void> {
     const envFile = app.path.resolve('.env');
+
     if (fs.existsSync(envFile)) {
       config({ path: envFile });
       debug(`Loaded environment variables from ${envFile}`);
@@ -22,12 +23,8 @@ export default class LoadEnvironmentVariables implements BootstrapperInterface {
 
     const { Env } = await this._envVariablesResolver();
 
-    const nodeEnv = Object.hasOwn(Env, 'NODE_ENV')
-      ? Env.NODE_ENV
-      : process.env.NODE_ENV;
-
-    if (nodeEnv) {
-      app.setEnvionment(String(nodeEnv));
+    if (Object.hasOwn(Env, 'NODE_ENV')) {
+      app.setEnvionment(String(Env.NODE_ENV));
     }
   }
 }

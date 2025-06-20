@@ -21,10 +21,8 @@ export default class SlashCommandModule implements ModuleInterface {
   public readonly author = pkg.author;
   public readonly version = pkg.version;
 
-  public constructor(protected readonly _app: Application) { }
-
-  public register(): void {
-    this._app.container.singleton('slash-commands', async (container) => {
+  public register(app: Application): void {
+    app.container.singleton('slash-commands', async (container) => {
       return new SlashCommandManager(
         await container.make('app'),
         await container.make('discord.client'),
@@ -32,15 +30,15 @@ export default class SlashCommandModule implements ModuleInterface {
       );
     });
 
-    this._app.container.singleton('slash-commands.logger', async (container) => {
+    app.container.singleton('slash-commands.logger', async (container) => {
       const factory: LoggerFactoryInterface = await container.make('logger.factory');
       return factory.createLogger(this.id);
     });
   }
 
-  public async boot(): Promise<void> {
-    const discord: Client = await this._app.container.make('discord.client');
-    const manager = await this._app.container.make('slash-commands');
+  public async boot(app: Application): Promise<void> {
+    const discord: Client = await app.container.make('discord.client');
+    const manager = await app.container.make('slash-commands');
 
     // TODO: Added just for testing purposes, remove later
     discord.on(Events.ClientReady, async (discord) => {
@@ -58,7 +56,7 @@ export default class SlashCommandModule implements ModuleInterface {
       }
     });
 
-    const config: ConfigRepository = await this._app.container.make('config');
+    const config: ConfigRepository = await app.container.make('config');
     const slashCommandConfig = config.get('slash-commands');
 
     if (slashCommandConfig) {

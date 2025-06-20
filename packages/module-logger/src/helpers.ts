@@ -1,5 +1,4 @@
 import { Application, defineBaseConfig } from '@framework/core';
-import NullTransportLoader from '#/transport-loaders/null-transport-loader';
 import type { LoggerConfig, LoggerInterface } from '#/types';
 
 export const getDefaultLogger = async (app?: Application): Promise<LoggerInterface> => {
@@ -17,5 +16,6 @@ export const defineLoggerConfig = (config: Partial<LoggerConfig>) => defineBaseC
   label: config.label ?? 'DiscordBOT',
   defaultMeta: config.defaultMeta ?? {},
   level: config.level ?? 'info',
-  transports: config.transports ?? new NullTransportLoader(),
+  showStackTraces: config.showStackTraces ?? false,
+  transports: config.transports ?? [],
 });

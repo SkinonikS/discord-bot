@@ -1,8 +1,13 @@
+import { importModule, ImportNotFoundException } from '@framework/core';
 import type { Application } from '@framework/core';
 import type { LoggerInterface } from '@module/logger';
-import { type AutocompleteInteraction, type ChatInputCommandInteraction, type Client, type Guild, Collection, MessageFlags } from 'discord.js';
+import { Collection, MessageFlags } from 'discord.js';
+import type { AutocompleteInteraction, ChatInputCommandInteraction, Client, Guild } from 'discord.js';
 import { DateTime } from 'luxon';
-import type { CommandsLoaderInterface, SlashCommandInterface } from '#/types';
+import { err, ok } from 'neverthrow';
+import type { Result } from 'neverthrow';
+import { DiscordClientNotReadyException, SlashCommandCooldownException, SlashCommandNotFoundException } from '#/exceptions';
+import type { SlashCommandInterface, SlashCommandResolver } from '#/types';
 
 export default class SlashCommandManager {
   protected readonly _commands = new Collection<string, SlashCommandInterface>();
@@ -16,21 +21,30 @@ export default class SlashCommandManager {
     //
   }
 
-  public async register(commandsLoader: CommandsLoaderInterface): Promise<void> {
-    const commands = await commandsLoader.load(this._app);
+  public async register(slashCommands: SlashCommandResolver[]): Promise<void> {
+    for (const slashCommandResolver of slashCommands) {
+      try {
+        const command = await importModule(() => slashCommandResolver());
 
-    for (const command of commands) {
-      this._commands.set(command.name, command);
-      this._logger.debug(`Registered command: ${command.name}`);
+        this._commands.set(command.name, command);
+        this._logger.debug(`Registered slash command: ${command.name}`);
+      } catch (e) {
+        if (e instanceof ImportNotFoundException) {
+          this._logger.error(e as ImportNotFoundException);
+          continue;
+        }
+
+        throw e;
+      }
     }
   }
 
-  public async execute(interaction: ChatInputCommandInteraction): Promise<void> {
+  public async execute(interaction: ChatInputCommandInteraction): Promise<Result<void, Error>> {
     const command = this._commands.get(interaction.commandName);
 
     if (! command) {
       this._logger.warn(`Unknown command: ${interaction.commandName}`);
-      return;
+      return err(new SlashCommandNotFoundException(interaction.commandName));
     }
 
     if (! this._cooldowns.has(command.name)) {
@@ -53,8 +67,7 @@ export default class SlashCommandManager {
           flags: MessageFlags.Ephemeral,
         });
 
-        this._logger.debug(`User ${interaction.user.tag} (${interaction.user.id}) tried to use command ${command.name} on cooldown.`);
-        return;
+        return err(new SlashCommandCooldownException(interaction.user.id, command.name));
       }
     }
 
@@ -63,32 +76,39 @@ export default class SlashCommandManager {
 
     await command.execute(interaction);
     this._logger.debug(`Executed command: ${command.name} for user: ${interaction.user.tag} (${interaction.user.id})`);
+
+    return ok();
   }
 
-  public async autocomplete(interaction: AutocompleteInteraction): Promise<void> {
+  public async autocomplete(interaction: AutocompleteInteraction): Promise<Result<void, Error>> {
     const command = this._commands.get(interaction.commandName);
 
     if (! command) {
       this._logger.warn(`Unknown command: ${interaction.commandName}`);
-      return;
+      return err(new SlashCommandNotFoundException(interaction.commandName));
     }
 
     if (command.autocomplete) {
       await command.autocomplete(interaction);
+    } else {
+      this._logger.debug(`No autocomplete handler for command '${command.name}', skipping...`);
     }
+
+    return ok();
   }
 
-  public async deployToGuilds(guilds: Guild[]): Promise<void> {
+  public async deployToGuilds(guilds: Guild[]): Promise<Result<void, Error>> {
     if (! this._discord.isReady()) {
-      this._logger.warn('Discord client is not ready. Cannot deploy commands.');
-      return;
+      this._logger.warn('Discord client is not ready. Did you forget wrap it in a ready event?');
+      return err(new DiscordClientNotReadyException());
     }
 
     for (const guild of guilds) {
-      await guild.commands.set(this._commands.map((command) => command.build()));
+      await guild.commands.set(this._commands.map((command) => command.metadata));
       this._logger.debug(`Deployed commands to guild: ${guild.name} (${guild.id})`);
     }
 
     this._logger.info(`Deployed ${this._commands.size} commands to ${guilds.length} guild(s)`);
+    return ok();
   }
 }
