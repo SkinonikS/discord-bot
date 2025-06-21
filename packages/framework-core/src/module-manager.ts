@@ -1,6 +1,6 @@
 import type Application from '#/application';
 import debug from '#/debug';
-import { importModule } from '#/helpers';
+import { importModule, instantiateIfNeeded } from '#/helpers';
 import type { ModuleInterface, ModuleResolver } from '#/types';
 
 export default class ModuleManager {
@@ -17,10 +17,7 @@ export default class ModuleManager {
 
     for (const moduleResolver of modules) {
       const resolvedModule = await importModule(() => moduleResolver());
-
-      const module = resolvedModule instanceof Function
-        ? new resolvedModule()
-        : resolvedModule;
+      const module = await instantiateIfNeeded(resolvedModule, this._app);
 
       if (Object.hasOwn(this._resolvedModules, module.id)) {
         debug(`Module '${module.id}' is already registered`);
