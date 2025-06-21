@@ -113,7 +113,10 @@ export default class Application
   }
 
   public setEnvionment(environment: string): void {
-    this._ensureState(ApplicationState.INITIAL);
+    if (this.isBooted) {
+      debug('Cannot change environment after application has booted');
+      throw new Error('Cannot change environment after application has booted');
+    }
 
     debug('Setting application environment to:', environment);
     this._environment = environment;
