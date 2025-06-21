@@ -3,6 +3,7 @@ import { defineConfig } from 'tsdown/config';
 export default defineConfig({
   entry: [
     'index.ts',
+    'src/workers/*.ts',
     'src/bootstrappers/*.ts',
   ],
   outDir: 'dist',

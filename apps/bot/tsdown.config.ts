@@ -3,6 +3,7 @@ import { defineConfig } from 'tsdown/config';
 export default defineConfig({
   entry: [
     'bin/start-bot.ts',
+    'bin/workers/*.ts',
   ],
   outDir: 'dist/src',
   copy: [

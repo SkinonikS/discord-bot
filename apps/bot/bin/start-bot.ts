@@ -1,18 +1,21 @@
-import path from 'path';
-import { Application } from '@framework/core';
-import pkg from '../package.json';
-import kernelConfig from '#/bootstrap/kernel';
-import { createKernel } from '#start/kernel';
-import 'reflect-metadata';
+import path from 'node:path';
+import { ForkWorkerSpawner, WorkerManager } from '@framework/core/workers';
 
-const app = new Application({
-  appRoot: path.resolve(import.meta.dirname, '..'),
-  version: pkg.version,
-  environment: 'development',
-});
-Application.setInstance(app);
+const workers = new WorkerManager(
+  new ForkWorkerSpawner(),
+);
 
-const kernel = await createKernel(app, kernelConfig);
-void kernel.run(async (app) => {
-  app.start();
+workers.register([
+  {
+    path: path.resolve(import.meta.dirname, 'workers', 'discord-worker.js'),
+    args: [],
+  },
+]);
+
+workers.on('ready', (workers) => {
+  for (const worker of workers) {
+    console.log(`Worker ${worker.id} is ready.`);
+  }
 });
+
+workers.spawn();

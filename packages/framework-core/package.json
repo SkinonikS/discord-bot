@@ -10,6 +10,11 @@
       "node": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
+    "./workers": {
+      "import": "./dist/src/workers/index.js",
+      "node": "./dist/src/workers/index.js",
+      "types": "./dist/src/workers/index.d.ts"
+    },
     "./bootstrappers/*": {
       "import": "./dist/src/bootstrappers/*.js",
       "node": "./dist/src/bootstrappers/*.js",

@@ -14,6 +14,7 @@ export default class LoadEnvironmentVariablesBootstrapper implements Bootstrappe
   public async bootstrap(app: Application): Promise<void> {
     const envFile = app.path.resolve('.env');
 
+    debug(`Looking for environment variables file at ${envFile}`);
     if (fs.existsSync(envFile)) {
       config({ path: envFile });
       debug(`Loaded environment variables from ${envFile}`);
