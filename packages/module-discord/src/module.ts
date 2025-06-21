@@ -52,7 +52,7 @@ export default class DiscordModule implements ModuleInterface {
   public async boot(app: Application): Promise<void> {
     const discord = await app.container.make('discord.client');
     const logger = await app.container.make('discord.logger');
-    const errorHandler: ErrorHandler = await app.container.make('error.handler');
+    const errorHandler: ErrorHandler = await app.container.make('errorHandler');
 
     const controller = new Controller(logger, errorHandler);
     discord.on(Events.Debug, (message) => controller.debug(message));
