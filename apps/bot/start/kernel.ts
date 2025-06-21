@@ -11,8 +11,8 @@ export const createKernel = async (app: Application, config: KernelConfig): Prom
   await kernel.bootstrapWith([
     new LoadEnvironmentVariablesBootstrapper(() => import('#bootstrap/env')),
     new LoadConfigurationBootstrapper(config.configFiles),
-    new RegisterModulesBootstrapper(config.modules),
     new HandleErrorsBootstrapper(),
+    new RegisterModulesBootstrapper(config.modules),
     new BootModuleBootstrapper(),
   ]);
 
