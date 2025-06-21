@@ -126,40 +126,18 @@ importers:
       '@poppinss/utils':
         specifier: ^6.10.0
         version: 6.10.0
-      async-exit-hook:
-        specifier: ^2.0.1
-        version: 2.0.1
-      dot-prop:
-        specifier: ^9.0.0
-        version: 9.0.0
       dotenv:
         specifier: ^16.5.0
         version: 16.5.0
       envalid:
         specifier: ^8.0.0
         version: 8.0.0
-      log-process-errors:
-        specifier: ^12.0.1
-        version: 12.0.1
       neverthrow:
         specifier: ^8.2.0
         version: 8.2.0
-      object-path:
-        specifier: ^0.11.8
-        version: 0.11.8
       signal-exit:
         specifier: ^4.1.0
         version: 4.1.0
-      typedots:
-        specifier: ^0.1.0
-        version: 0.1.0
-    devDependencies:
-      '@types/async-exit-hook':
-        specifier: ^2.0.2
-        version: 2.0.2
-      '@types/object-path':
-        specifier: ^0.11.4
-        version: 0.11.4
 
   packages/module-discord:
     dependencies:
@@ -794,9 +772,6 @@ packages:
   '@tybys/wasm-util@0.9.0':
     resolution: {integrity: sha512-6+7nlbMVX/PVDCwaIQ8nTOPveOcFLSt8GcXdx8hD0bt39uWxYT88uXzqTd4fTvqta7oeUJqudepapKNt2DYJFw==}
 
-  '@types/async-exit-hook@2.0.2':
-    resolution: {integrity: sha512-RJbTNivnnn+JzNiQTtUgwo/1S6QUHwI5JfXCeUPsqZXB4LuvRwvHhbKFSS5jFDYpk8XoEAYVW2cumBOdGpXL2Q==}
-
   '@types/bytes@3.1.5':
     resolution: {integrity: sha512-VgZkrJckypj85YxEsEavcMmmSOIzkUHqWmM4CCyia5dc54YwsXzJ5uT4fYxBQNEXx+oF1krlhgCbvfubXqZYsQ==}
 
@@ -814,9 +789,6 @@ packages:
 
   '@types/node@24.0.3':
     resolution: {integrity: sha512-R4I/kzCYAdRLzfiCabn9hxWfbuHS573x+r0dJMkkzThEa7pbrcDWK+9zu3e7aBOouf+rQAciqPFMnxwr0aWgKg==}
-
-  '@types/object-path@0.11.4':
-    resolution: {integrity: sha512-4tgJ1Z3elF/tOMpA8JLVuR9spt9Ynsf7+JjqsQ2IqtiPJtcLoHoXcT6qU4E10cPFqyXX5HDm9QwIzZhBSkLxsw==}
 
   '@types/pluralize@0.0.33':
     resolution: {integrity: sha512-JOqsl+ZoCpP4e8TDke9W79FDcSgPAR0l6pixx2JHkhnRjvShyYiAYw2LVsnA7K08Y6DeOnaU6ujmENO4os/cYg==}
@@ -1191,10 +1163,6 @@ packages:
       '@discordjs/voice': '*'
       discord.js: '14'
 
-  dot-prop@9.0.0:
-    resolution: {integrity: sha512-1gxPBJpI/pcjQhKgIU91II6Wkay+dLcN3M6rf2uwP8hRur3HtQXjVrdAK3sjC0piaEuxzMwjXChcETiJl47lAQ==}
-    engines: {node: '>=18'}
-
   dotenv@16.5.0:
     resolution: {integrity: sha512-m/C+AwOAr9/W1UOIZUo232ejMNnJAJtYQjUbHoNTBNTJSvqzzDh7vnrei3o3r3m9blf6ZoDkvcw0VmozNRFJxg==}
     engines: {node: '>=12'}
@@ -1447,10 +1415,6 @@ packages:
   is-arrayish@0.3.2:
     resolution: {integrity: sha512-eVRqCvVlZbuw3GrM63ovNSNAeA1K16kaR/LRY/92w0zxQ5/1YzwblUX652i4Xs9RwAGjW9d9y6X88t8OaAJfWQ==}
 
-  is-error-instance@3.0.1:
-    resolution: {integrity: sha512-nEw1ptjtbmXRkHOFrLvpHywsv+jMUZdtqI2BAC/XxMd24vUY5gXhvOprH0Bh4xA2gqQCQsEkr7aaxsgvxYRjnQ==}
-    engines: {node: '>=18.18.0'}
-
   is-extglob@2.1.1:
     resolution: {integrity: sha512-SbKbANkN603Vi4jEZv49LeVJMn4yGwsbzZworEoyEiutsN3nJYdbO36zfhGJ6QEDpOZIFkDtnq5JRxmvl3jsoQ==}
     engines: {node: '>=0.10.0'}
@@ -1466,10 +1430,6 @@ packages:
   is-number@7.0.0:
     resolution: {integrity: sha512-41Cifkg6e8TylSpdtTpeLVMqvSBEVzTttHvERD741+pnZ8ANv0004MRL43QKPDlK9cGvNp6NZWZUBlbGXYxxng==}
     engines: {node: '>=0.12.0'}
-
-  is-plain-obj@4.1.0:
-    resolution: {integrity: sha512-+Pgi+vMuUNkJyExiMBt5IlFoMyKnr5zhJ4Uspz58WOhBF5QoIZkFyNHIbBAtHwzVAgk5RtndVNsDRN61/mmDqg==}
-    engines: {node: '>=12'}
 
   is-stream@2.0.1:
     resolution: {integrity: sha512-hFoiJiTl63nn+kstHGBtewWSKnQLpyb155KHheA1l39uvtO9nWIop1p3udqPcUd/xbF1VLMO4n7OI6p7RbngDg==}
@@ -1522,10 +1482,6 @@ packages:
 
   lodash@4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
-
-  log-process-errors@12.0.1:
-    resolution: {integrity: sha512-4+s7bTovTyrlOJbV2jzQxeXt/ITfDEGw4pdp9KHu1v32gsy/56N/bWYVjqKygsGb1RaiZ1c3wd4DE4lOSY031A==}
-    engines: {node: '>=18.18.0'}
 
   logform@2.7.0:
     resolution: {integrity: sha512-TFYA4jnP7PVbmlBIfhlSe+WKxs9dklXMTEGcBCIvLhE/Tn3H6Gk1norupVW7m5Cnd4bLcr08AytbyV/xj7f/kQ==}
@@ -1628,10 +1584,6 @@ packages:
     engines: {node: '>=6'}
     hasBin: true
 
-  normalize-exception@4.0.1:
-    resolution: {integrity: sha512-2fUwKMZLYvHIHZN4a6Bt2FYEea6mDwQcTVCffRvQ1bJHndQRRrNhq8+WQiLolOzJ7bJl59SCURGSwCLvQv/X7w==}
-    engines: {node: '>=18.18.0'}
-
   npmlog@5.0.1:
     resolution: {integrity: sha512-AqZtDUWOMKs1G/8lwylVjrdYgqA4d9nu8hc+0gzRxlDb1I10+FHBGMXs6aiQHFdCUUlqH99MUMuLfzWDNDtfxw==}
     deprecated: This package is no longer supported.
@@ -1643,10 +1595,6 @@ packages:
   object-hash@3.0.0:
     resolution: {integrity: sha512-RSn9F68PjH9HqtltsSnqYC1XXoWe9Bju5+213R98cNGttag9q9yAOTzdbsqvIa7aNm5WffBZFpWYr2aWrklWAw==}
     engines: {node: '>= 6'}
-
-  object-path@0.11.8:
-    resolution: {integrity: sha512-YJjNZrlXJFM42wTBn6zgOJVar9KFJvzx6sTWDte8sWZF//cnjl0BxHNpfZx+ZffXX63A9q0b1zsFiBX4g4X5KA==}
-    engines: {node: '>= 10.12.0'}
 
   once@1.4.0:
     resolution: {integrity: sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==}
@@ -1821,10 +1769,6 @@ packages:
   set-blocking@2.0.0:
     resolution: {integrity: sha512-KiKBS8AnWGEyLzofFfmvKwpdPzqiy16LvQfK3yv/fVH7Bj13/wl3JSR1J+rfgRE9q7xUJK4qvgS8raSOeLUehw==}
 
-  set-error-message@3.0.1:
-    resolution: {integrity: sha512-5+TX4opc5Hus1nu5UDQq0y5SuOCvDqQFh+yGcKgzJDKvohVcU51iE2XtTxw/V7VsZ7xA142tei+KSq3ZIB/dNw==}
-    engines: {node: '>=18.18.0'}
-
   shebang-command@2.0.0:
     resolution: {integrity: sha512-kHxr2zZpYtdmrN1qDjrrX/Z1rR1kG8Dx+gkpK1G4eXmvXswmcE1hTWBWYUzlraYw1/yZp6YuDY77YtvbN0dmDA==}
     engines: {node: '>=8'}
@@ -1968,13 +1912,6 @@ packages:
   type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
     engines: {node: '>= 0.8.0'}
-
-  type-fest@4.41.0:
-    resolution: {integrity: sha512-TeTSQ6H5YHvpqVwBRcnLDCBnDOHWYu7IvGbHT6N8AOymcr9PJGjc1GTtiWZTYg0NCgYwvnYWEkVChQAr9bjfwA==}
-    engines: {node: '>=16'}
-
-  typedots@0.1.0:
-    resolution: {integrity: sha512-7rkldELq49pvGSvnc6tNJIxbYY+GGCSVNlPmI8KZehRTqM0+cY5ot4vjP2gFWau2kSMoYUpQLidwhi0zfbx6jQ==}
 
   typescript-eslint@8.34.1:
     resolution: {integrity: sha512-XjS+b6Vg9oT1BaIUfkW3M3LvqZE++rbzAMEHuccCfO/YkP43ha6w3jTEMilQxMF92nVOYCcdjv1ZUhAa1D/0ow==}
@@ -2572,8 +2509,6 @@ snapshots:
       tslib: 2.8.1
     optional: true
 
-  '@types/async-exit-hook@2.0.2': {}
-
   '@types/bytes@3.1.5': {}
 
   '@types/estree@1.0.8': {}
@@ -2589,8 +2524,6 @@ snapshots:
   '@types/node@24.0.3':
     dependencies:
       undici-types: 7.8.0
-
-  '@types/object-path@0.11.4': {}
 
   '@types/pluralize@0.0.33': {}
 
@@ -2937,10 +2870,6 @@ snapshots:
       tiny-typed-emitter: 2.1.0
       undici: 7.10.0
 
-  dot-prop@9.0.0:
-    dependencies:
-      type-fest: 4.41.0
-
   dotenv@16.5.0: {}
 
   dts-resolver@2.1.1: {}
@@ -3210,8 +3139,6 @@ snapshots:
 
   is-arrayish@0.3.2: {}
 
-  is-error-instance@3.0.1: {}
-
   is-extglob@2.1.1: {}
 
   is-fullwidth-code-point@3.0.0: {}
@@ -3221,8 +3148,6 @@ snapshots:
       is-extglob: 2.1.1
 
   is-number@7.0.0: {}
-
-  is-plain-obj@4.1.0: {}
 
   is-stream@2.0.1: {}
 
@@ -3262,13 +3187,6 @@ snapshots:
   lodash.snakecase@4.1.1: {}
 
   lodash@4.17.21: {}
-
-  log-process-errors@12.0.1:
-    dependencies:
-      is-error-instance: 3.0.1
-      is-plain-obj: 4.1.0
-      normalize-exception: 4.0.1
-      set-error-message: 3.0.1
 
   logform@2.7.0:
     dependencies:
@@ -3352,11 +3270,6 @@ snapshots:
     dependencies:
       abbrev: 1.1.1
 
-  normalize-exception@4.0.1:
-    dependencies:
-      is-error-instance: 3.0.1
-      is-plain-obj: 4.1.0
-
   npmlog@5.0.1:
     dependencies:
       are-we-there-yet: 2.0.0
@@ -3367,8 +3280,6 @@ snapshots:
   object-assign@4.1.1: {}
 
   object-hash@3.0.0: {}
-
-  object-path@0.11.8: {}
 
   once@1.4.0:
     dependencies:
@@ -3536,10 +3447,6 @@ snapshots:
 
   set-blocking@2.0.0: {}
 
-  set-error-message@3.0.1:
-    dependencies:
-      normalize-exception: 4.0.1
-
   shebang-command@2.0.0:
     dependencies:
       shebang-regex: 3.0.0
@@ -3681,10 +3588,6 @@ snapshots:
   type-check@0.4.0:
     dependencies:
       prelude-ls: 1.2.1
-
-  type-fest@4.41.0: {}
-
-  typedots@0.1.0: {}
 
   typescript-eslint@8.34.1(eslint@9.29.0(jiti@2.4.2))(typescript@5.8.3):
     dependencies:
