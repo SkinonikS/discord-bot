@@ -8,4 +8,7 @@ export const Env = cleanEnv(process.env, {
   HTTP_API_HOST: str({ default: '127.0.0.1' }),
   LOKI_HOST: str({ default: 'http://localhost:3100' }),
   REDIS_URL: str({ default: 'redis://localhost:6379' }),
+  REDIS_DATABASE: num({ default: 0 }),
+  LOG_LEVEL: str({ default: 'debug' }),
+  LOG_SHOW_STACK_TRACES: bool({ default: false }),
 });
