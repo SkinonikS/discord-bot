@@ -16,7 +16,6 @@ export type ReportCallback = (error: ReportableException, app: Application) => v
 export type CleanupCallback = (app: Application) => void | Promise<void>;
 export type StartCallback = (app: Application) => (CleanupCallback | Promise<CleanupCallback>) | (Promise<void> | void);
 
-// export type BaseResolver<T> = (...args: unknown[]) => Promise<{ default: T }> | Promise<T> | T;
 export type BaseResolver<T> = (...args: unknown[]) => Promise<{ default: T } | T> | T;
 export type BootstrapperResolver = BaseResolver<BootstrapperInterface | (new () => BootstrapperInterface)>;
 export type ModuleResolver = BaseResolver<ModuleInterface | (new () => ModuleInterface)>;
