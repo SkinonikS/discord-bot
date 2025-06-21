@@ -1,6 +1,6 @@
-import { Exception } from '@poppinss/exception';
+import { RuntimeException } from '@poppinss/exception';
 
-export class ConfigNotFoundException extends Exception {
+export class ConfigNotFoundException extends RuntimeException {
   public static status = 500;
   public static code = 'E_CONFIG_NOT_FOUND';
 
@@ -9,7 +9,7 @@ export class ConfigNotFoundException extends Exception {
   }
 }
 
-export class ImportNotFoundException extends Exception {
+export class ImportNotFoundException extends RuntimeException {
   public static status = 500;
   public static code = 'E_IMPORT_NOT_FOUND';
 
@@ -18,7 +18,7 @@ export class ImportNotFoundException extends Exception {
   }
 }
 
-export class InvalidStateTransitionException extends Exception {
+export class InvalidStateTransitionException extends RuntimeException {
   public static status = 500;
   public static code = 'E_INVALID_STATE_TRANSITION';
 
