@@ -27,7 +27,7 @@ discord-bot/
 └── apps/bot/                    # Main bot application
 ```
 
-## 🛠️ Development
+## Development
 ```bash
 pnpm dev          # Start with hot reload
 pnpm build        # Build all packages
@@ -40,7 +40,7 @@ cd apps/bot
 docker-compose up -d
 ```
 
-## 📚 Documentation
+## Documentation
 Detailed documentation is available in each module's README file:
 - Framework Core: `packages/framework-core/README.md`
 - Discord Module: `packages/module-discord/README.md`  
