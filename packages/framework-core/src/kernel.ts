@@ -26,6 +26,8 @@ export default class Kernel {
           console.error(`Failed to resolve bootstrapper: ${e.message}`);
           process.exit(1);
         }
+
+        throw e;
       }
     }
 
