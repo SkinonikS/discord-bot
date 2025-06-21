@@ -6,7 +6,7 @@ export default class PingCommand implements SlashCommandInterface {
   public readonly name = 'ping';
   public readonly cooldown = 5;
 
-  public build(): SlashCommandBuilder {
+  public get metadata(): SlashCommandBuilder {
     return new SlashCommandBuilder()
       .setName(this.name)
       .setDescription('Replies with Pong!');

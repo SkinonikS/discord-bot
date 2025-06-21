@@ -1,7 +1,7 @@
 import { defineSlashCommandsConfig } from '@module/slash-commands';
 
 export default defineSlashCommandsConfig({
-  actions: [
+  commands: [
     () => import('#/app/slash-commands/ping'),
   ],
 });

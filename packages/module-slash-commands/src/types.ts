@@ -1,7 +1,7 @@
 import type { BaseResolver } from '@framework/core';
 import type { AutocompleteInteraction, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
-export type SlashCommandResolver = BaseResolver<SlashCommandInterface>;
+export type SlashCommandResolver = BaseResolver<new () => SlashCommandInterface>;
 
 export interface SlashCommandInterface {
   readonly name: string;
