@@ -1,7 +1,7 @@
 import path from 'path';
 import { Application } from '@framework/core';
-import pkg from '../package.json';
 import kernelConfig from '#/bootstrap/kernel';
+import pkg from '#/package.json';
 import { createKernel } from '#start/kernel';
 import 'reflect-metadata';
 
@@ -13,6 +13,4 @@ const app = new Application({
 Application.setInstance(app);
 
 const kernel = await createKernel(app, kernelConfig);
-void kernel.run(async (app) => {
-  app.start();
-});
+void kernel.run(async (app) => app.start());
