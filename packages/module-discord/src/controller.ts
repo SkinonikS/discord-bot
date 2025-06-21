@@ -1,9 +1,11 @@
+import type { ErrorHandler } from '@framework/core';
 import type { LoggerInterface } from '@module/logger';
 import type { Client } from 'discord.js';
 
 export default class Controller {
   public constructor(
     protected readonly _logger: LoggerInterface,
+    protected readonly _errorHandler: ErrorHandler,
   ) { }
 
   public debug(message: string): void {
@@ -11,7 +13,7 @@ export default class Controller {
   }
 
   public error(error: Error): void {
-    this._logger.error(error);
+    this._errorHandler.handle(error);
   }
 
   public shardReady(shardId: number): void {
