@@ -1,4 +1,3 @@
-import type { LoggerInterface } from '@module/logger';
 import { onExit } from 'signal-exit';
 import type Application from '#/application';
 import debug from '#/debug';
@@ -11,7 +10,7 @@ declare module '@framework/core' {
   }
 }
 
-export default class HandleErrorsBootstrapper implements BootstrapperInterface {
+export default class HandleErrors implements BootstrapperInterface {
   public async bootstrap(app: Application): Promise<void> {
     const errorHandler = new ErrorHandler(app);
     app.container.bindValue('errorHandler', errorHandler);

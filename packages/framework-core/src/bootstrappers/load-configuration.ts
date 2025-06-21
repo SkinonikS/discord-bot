@@ -9,7 +9,7 @@ declare module '@framework/core' {
   }
 }
 
-export default class LoadConfigurationBootstrapper implements BootstrapperInterface {
+export default class LoadConfiguration implements BootstrapperInterface {
   public constructor(
     protected readonly _configFiles: ConfigFileResolver[],
   ) {

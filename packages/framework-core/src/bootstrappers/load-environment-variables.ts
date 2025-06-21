@@ -4,7 +4,7 @@ import type Application from '#/application';
 import debug from '#/debug';
 import type { BootstrapperInterface, EnvVariablesResolver } from '#/types';
 
-export default class LoadEnvironmentVariablesBootstrapper implements BootstrapperInterface {
+export default class LoadEnvironmentVariables implements BootstrapperInterface {
   public constructor(
     protected readonly _envVariablesResolver: EnvVariablesResolver,
   ) {
