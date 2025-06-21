@@ -22,12 +22,10 @@ export default class SlashCommandManager {
   }
 
   public async register(slashCommands: SlashCommandResolver[]): Promise<void> {
-    console.log(slashCommands);
     for (const slashCommandResolver of slashCommands) {
       try {
         const resolvedCommand = await importModule(() => slashCommandResolver());
         const command = await instantiateIfNeeded(resolvedCommand, this._app);
-        console.log(command);
 
         this._commands.set(command.name, command);
         this._logger.debug(`Registered slash command: ${command.name}`);
