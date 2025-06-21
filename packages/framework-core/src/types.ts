@@ -15,9 +15,13 @@ export interface ReportableException extends Error {
 export type ReportCallback = (error: ReportableException, app: Application) => void | Promise<void>;
 export type CleanupCallback = (app: Application) => void | Promise<void>;
 export type StartCallback = (app: Application) => (CleanupCallback | Promise<CleanupCallback>) | (Promise<void> | void);
-export type BaseResolver<T> = (...args: unknown[]) => Promise<{ default: T }> | Promise<T> | T;
-export type ModuleResolver = BaseResolver<new () => ModuleInterface | ModuleInterface>;
+
+// export type BaseResolver<T> = (...args: unknown[]) => Promise<{ default: T }> | Promise<T> | T;
+export type BaseResolver<T> = (...args: unknown[]) => Promise<{ default: T } | T> | T;
+export type BootstrapperResolver = BaseResolver<BootstrapperInterface | (new () => BootstrapperInterface)>;
+export type ModuleResolver = BaseResolver<ModuleInterface | (new () => ModuleInterface)>;
 export type ConfigFileResolver = () => Promise<{ default: BaseConfig<unknown> }>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type EnvVariablesResolver = () => Promise<{ Env: CleanedEnv<any> }>;
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

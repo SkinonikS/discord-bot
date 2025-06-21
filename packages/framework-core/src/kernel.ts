@@ -1,6 +1,8 @@
 import type Application from '#/application';
 import debug from '#/debug';
-import type { StartCallback, BootstrapperInterface } from '#/types';
+import { ImportNotFoundException } from '#/exceptions';
+import { importModule, instantiateIfNeeded } from '#/helpers';
+import type { StartCallback, BootstrapperResolver } from '#/types';
 
 export default class Kernel {
   public constructor(
@@ -9,18 +11,29 @@ export default class Kernel {
     //
   }
 
-  public async bootstrapWith(bootstrappers: BootstrapperInterface[]): Promise<void> {
+  public async bootstrapWith(bootstrappers: BootstrapperResolver[]): Promise<this> {
     debug('Bootstrapping application');
 
-    for (const bootstrapper of bootstrappers) {
-      await bootstrapper.bootstrap(this._app);
-      debug(`Bootstrapped '${bootstrapper.constructor.name}'`);
+    for (const bootstrapperResolver of bootstrappers) {
+      try {
+        const reolvedBootstrapper = await importModule(() => bootstrapperResolver());
+        const bootstrapper = await instantiateIfNeeded(reolvedBootstrapper, this._app);
+
+        await bootstrapper.bootstrap(this._app);
+        debug(`Bootstrapped '${bootstrapper.constructor.name}'`);
+      } catch (e) {
+        if (e instanceof ImportNotFoundException) {
+          console.error(`Failed to resolve bootstrapper: ${e.message}`);
+          process.exit(1);
+        }
+      }
     }
 
     debug('Application bootstrapped successfully');
+    return this;
   }
 
-  public async run(callback?: StartCallback): Promise<void> {
+  public async run(callback?: StartCallback): Promise<this> {
     debug('Kernel is starting');
 
     if (callback) {
@@ -33,5 +46,6 @@ export default class Kernel {
     }
 
     debug('Kernel started, application is booted');
+    return this;
   }
 }
