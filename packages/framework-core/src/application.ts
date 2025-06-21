@@ -73,7 +73,7 @@ export default class Application
   }
 
   public onShutdown(handler: HookHandler<[Application], [Application]>): void {
-    debug('Registering shutdown hook');
+    debug('Registering \'shutdown\' hook');
     this._hooks.add('shutdown', handler);
   }
 
@@ -124,6 +124,7 @@ export default class Application
   }
 
   public async boot(): Promise<void> {
+    debug('Booting application');
     this._ensureState(ApplicationState.INITIAL);
 
     await this._hooks.runner('booting').run(this);
@@ -139,6 +140,7 @@ export default class Application
   }
 
   public async start(): Promise<void> {
+    debug('Starting application');
     this._ensureState(ApplicationState.BOOTED);
 
     await this._hooks.runner('starting').run(this);
@@ -164,6 +166,7 @@ export default class Application
       return;
     }
 
+    debug('Shutting down application');
     this._isShuttingDown = true;
     await this._modules.shutdown();
 
@@ -191,7 +194,7 @@ export default class Application
   }
 
   protected _addHookIf(shouldCall: (app: Application) => boolean, handler: HookHandler<[Application], [Application]>, hookName: keyof HooksMap): void {
-    debug(`Registering ${hookName} hook`);
+    debug(`Registering '${hookName}' hook`);
 
     if (shouldCall(this)) {
       void handler(this);
