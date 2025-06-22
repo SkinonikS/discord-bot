@@ -123,6 +123,9 @@ importers:
       sleep-promise:
         specifier: ^9.1.0
         version: 9.1.0
+      winston:
+        specifier: ^3.17.0
+        version: 3.17.0
 
   packages/framework-core:
     dependencies:
