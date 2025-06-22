@@ -1,0 +1,15 @@
+apiVersion: example.com/v1
+kind: DiscordBot
+metadata:
+  name: discord-bot
+  namespace: discord-bot
+spec:
+  sharding:
+    reshardInterval: 1m
+  tokenSecretRef:
+    name: discord-bot-token
+    key: discordToken
+  container:
+    name: discord-bot
+    image: "discord-bot:latest"
+    imagePullPolicy: Never
