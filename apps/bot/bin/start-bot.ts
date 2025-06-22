@@ -13,4 +13,4 @@ const app = new Application({
 Application.setInstance(app);
 
 const kernel = await createKernel(app, kernelConfig);
-void kernel.run(async (app) => app.start());
+void kernel.run((app) => app.start());
