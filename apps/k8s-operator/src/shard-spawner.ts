@@ -1,5 +1,6 @@
 import type * as k8s from '@kubernetes/client-node';
-import { err, ok, type Result } from 'neverthrow';
+import { err, ok } from 'neverthrow';
+import type { Result } from 'neverthrow';
 import sleep from 'sleep-promise';
 import type { ShardSpawnerConfig, ShardSpawnerInterface, SpawnInstance } from '#/types';
 

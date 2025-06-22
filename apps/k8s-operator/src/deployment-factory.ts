@@ -1,16 +1,8 @@
 import type * as k8s from '@kubernetes/client-node';
 import type { DeploymentFactoryInterface, DeploymentObject, ShardConfig } from '#/types';
 
-// app.kubernetes.io/name: discord-bot
-// app.kubernetes.io/instance: my-discord-bot
-// app.kubernetes.io/version: "1.0.0"
-// app.kubernetes.io/component: bot
-// app.kubernetes.io/part-of: discord-bot-operator
-// app.kubernetes.io/managed-by: DiscordBotOperator
-
 export default class DeploymentFactory implements DeploymentFactoryInterface {
   public constructor(protected _resolveName: (resource: DeploymentObject, shardConfig: ShardConfig) => string) { }
-
 
   public createDeployment(resource: DeploymentObject, shardConfig: ShardConfig): k8s.V1Deployment {
     return {

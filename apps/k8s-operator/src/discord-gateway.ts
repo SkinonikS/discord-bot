@@ -1,4 +1,5 @@
-import { err, ok, type Result } from 'neverthrow';
+import { err, ok } from 'neverthrow';
+import type { Result } from 'neverthrow';
 import type { DiscordGatewayBotResponse, DiscordGatewayInterface } from '#/types';
 
 export interface DiscordGatewayBotRawResponse {
@@ -12,6 +13,7 @@ export interface DiscordGatewayBotRawResponse {
   };
 }
 
+// For testing purposes
 export class ManualDiscordGateway implements DiscordGatewayInterface {
   public constructor(
     protected _shards: number = 1,
@@ -32,9 +34,11 @@ export class ManualDiscordGateway implements DiscordGatewayInterface {
 }
 
 export default class DiscordGateway implements DiscordGatewayInterface {
+  public static readonly GATEWAY_URL = 'https://discord.com/api/v10/gateway/bot';
+
   public async getBotInfo(discordToken: string): Promise<Result<DiscordGatewayBotResponse, Error>> {
     try {
-      const response = await fetch('https://discord.com/api/v10/gateway/bot', {
+      const response = await fetch(DiscordGateway.GATEWAY_URL, {
         method: 'GET',
         headers: {
           Authorization: `Bot ${discordToken}`,

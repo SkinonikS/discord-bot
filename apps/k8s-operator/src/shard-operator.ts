@@ -3,8 +3,7 @@ import type { Result } from 'neverthrow';
 import { err, fromPromise } from 'neverthrow';
 import type { Logger } from 'winston';
 import DeploymentRepository from '#/deployment-repository';
-import type DiscordGateway from '#/discord-gateway';
-import { ManualDiscordGateway } from '#/discord-gateway';
+import DiscordGateway from '#/discord-gateway';
 import ReshardingManager from '#/resharding-manager';
 import ShardCluster from '#/shard-cluster';
 import ShardSpawner from '#/shard-spawner';
@@ -36,7 +35,7 @@ export class ShardOperator {
     this._apiCore = this._kc.makeApiClient(k8s.CoreV1Api);
     this._apiWatch = new k8s.Watch(this._kc);
 
-    this._discordGateway = new ManualDiscordGateway();
+    this._discordGateway = new DiscordGateway();
     this._shardCluster = new ShardCluster(
       new ShardSpawner(this._operatorConfig.sleepDelay),
       this._deploymentFactory,

@@ -1,11 +1,6 @@
-import { ok, err, type Result } from 'neverthrow';
-
-export interface StartReshardingOptions {
-  resourceUid: string;
-  intervalDelay: number;
-}
-
-export type StartReshardCallback = (resourceUid: string) => Promise<void>;
+import { ok, err } from 'neverthrow';
+import type { Result } from 'neverthrow';
+import type { StartReshardCallback, StartReshardingOptions } from '#/types';
 
 export default class ReshardingManager {
   protected readonly _reshardIntervals: Map<string, NodeJS.Timeout> = new Map();

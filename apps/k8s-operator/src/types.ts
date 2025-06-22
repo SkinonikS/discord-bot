@@ -11,6 +11,7 @@ export interface SpawnInstanceConfig {
   shardId: number;
   totalShards: number;
 }
+
 export interface ShardSpawnerConfig {
   maxConcurrency: number;
   totalShards: number;
