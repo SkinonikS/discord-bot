@@ -36,8 +36,8 @@ export default class DiscordModule implements ModuleInterface {
       return new Client({
         intents: discordConfig.intents,
         presence: discordConfig.richPresence,
-        shardCount: 1,
-        shards: 0,
+        shardCount: discordConfig.shardCount,
+        shards: [discordConfig.shardId],
       });
     });
 

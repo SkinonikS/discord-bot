@@ -11,4 +11,6 @@ export const Env = cleanEnv(process.env, {
   REDIS_DATABASE: num({ default: 0 }),
   LOG_LEVEL: str({ default: 'debug' }),
   LOG_SHOW_STACK_TRACES: bool({ default: false }),
+  SHARD_ID: num({ default: 0 }),
+  SHARD_COUNT: num({ default: 1 }),
 });

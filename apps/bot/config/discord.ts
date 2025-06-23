@@ -21,4 +21,6 @@ export default defineDiscordConfig({
       url: 'https://github.com/SkinonikS/discord-bot',
     }],
   },
+  shardId: Env.SHARD_ID,
+  shardCount: Env.SHARD_COUNT,
 });

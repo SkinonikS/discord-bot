@@ -4,4 +4,6 @@ export interface DiscordConfig extends Record<string, unknown> {
   token: string;
   intents: IntentsBitField;
   richPresence?: PresenceData;
+  shardId: number;
+  shardCount: number;
 }
