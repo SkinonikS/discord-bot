@@ -21,6 +21,8 @@ export default class ShardSpawner implements ShardSpawnerInterface{
       });
 
       if (spawnResult.isErr()) {
+        // FIXME: Maybe its to rough to return an error here, we could just log it and continue
+        // spawning the rest of the shards??
         return err(spawnResult.error);
       }
 
