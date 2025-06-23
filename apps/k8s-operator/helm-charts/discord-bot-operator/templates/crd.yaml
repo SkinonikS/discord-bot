@@ -1,0 +1,72 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: discordbots.example.com
+  labels:
+    {{- include "discord-bot-operator.labels" . | nindent 4 }}
+spec:
+  group: example.com
+  names:
+    plural: discordbots
+    singular: discordbot
+    kind: DiscordBot
+  scope: Namespaced
+  versions:
+  - name: v1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              container:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The name of the container.
+                  image:
+                    type: string
+                    description: The container image for the Discord bot.
+                  imagePullPolicy:
+                    type: string
+                    description: The image pull policy for the container (e.g., Always, IfNotPresent).
+              tokenSecretRef:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The name of the secret containing the Discord bot token.
+                  key:
+                    type: string
+                    description: The key in the secret that contains the token.
+              sharding:
+                type: object
+                properties:
+                  reshardInterval:
+                    type: string
+                    format: duration
+                    description: The interval for re-sharding the bot (e.g., "1h", "30m").
+              env:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      description: The name of the environment variable.
+                    value:
+                      type: string
+                      description: The value of the environment variable.
+          # status:
+          #   type: object
+          #   properties:
+          #     totalShards:
+          #       type: integer
+          #       description: The total number of shards assigned.
+          #     status:
+          #       type: string
+          #       description: The status of the deployment.

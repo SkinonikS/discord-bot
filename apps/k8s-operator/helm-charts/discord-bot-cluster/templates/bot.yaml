@@ -1,0 +1,17 @@
+apiVersion: example.com/v1
+kind: DiscordBot
+metadata:
+  name: {{ include "discord-bot-cluster.fullname" . | quote }}
+  namespace: discord-bot
+  labels:
+    {{- include "discord-bot-cluster.labels" . | nindent 4 }}
+spec:
+  sharding:
+    reshardInterval: {{ .Values.sharding.reshardInterval | quote }}
+  tokenSecretRef:
+    name: {{ .Values.tokenSecretRef.name | quote }}
+    key: {{ .Values.tokenSecretRef.key | quote }}
+  container:
+    name: {{ .Values.container.name | quote }}
+    image: {{ .Values.container.image | quote }}
+    imagePullPolicy: {{ .Values.container.imagePullPolicy | quote }}

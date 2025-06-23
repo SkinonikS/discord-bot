@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "discord-bot-operator.fullname" . | quote }}
+  namespace: discord-bot-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "discord-bot-operator.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "discord-bot-operator.labels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "discord-bot-operator.fullname" . | quote }}
+      containers:
+      - name: {{ .Values.container.name | quote }}
+        image: {{ .Values.container.image | quote }}
+        imagePullPolicy: {{ .Values.container.imagePullPolicy | quote }}
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}

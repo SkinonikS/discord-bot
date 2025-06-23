@@ -1,0 +1,40 @@
+# This field allows specifying a custom name for the deployment or resource.
+# If `fullOverrideName` is not empty, this value will be ignored.
+nameOverride: ""
+
+# This key can be used to fully override the resource name, ensuring that the specified name is used exactly as provided.
+# If left empty (""), the auto-generated name is used.
+fullnameOverride: ""
+
+# This section specifies the container image to be used for the deployment.
+container:
+  # The name of the container that will run the Discord bot operator.
+  name: "discord-bot-operator"
+  # The Docker image for the Discord bot operator.
+  image: "discord-bot-operator:latest"
+  # The image pull policy for the container.
+  imagePullPolicy: Never
+
+# devMode is a flag that can be used to enable or disable the development mode.
+debug: false
+
+# This key specifies the environment in which the application is running.
+environment: "production"
+
+# This section defines the resource requests and limits for the container.
+# It ensures that the application is allocated a specified amount of CPU and memory.
+resources:
+  # Specifies the minimum amount of resources that the container requires to run.
+  # The scheduler uses these values to decide on which node to place the pod.
+  requests:
+    # The minimum amount of memory (RAM) that the container will be allocated.
+    memory: 64Mi
+    # The minimum amount of CPU that the container will be allocated.
+    cpu: 250m
+  # Specifies the maximum amount of resources that the container can use.
+  # If the container exceeds these values, it may be throttled or killed.
+  limits:
+    # The maximum amount of memory (RAM) that the container can use.
+    memory: 128Mi
+    # The maximum amount of CPU that the container can use.
+    cpu: 500m
