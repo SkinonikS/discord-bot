@@ -1,0 +1,27 @@
+# This field allows specifying a custom name for the deployment or resource.
+# If `fullOverrideName` is not empty, this value will be ignored.
+nameOverride: ""
+
+# This key can be used to fully override the resource name, ensuring that the specified name is used exactly as provided.
+# If left empty (""), the auto-generated name is used.
+fullnameOverride: ""
+
+# This section specifies the container image to be used for the deployment.
+container:
+  # The name of the container that will run the Discord bot operator.
+  name: "discord-bot"
+  # The Docker image for the Discord bot operator.
+  image: "discord-bot:latest"
+  # The image pull policy for the container.
+  imagePullPolicy: Never
+
+tokenSecretRef:
+  # The name of the Kubernetes secret that contains the Discord bot token.
+  name: "discord-bot-secrets"
+  # The key within the secret that holds the Discord bot token.
+  key: "discordToken"
+
+# Sharding configuration for the Discord bot cluster.
+sharding:
+  # The interval at which the bot will reshard.
+  reshardInterval: "6h"

@@ -3,9 +3,7 @@ kind: CustomResourceDefinition
 metadata:
   name: discordbots.example.com
   labels:
-    app.kubernetes.io/name: discord-bot
-    app.kubernetes.io/version: "1.2.1"
-    app.kubernetes.io/component: crd
+    {{- include "discord-bot-operator.labels" . | nindent 4 }}
 spec:
   group: example.com
   names:
