@@ -59,8 +59,8 @@ export default class ShardCluster {
     return spawnShardsResult;
   }
 
-  public recreateCluster(resource: WatchObject, shardSpawnerConfig: ShardSpawnerConfig): Promise<Result<k8s.V1Deployment[], Error>> {
-    this.destroyCluster(resource);
+  public async recreateCluster(resource: WatchObject, shardSpawnerConfig: ShardSpawnerConfig): Promise<Result<k8s.V1Deployment[], Error>> {
+    await this.destroyCluster(resource);
     return this.createCluster(resource, shardSpawnerConfig);
   }
 
