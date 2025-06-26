@@ -1,0 +1,37 @@
+{
+  "private": true,
+  "name": "@module/redis",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": "Vadim SkinonikS.#",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "node": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./module": {
+      "import": "./dist/src/module.js",
+      "node": "./dist/src/module.js",
+      "types": "./dist/src/module.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "build:watch": "tsdown --watch"
+  },
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@framework/core": "workspace:*",
+    "@module/logger": "workspace:*",
+    "redis": "^4.7.1"
+  },
+  "packageManager": "pnpm@10.6.3"
+}
