@@ -12,5 +12,11 @@ export const defineDiscordConfig = (config: Partial<DiscordConfig>) => defineBas
   intents: config.intents ?? new IntentsBitField(),
   richPresence: config.richPresence ?? {},
   shardCount: config.shardCount ?? 1,
-  shards: config.shards ?? [],
+  shardId: config.shardId ?? 0,
+  rateLimiter: config.rateLimiter ?? {
+    maxConcurrency: 5,
+    resetDuration: 5000,
+    channelName: 'connection-rate-limit',
+    database: 0,
+  },
 });

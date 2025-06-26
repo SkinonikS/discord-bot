@@ -1,21 +1,33 @@
+import { randomUUID } from 'crypto';
+import type { UUID } from 'crypto';
 import { ConfigNotFoundException } from '@framework/core';
-import type { Application, ErrorHandler } from '@framework/core';
-import type { ConfigRepository, ModuleInterface } from '@framework/core';
+import type { Application, ErrorHandler, ConfigRepository, ModuleInterface } from '@framework/core';
 import type { LoggerFactoryInterface, LoggerInterface } from '@module/logger';
 import { Client, Events } from 'discord.js';
+import type { createClient } from 'redis';
 import { debug } from '../debug';
 import pkg from '../package.json';
+import Connector from '#/connector';
 import Controller from '#/controller';
-import type { DiscordConfig } from '#/types';
+import { RoundRobinLoadBalancer } from '#/load-balancers/round-robin';
+import type { DiscordConfig, LoadBalancerInterface } from '#/types';
 
 declare module '@framework/core' {
   interface ContainerBindings {
     'discord.client': Client;
     'discord.logger': LoggerInterface;
+    'discord.lb': LoadBalancerInterface;
   }
 
   interface ConfigBindings {
     'discord': DiscordConfig;
+  }
+}
+
+declare module 'discord.js' {
+  interface Client {
+    uid: UUID;
+    shardId: number;
   }
 }
 
@@ -25,7 +37,15 @@ export default class DiscordModule implements ModuleInterface {
   readonly version = pkg.version;
 
   public register(app: Application): void {
+    app.container.singleton('discord.lb', async (container) => {
+      const discord = await container.make('discord.client');
+      const redis: ReturnType<typeof createClient> = await container.make('redis.client');
+      return new RoundRobinLoadBalancer(discord, redis);
+    });
+
     app.container.singleton('discord.client', async (container) => {
+      debug('Creating Discord client...');
+
       const config: ConfigRepository = await container.make('config');
       const discordConfig = config.get('discord');
 
@@ -33,23 +53,28 @@ export default class DiscordModule implements ModuleInterface {
         throw new ConfigNotFoundException('discord');
       }
 
-      return new Client({
+      const client = new Client({
         intents: discordConfig.intents,
         presence: discordConfig.richPresence,
         shardCount: discordConfig.shardCount,
-        shards: [discordConfig.shardId],
+        shards: discordConfig.shardId,
       });
+
+      client.uid = randomUUID();
+      client.shardId = discordConfig.shardId;
+
+      return client;
     });
 
     app.container.singleton('discord.logger', async (container) => {
       const factory: LoggerFactoryInterface = await container.make('logger.factory');
       return factory.createLogger(this.id);
     });
-
-    debug('Discord module has been registered');
   }
 
   public async boot(app: Application): Promise<void> {
+    debug('Booting Discord module...');
+
     const discord = await app.container.make('discord.client');
     const logger = await app.container.make('discord.logger');
     const errorHandler: ErrorHandler = await app.container.make('errorHandler');
@@ -65,7 +90,11 @@ export default class DiscordModule implements ModuleInterface {
   }
 
   public async start(app: Application): Promise<void> {
+    debug('Starting Discord module...');
+
+    const loadBalancer = await app.container.make('discord.lb');
     const discord = await app.container.make('discord.client');
+
     const config: ConfigRepository = await app.container.make('config');
     const discordConfig = config.get('discord');
 
@@ -73,11 +102,20 @@ export default class DiscordModule implements ModuleInterface {
       throw new ConfigNotFoundException('discord');
     }
 
-    await discord.login();
-    debug('Discord client has been logged in');
+    discord.on(Events.ShardReady, async () => {
+      await loadBalancer.register();
+    });
+
+    discord.on(Events.ShardDisconnect, async () => {
+      await loadBalancer.unregister();
+    });
+
+    this._tryConnect(app, discord, discordConfig); // This should not be awaited
   }
 
   public async shutdown(app: Application): Promise<void> {
+    debug('Shutting down Discord module...');
+
     const discord = await app.container.make('discord.client');
     const logger = await app.container.make('discord.logger');
 
@@ -90,5 +128,17 @@ export default class DiscordModule implements ModuleInterface {
       logger.warn('Discord client was not ready, nothing to destroy');
       debug('Discord client was not ready, nothing to destroy');
     }
+  }
+
+  protected async _tryConnect(app: Application, discord: Client, discordConfig: DiscordConfig): Promise<void> {
+    const redis: ReturnType<typeof createClient> = await app.container.make('redis.client');
+    const logger = await app.container.make('discord.logger');
+
+    const rateLimitRedis = redis.duplicate({
+      database: discordConfig.rateLimiter.database,
+    });
+
+    const connector = new Connector(rateLimitRedis, discordConfig, discord, logger);
+    await connector.connect();
   }
 }
