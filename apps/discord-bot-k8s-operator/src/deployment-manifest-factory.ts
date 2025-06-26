@@ -69,10 +69,6 @@ export default class DeploymentManifestFactory implements DeploymentManifestFact
                     name: 'DISCORD_RATE_LIMIT_MAX_CONCURRENCY',
                     value: shardOptions.gatewayInfo.sessionStartLimit.maxConcurrency.toString(),
                   },
-                  {
-                    name: 'APP_UID',
-                    value: watchObject.metadata.uid,
-                  },
                 ],
               },
             ],
