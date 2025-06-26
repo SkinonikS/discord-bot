@@ -9,7 +9,7 @@ spec:
   names:
     plural: discordbots
     singular: discordbot
-    kind: DiscordBot
+    kind: DiscordBotCluster
   scope: Namespaced
   versions:
   - name: v1
@@ -25,9 +25,6 @@ spec:
               container:
                 type: object
                 properties:
-                  name:
-                    type: string
-                    description: The name of the container.
                   image:
                     type: string
                     description: The container image for the Discord bot.
@@ -61,12 +58,21 @@ spec:
                     value:
                       type: string
                       description: The value of the environment variable.
-          # status:
-          #   type: object
-          #   properties:
-          #     totalShards:
-          #       type: integer
-          #       description: The total number of shards assigned.
-          #     status:
-          #       type: string
-          #       description: The status of the deployment.
+                    valueFrom:
+                      type: object
+                      description: Source for the environment variable's value.
+                      properties:
+                        secretKeyRef:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            key:
+                              type: string
+                        configMapKeyRef:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            key:
+                              type: string

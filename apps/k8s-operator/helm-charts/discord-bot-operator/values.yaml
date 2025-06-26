@@ -8,18 +8,10 @@ fullnameOverride: ""
 
 # This section specifies the container image to be used for the deployment.
 container:
-  # The name of the container that will run the Discord bot operator.
-  name: "discord-bot-operator"
   # The Docker image for the Discord bot operator.
-  image: "discord-bot-operator:latest"
+  image: "discord-bot-k8s-operator:latest"
   # The image pull policy for the container.
   imagePullPolicy: Never
-
-# devMode is a flag that can be used to enable or disable the development mode.
-debug: false
-
-# This key specifies the environment in which the application is running.
-environment: "production"
 
 # This section defines the resource requests and limits for the container.
 # It ensures that the application is allocated a specified amount of CPU and memory.

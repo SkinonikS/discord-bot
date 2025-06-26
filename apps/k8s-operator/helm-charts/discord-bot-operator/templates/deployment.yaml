@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "discord-bot-operator.fullname" . | quote }}
-  namespace: discord-bot-operator
+  namespace: {{ .Release.Namespace | quote }}
 spec:
   replicas: 1
   selector:
@@ -15,7 +15,7 @@ spec:
     spec:
       serviceAccountName: {{ include "discord-bot-operator.fullname" . | quote }}
       containers:
-      - name: {{ .Values.container.name | quote }}
+      - name: "discord-bot-k8s-operator"
         image: {{ .Values.container.image | quote }}
         imagePullPolicy: {{ .Values.container.imagePullPolicy | quote }}
         resources:

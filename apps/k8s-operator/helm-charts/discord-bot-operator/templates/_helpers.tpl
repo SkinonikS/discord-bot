@@ -32,7 +32,3 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 app.kubernetes.io/name: {{ include "discord-bot-operator.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
-
-{{- define "discord-bot-operator.serviceAccountName" -}}
-{{- default (include "discord-bot-operator.fullname" .) .Values.serviceAccount.name }}
-{{- end }}
