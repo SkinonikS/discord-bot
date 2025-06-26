@@ -1,5 +1,5 @@
 import type { Application } from '@framework/core';
-import type TransportStream from 'winston-transport';
+import type { transport as Transport } from 'winston';
 
 export interface LoggerInterface {
   info(message: string | object, ...args: unknown[]): void;
@@ -20,7 +20,7 @@ export interface TransportFactoryCreateOptions {
 }
 
 export interface TransportFactoryInterface {
-  create(app: Application, options: TransportFactoryCreateOptions): Promise<TransportStream> | TransportStream;
+  create(app: Application, options: TransportFactoryCreateOptions): Promise<Transport> | Transport;
 }
 
 export interface LoggerConfig {
