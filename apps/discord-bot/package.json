@@ -11,7 +11,7 @@
   "scripts": {
     "build": "tsdown",
     "build:watch": "tsdown --watch",
-    "start": "node dist/src/start-bot.js"
+    "start": "node --enable-source-maps dist/src/start-bot.js"
   },
   "dependencies": {
     "@adonisjs/fold": "^10.2.0",
