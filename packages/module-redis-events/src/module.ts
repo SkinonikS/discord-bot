@@ -1,7 +1,6 @@
 import { ConfigNotFoundException } from '@framework/core';
 import type { Application, ConfigRepository, ModuleInterface } from '@framework/core';
 import type { LoggerFactoryInterface, LoggerInterface } from '@module/logger';
-import { fromPromise } from 'neverthrow';
 import type { createClient } from 'redis';
 import pkg from '../package.json';
 import EventManager from '#/event-manager';
