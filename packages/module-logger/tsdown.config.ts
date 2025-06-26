@@ -7,4 +7,5 @@ export default defineConfig({
   dts: true,
   unbundle: true,
   skipNodeModulesBundle: true,
+  silent: true,
 });
