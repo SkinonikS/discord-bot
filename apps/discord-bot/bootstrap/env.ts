@@ -2,6 +2,7 @@ import { bool, cleanEnv, str, num } from 'envalid';
 
 export const Env = cleanEnv(process.env, {
   APP_UID: str({ default: undefined }),
+
   DISCORD_TOKEN: str(),
   DISCORD_SHARD_ID: num({ default: 0 }),
   DISCORD_SHARD_COUNT: num({ default: 1 }),
