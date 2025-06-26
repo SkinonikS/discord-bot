@@ -33,7 +33,7 @@
     "@discordjs/voice": "^0.18.0",
     "@framework/core": "workspace:*",
     "@module/logger": "workspace:*",
-    "discord.js": "^14.20.0",
+    "discord.js": "^14.21.0",
     "distube": "^5.0.7"
   },
   "packageManager": "pnpm@10.6.3"
