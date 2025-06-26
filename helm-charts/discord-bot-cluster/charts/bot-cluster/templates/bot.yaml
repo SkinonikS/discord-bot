@@ -11,6 +11,20 @@ spec:
   tokenSecretRef:
     name: {{ .Values.tokenSecretRef.name | quote }}
     key: {{ .Values.tokenSecretRef.key | quote }}
+initContainers:
+  - name: "wait-for-redis"
+    image: "busybox:latest"
+    imagePullPolicy: IfNotPresent
+    command:
+    - /bin/sh
+    - -c
+    - |
+      echo "Waiting for Redis to be available at redis:6379..."
+      until nc -z redis 6379; do
+        echo "Redis not ready yet..."
+        sleep 2
+      done
+      echo "Redis is up!"
   container:
     image: {{ .Values.container.image | quote }}
     imagePullPolicy: {{ .Values.container.imagePullPolicy | quote }}

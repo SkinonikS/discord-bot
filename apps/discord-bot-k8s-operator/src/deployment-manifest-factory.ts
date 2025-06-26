@@ -41,6 +41,7 @@ export default class DeploymentManifestFactory implements DeploymentManifestFact
             },
           },
           spec: {
+            initContainers: watchObject.spec?.initContainers ?? [],
             containers: [
               {
                 name: `discord-bot-shard-${shardOptions.shardId}`,
