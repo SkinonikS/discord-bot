@@ -7,4 +7,5 @@ export default defineConfig({
   sourcemap: true,
   unbundle: true,
   skipNodeModulesBundle: true,
+  silent: true,
 });

@@ -1,67 +1,8 @@
 import type * as k8s from '@kubernetes/client-node';
 import type { Result } from 'neverthrow';
 
-export type SpawnInstance = (shardConfig: SpawnInstanceConfig) => Promise<Result<k8s.V1Deployment, Error>>;
-
-export interface ShardSpawnerInterface {
-  spawn(spawnInstance: SpawnInstance, config: ShardSpawnerConfig): Promise<Result<k8s.V1Deployment[], Error>>;
-}
-
-export interface SpawnInstanceConfig {
-  shardId: number;
-  totalShards: number;
-}
-
-export interface ShardSpawnerConfig {
-  maxConcurrency: number;
-  totalShards: number;
-}
-
-export interface Metadata {
-  name: string;
-  namespace: string;
-  uid: string;
-}
-
-export interface DeploymentSpec {
-  containerImage: string;
-  imagePullPolicy: string;
-  tokenSecretRef: {
-    name: string;
-    key: string;
-  };
-  container: {
-    name: string;
-    image: string;
-    imagePullPolicy: string;
-  };
-  sharding: {
-    reshardInterval: string | number;
-  };
-  env?: {
-    name: string;
-    valueFrom?: {
-      secretKeyRef: {
-        name: string;
-        key: string;
-      };
-    };
-    value?: string;
-  }[];
-}
-
-export interface WatchObject {
-  metadata: Metadata;
-  spec: DeploymentSpec;
-}
-
-export interface ShardConfig {
-  shardId: number;
-  totalShards: number;
-}
-
 export interface DeleteDeploymentsOptions {
-  app: string;
+  name: string;
   namespace: string;
 }
 
@@ -70,29 +11,45 @@ export interface CreateDeploymentOptions {
   resource: k8s.V1Deployment;
 }
 
-export interface DeploymentRepositoryInterface {
+export interface ListDeploymentsOptions {
+  name: string;
+  namespace: string;
+}
+
+export interface DeploymentStorageInterface {
   createDeployment(options: CreateDeploymentOptions): Promise<Result<k8s.V1Deployment, Error>>;
   deleteDeployments(options: DeleteDeploymentsOptions): Promise<Result<k8s.V1Status, Error>>;
+  listDeployments(options: ListDeploymentsOptions): Promise<Result<k8s.V1DeploymentList, Error>>;
 }
 
-export interface DeploymentFactoryInterface {
-  createDeployment: (resource: DeploymentObject, shardConfig: ShardConfig) => k8s.V1Deployment;
-}
+export type ReshardIntervalCallback = (watchObject: WatchObject) => Promise<void> | void;
 
-export interface StartReshardingOptions {
-  resourceUid: string;
-  intervalDelay: number;
+export interface StartReshardingIntervalOptions {
+  watchObject: WatchObject;
+  interval: number | string;
 }
-
-export type StartReshardCallback = (resourceUid: string) => Promise<void>;
 
 export interface ReshardingManagerInterface {
-  startInterval({ resourceUid, intervalDelay }: StartReshardingOptions, callback: StartReshardCallback): Result<void, Error>;
-  stopInterval(resourceUid: string): boolean;
-  hasInterval(resourceUid: string): boolean;
+  startInterval(options: StartReshardingIntervalOptions, callback: ReshardIntervalCallback): Result<void, Error>;
+  stopInterval(watchObject: WatchObject): boolean;
+  hasInterval(watchObject: WatchObject): boolean;
 }
 
-export interface DiscordGatewayBotResponse {
+export interface GatwayInfoProviderInterface {
+  fetchInfo(botToken: string): Promise<Result<GatewayInfo, Error>>;
+}
+
+export interface OpqueSecretOptions {
+  name: string;
+  namespace: string;
+  key: string;
+}
+
+export interface SecretStorageInterface {
+  getSecretOpaque(options: OpqueSecretOptions): Promise<Result<string, Error>>;
+}
+
+export interface GatewayInfo {
   shards: number;
   sessionStartLimit: {
     total: number;
@@ -102,45 +59,52 @@ export interface DiscordGatewayBotResponse {
   };
 }
 
-export interface DiscordGatewayInterface {
-  getBotInfo(botToken: string): Promise<Result<DiscordGatewayBotResponse, Error>>;
+export interface ShardOptions {
+  shardId: number;
+  gatewayInfo: GatewayInfo;
 }
 
-export interface ShardClusterInterface {
-  createCluster(resource: WatchObject, shardSpawnerConfig: ShardSpawnerConfig): Promise<Result<k8s.V1Deployment[], Error>>;
-  spawnShards(resource: WatchObject, shardSpawnerConfig: ShardSpawnerConfig): Promise<Result<k8s.V1Deployment[], Error>>;
+export interface ShardSpawnerInterface {
+  spawn(watchObject: WatchObject, gatewayInfo: GatewayInfo): Promise<Result<k8s.V1Deployment[], Error>>;
 }
 
-export interface DiscordBotOperatorSpec {
-  containerImage: string;
-  imagePullPolicy: string;
+export interface DeploymentManifestFactoryInterface {
+  createManifest: (watchObject: WatchObject, shardOptions: ShardOptions) => k8s.V1Deployment;
+}
+
+export interface Metadata {
+  name: string;
+  namespace: string;
+  uid: string;
+}
+
+export interface WatchObject {
+  metadata: Metadata;
+  spec: Spec;
+}
+
+export type Env = {
+  name: string;
+  valueFrom?: {
+    secretKeyRef: {
+      name: string;
+      key: string;
+    };
+  };
+  value?: string;
+};
+
+export interface Spec {
   tokenSecretRef: {
     name: string;
     key: string;
   };
   container: {
-    name: string;
     image: string;
     imagePullPolicy: string;
   };
   sharding: {
     reshardInterval: string | number;
   };
-  env?: {
-    name: string;
-    valueFrom?: {
-      secretKeyRef: {
-        name: string;
-        key: string;
-      };
-    };
-    value?: string;
-  }[];
-}
-
-export interface DeploymentObject {
-  appName: string;
-  version: string;
-  metadata: Metadata;
-  spec: DiscordBotOperatorSpec;
+  env?: Env[];
 }

@@ -1,41 +1,33 @@
 import type * as k8s from '@kubernetes/client-node';
 import { err, ok } from 'neverthrow';
 import type { Result } from 'neverthrow';
-import sleep from 'sleep-promise';
-import type { ShardSpawnerConfig, ShardSpawnerInterface, SpawnInstance } from '#/types';
+import type { DeploymentManifestFactoryInterface, DeploymentStorageInterface, GatewayInfo, ShardSpawnerInterface, WatchObject } from '#/types';
 
-export default class ShardSpawner implements ShardSpawnerInterface{
+export default class ShardSpawner implements ShardSpawnerInterface {
   public constructor(
-    protected readonly _sleepDelay: number,
+    protected readonly _deploymentFactory: DeploymentManifestFactoryInterface,
+    protected readonly _deploymentStorage: DeploymentStorageInterface,
   ) { }
 
-  public async spawn(spawnInstance: SpawnInstance, conifg: ShardSpawnerConfig): Promise<Result<k8s.V1Deployment[], Error>> {
+  public async spawn(watchObject: WatchObject, gatewayInfo: GatewayInfo): Promise<Result<k8s.V1Deployment[], Error>> {
     const deployments: k8s.V1Deployment[] = [];
-    let shardId = 0;
-    while (shardId < conifg.totalShards) {
-      const rateLimitKey = shardId % conifg.maxConcurrency;
 
-      const spawnResult = await spawnInstance({
-        shardId,
-        totalShards: conifg.totalShards,
+    for (let i = 0; i < gatewayInfo.shards; i++) {
+      const deployment = this._deploymentFactory.createManifest(watchObject, {
+        shardId: i,
+        gatewayInfo: gatewayInfo,
+      });
+
+      const spawnResult = await this._deploymentStorage.createDeployment({
+        namespace: watchObject.metadata.namespace,
+        resource: deployment,
       });
 
       if (spawnResult.isErr()) {
-        // FIXME: Maybe its to rough to return an error here, we could just log it and continue
-        // spawning the rest of the shards??
         return err(spawnResult.error);
       }
 
       deployments.push(spawnResult.value);
-      shardId++;
-
-      if (shardId >= conifg.totalShards) {
-        break;
-      }
-
-      if (rateLimitKey === conifg.maxConcurrency - 1) {
-        await sleep(this._sleepDelay);
-      }
     }
 
     return ok(deployments);

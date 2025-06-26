@@ -1,6 +1,6 @@
 import { err, ok } from 'neverthrow';
 import type { Result } from 'neverthrow';
-import type { DiscordGatewayBotResponse, DiscordGatewayInterface } from '#/types';
+import type { GatwayInfoProviderInterface, GatewayInfo } from '#/types';
 
 export interface DiscordGatewayBotRawResponse {
   url: string;
@@ -13,32 +13,12 @@ export interface DiscordGatewayBotRawResponse {
   };
 }
 
-// For testing purposes
-export class ManualDiscordGateway implements DiscordGatewayInterface {
-  public constructor(
-    protected _shards: number = 1,
-    protected _maxConcurrency: number = 1,
-  ) { }
-
-  public async getBotInfo(discordToken: string): Promise<Result<DiscordGatewayBotResponse, Error>> {
-    return ok({
-      shards: this._shards,
-      sessionStartLimit: {
-        total: 1000,
-        remaining: 999,
-        resetAfter: 3600000,
-        maxConcurrency: this._maxConcurrency,
-      },
-    });
-  }
-}
-
-export default class DiscordGateway implements DiscordGatewayInterface {
+export default class DiscordGatewayInfoProvider implements GatwayInfoProviderInterface {
   public static readonly GATEWAY_URL = 'https://discord.com/api/v10/gateway/bot';
 
-  public async getBotInfo(discordToken: string): Promise<Result<DiscordGatewayBotResponse, Error>> {
+  public async fetchInfo(discordToken: string): Promise<Result<GatewayInfo, Error>> {
     try {
-      const response = await fetch(DiscordGateway.GATEWAY_URL, {
+      const response = await fetch(DiscordGatewayInfoProvider.GATEWAY_URL, {
         method: 'GET',
         headers: {
           Authorization: `Bot ${discordToken}`,
