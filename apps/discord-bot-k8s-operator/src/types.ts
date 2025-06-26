@@ -96,6 +96,7 @@ export type Env = {
 
 export interface Spec {
   tokenSecretRef: {
+    envVarName: string;
     name: string;
     key: string;
   };
@@ -103,6 +104,12 @@ export interface Spec {
     image: string;
     imagePullPolicy: string;
   };
+  initContainers?: {
+    name: string;
+    image: string;
+    imagePullPolicy: string;
+    command?: string[];
+  }[];
   sharding: {
     reshardInterval: string | number;
   };
