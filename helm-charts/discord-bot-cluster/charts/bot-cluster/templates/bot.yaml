@@ -9,9 +9,10 @@ spec:
   sharding:
     reshardInterval: {{ .Values.sharding.reshardInterval | quote }}
   tokenSecretRef:
+    envVarName: {{ .Values.tokenSecretRef.envVarName | quote }}
     name: {{ .Values.tokenSecretRef.name | quote }}
     key: {{ .Values.tokenSecretRef.key | quote }}
-initContainers:
+  initContainers:
   - name: "wait-for-redis"
     image: "busybox:latest"
     imagePullPolicy: IfNotPresent
