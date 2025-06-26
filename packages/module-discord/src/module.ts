@@ -1,5 +1,3 @@
-import { randomUUID } from 'crypto';
-import type { UUID } from 'crypto';
 import { ConfigNotFoundException } from '@framework/core';
 import type { Application, ErrorHandler, ConfigRepository, ModuleInterface } from '@framework/core';
 import type { LoggerFactoryInterface, LoggerInterface } from '@module/logger';
@@ -26,7 +24,6 @@ declare module '@framework/core' {
 
 declare module 'discord.js' {
   interface Client {
-    uid: UUID;
     shardId: number;
   }
 }
@@ -38,14 +35,13 @@ export default class DiscordModule implements ModuleInterface {
 
   public register(app: Application): void {
     app.container.singleton('discord.lb', async (container) => {
+      const app = await container.make('app');
       const discord = await container.make('discord.client');
       const redis: ReturnType<typeof createClient> = await container.make('redis.client');
-      return new RoundRobinLoadBalancer(discord, redis);
+      return new RoundRobinLoadBalancer(app, discord, redis);
     });
 
     app.container.singleton('discord.client', async (container) => {
-      debug('Creating Discord client...');
-
       const config: ConfigRepository = await container.make('config');
       const discordConfig = config.get('discord');
 
@@ -60,9 +56,7 @@ export default class DiscordModule implements ModuleInterface {
         shards: discordConfig.shardId,
       });
 
-      client.uid = randomUUID();
       client.shardId = discordConfig.shardId;
-
       return client;
     });
 

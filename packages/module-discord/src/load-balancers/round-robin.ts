@@ -1,22 +1,25 @@
+import type { Application } from '@framework/core';
 import type { Client } from 'discord.js';
 import type { createClient } from 'redis';
 import type { LoadBalancerInterface } from '#/types';
 
 export type ConsumeCallback = (uid: string, shardId?: number) => Promise<void>;
 
-// Round-Robin Load Balancer
 export class RoundRobinLoadBalancer implements LoadBalancerInterface {
   public constructor(
+    protected readonly _app: Application,
     protected readonly _discord: Client,
     protected readonly _redis: ReturnType<typeof createClient>,
-  ) { }
+  ) {
+    //
+  }
 
   public async register(): Promise<void> {
-    await this._redis.sAdd(this._createReplicasKey(this._discord.shardId), this._discord.uid);
+    await this._redis.sAdd(this._createReplicasKey(this._discord.shardId), this._app.uid);
   }
 
   public async unregister(): Promise<void> {
-    await this._redis.sRem(this._createReplicasKey(this._discord.shardId), this._discord.uid);
+    await this._redis.sRem(this._createReplicasKey(this._discord.shardId), this._app.uid);
   }
 
   public async execute(callback: ConsumeCallback): Promise<void> {
@@ -35,12 +38,12 @@ export class RoundRobinLoadBalancer implements LoadBalancerInterface {
     const currentIndex = counter % replicas.length;
     const currentReplica = replicas[currentIndex];
 
-    const isMyTurn = currentReplica === this._discord.uid;
+    const isMyTurn = currentReplica === this._app.uid;
     if (! isMyTurn) {
       return;
     }
 
-    await callback(this._discord.uid, shardId);
+    await callback(this._app.uid, shardId);
     await this._redis.incr(counterKey);
   }
 
