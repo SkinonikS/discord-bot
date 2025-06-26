@@ -24,16 +24,16 @@ export default class ErrorHandler {
   }
 
   public async handle(error: Error): Promise<void> {
-    const errorCode = error instanceof Exception
-      ? error.code ?? ''
-      : error.constructor.name;
+    const e = this._convertToException(error);
 
-    await this._logError(error);
-    await this.report(error);
+    await this._logError(e);
+    await this.report(e);
 
-    if (this.isFatalError(errorCode)) {
+    const code = e.code ?? e.name;
+    if (this.isFatalError(code)) {
       debug('Due to a fatal error, the application will shutdown:', error);
       await this._app.shutdown();
+      process.exit(1);
     }
   }
 
@@ -59,6 +59,23 @@ export default class ErrorHandler {
         this._logError(new Error(String(error), { cause: error }));
       }
     }
+  }
+
+  protected _convertToException(error: Error): Exception {
+    if (error instanceof Exception) {
+      return error;
+    }
+
+    // @ts-expect-error Check if the error has a code property (some error has it)
+    const code = Object.hasOwn(error, 'code') ? error.code : error.name;
+    // @ts-expect-error Check if the error has a status property (some error has it)
+    const status = Object.hasOwn(error, 'status') ? error.status : 500;
+
+    return new Exception(error.message, {
+      cause: error,
+      code: code,
+      status: status,
+    });
   }
 
   protected async _logError(error: Error): Promise<void> {
