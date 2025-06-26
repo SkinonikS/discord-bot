@@ -49,7 +49,7 @@ export default class DeploymentManifestFactory implements DeploymentManifestFact
                 env: [
                   ...watchObject.spec.env ?? [],
                   {
-                    name: 'DISCORD_TOKEN',
+                    name: watchObject.spec.tokenSecretRef.envVarName,
                     valueFrom: {
                       secretKeyRef: {
                         name: watchObject.spec.tokenSecretRef.name,

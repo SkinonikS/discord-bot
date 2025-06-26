@@ -14,6 +14,8 @@ container:
   imagePullPolicy: Never
 
 tokenSecretRef:
+  # The environment variable name that will hold the Discord bot token.
+  envVarName: "DISCORD_TOKEN"
   # The name of the Kubernetes secret that contains the Discord bot token.
   name: "bot-cluster"
   # The key within the secret that holds the Discord bot token.

@@ -34,6 +34,9 @@ spec:
               tokenSecretRef:
                 type: object
                 properties:
+                  envVarName:
+                    type: string
+                    description: The name of the environment variable that will hold the Discord bot token.
                   name:
                     type: string
                     description: The name of the secret containing the Discord bot token.

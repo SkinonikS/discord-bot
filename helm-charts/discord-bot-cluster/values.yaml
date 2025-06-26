@@ -8,6 +8,7 @@ redis:
 bot-cluster:
   fullnameOverride: "bot-cluster"
   tokenSecretRef:
+    envVarName: "DISCORD_TOKEN"
     name: "bot-cluster"
     key: "discordToken"
   env:
