@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import fs from 'node:fs';
 import { config } from 'dotenv';
 import type Application from '#/application';
@@ -25,6 +26,14 @@ export default class LoadEnvironmentVariables implements BootstrapperInterface {
 
     if (Object.hasOwn(Env, 'NODE_ENV')) {
       app.setEnvionment(String(Env.NODE_ENV));
+    }
+
+    if (Object.hasOwn(Env, 'APP_UID')) {
+      debug('Using APP_UID from environment variables');
+      app.setUid(String(Env.APP_UID));
+    } else {
+      debug('Generating a new UID for the application');
+      app.setUid(randomUUID());
     }
   }
 }

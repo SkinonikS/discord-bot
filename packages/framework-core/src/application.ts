@@ -28,6 +28,7 @@ export default class Application
   protected _state = ApplicationState.INITIAL;
   protected _environment: string;
   protected _version: string;
+  protected _uid: string | null = null;
 
   protected static _instance: Application | null = null;
 
@@ -39,6 +40,14 @@ export default class Application
     this.container.bindValue('container', this.container);
     this.events.setMaxListeners(Infinity);
     debug('Application initialized with base path:', config.appRoot);
+  }
+
+  public get uid(): string {
+    if (! this._uid) {
+      throw new Error('Application UID is not set. Please ensure the application is booted before accessing the UID.');
+    }
+
+    return this._uid;
   }
 
   public get isStarted(): boolean {
@@ -70,6 +79,16 @@ export default class Application
 
   public get environment(): string {
     return this._environment;
+  }
+
+  public setUid(uid: string): void {
+    if (this._uid) {
+      debug('Application UID is already set, ignoring new UID:', uid);
+      return;
+    }
+
+    this._uid = uid;
+    debug('Application UID set successfully:', uid);
   }
 
   public onShutdown(handler: HookHandler<[Application], [Application]>): void {
