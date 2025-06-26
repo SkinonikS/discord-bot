@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "@app/k8s-operator",
+  "name": "@app/discord-bot-k8s-operator",
   "version": "1.0.0",
   "type": "module",
   "main": "dist/src/index.js",
