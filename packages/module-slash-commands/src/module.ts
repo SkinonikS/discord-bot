@@ -46,13 +46,13 @@ export default class SlashCommandModule implements ModuleInterface {
       manager.deployToGuilds(guilds);
     });
 
-    discord.on(Events.InteractionCreate, (interaction) => {
+    discord.on(Events.InteractionCreate, async (interaction) => {
       if (interaction.isChatInputCommand()) {
-        manager.execute(interaction);
+        await manager.execute(interaction);
       }
 
       if (interaction.isAutocomplete()) {
-        manager.autocomplete(interaction);
+        await manager.autocomplete(interaction);
       }
     });
 
