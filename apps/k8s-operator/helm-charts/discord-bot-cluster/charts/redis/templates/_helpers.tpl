@@ -1,8 +1,8 @@
-{{- define "discord-bot-cluster.name" -}}
+{{- define "redis.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
-{{- define "discord-bot-cluster.fullname" -}}
+{{- define "redis.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -15,24 +15,20 @@
 {{- end }}
 {{- end }}
 
-{{- define "discord-bot-cluster.chart" -}}
+{{- define "redis.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
-{{- define "discord-bot-cluster.labels" -}}
-helm.sh/chart: {{ include "discord-bot-cluster.chart" . }}
-{{ include "discord-bot-cluster.selectorLabels" . }}
+{{- define "redis.labels" -}}
+helm.sh/chart: {{ include "redis.chart" . }}
+{{ include "redis.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
-{{- define "discord-bot-cluster.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "discord-bot-cluster.name" . }}
+{{- define "redis.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "redis.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
-{{- end }}
-
-{{- define "discord-bot-cluster.serviceAccountName" -}}
-{{- default (include "discord-bot-cluster.fullname" .) .Values.serviceAccount.name }}
 {{- end }}

@@ -1,8 +1,8 @@
 apiVersion: example.com/v1
-kind: DiscordBot
+kind: DiscordBotCluster
 metadata:
   name: {{ include "discord-bot-cluster.fullname" . | quote }}
-  namespace: discord-bot
+  namespace: {{ .Release.Namespace | quote }}
   labels:
     {{- include "discord-bot-cluster.labels" . | nindent 4 }}
 spec:
@@ -12,6 +12,7 @@ spec:
     name: {{ .Values.tokenSecretRef.name | quote }}
     key: {{ .Values.tokenSecretRef.key | quote }}
   container:
-    name: {{ .Values.container.name | quote }}
     image: {{ .Values.container.image | quote }}
     imagePullPolicy: {{ .Values.container.imagePullPolicy | quote }}
+  env:
+    {{- toYaml .Values.env | nindent 2 }}
