@@ -24,11 +24,11 @@ export default class LoadEnvironmentVariables implements BootstrapperInterface {
 
     const { Env } = await this._envVariablesResolver();
 
-    if (Object.hasOwn(Env, 'NODE_ENV')) {
+    if (Object.hasOwn(Env, 'NODE_ENV') && Env.NODE_ENV) {
       app.setEnvionment(String(Env.NODE_ENV));
     }
 
-    if (Object.hasOwn(Env, 'APP_UID')) {
+    if (Object.hasOwn(Env, 'APP_UID') && Env.APP_UID) {
       debug('Using APP_UID from environment variables');
       app.setUid(String(Env.APP_UID));
     } else {
