@@ -11,9 +11,9 @@ export default defineLoggerConfig({
   showStackTraces: Env.LOG_SHOW_STACK_TRACES,
   transports: [
     new ConsoleTransportFactory(),
-    new LokiTransportFactory({
-      host: Env.LOKI_HOST,
-      label: pkg.name,
-    }),
+    // new LokiTransportFactory({
+    //   host: Env.LOG_LOKI_URL,
+    //   label: pkg.name,
+    // }),
   ],
 });

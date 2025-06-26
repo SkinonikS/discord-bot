@@ -10,6 +10,7 @@ export default defineDiscordConfig({
     'GuildMessages',
     'GuildVoiceStates',
     'DirectMessages',
+    'MessageContent',
   ]),
   richPresence: {
     afk: false,
@@ -21,6 +22,6 @@ export default defineDiscordConfig({
       url: 'https://github.com/SkinonikS/discord-bot',
     }],
   },
-  shardId: Env.SHARD_ID,
-  shardCount: Env.SHARD_COUNT,
+  shardId: Env.DISCORD_SHARD_ID,
+  shardCount: Env.DISCORD_SHARD_COUNT,
 });

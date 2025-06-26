@@ -1,4 +1,5 @@
-import type { TransportFactoryInterface } from '@module/logger';
+import type { Application } from '@framework/core';
+import type { TransportFactoryCreateOptions, TransportFactoryInterface } from '@module/logger';
 import type { transport as Transport } from 'winston';
 
 export interface LokiTransportFactoryConfig {
@@ -9,7 +10,7 @@ export interface LokiTransportFactoryConfig {
 export default class LokiTransportFactory implements TransportFactoryInterface {
   public constructor(protected readonly _config: LokiTransportFactoryConfig) { }
 
-  public async create(app, { module }): Promise<Transport> {
+  public async create(app: Application, { module }: TransportFactoryCreateOptions): Promise<Transport> {
     const { default: WinstonLoki } = await import('winston-loki');
     const winston = await import('winston');
 
@@ -26,11 +27,11 @@ export default class LokiTransportFactory implements TransportFactoryInterface {
       batching: true,
       clearOnError: true,
       onConnectionError: () => {
-        transport.close();
+        transport.close?.();
       },
     });
 
-    app.onShutdown(() => transport.close());
+    app.onShutdown(() => transport.close?.());
     return transport;
   }
 }

@@ -20,7 +20,7 @@ export default class PingUserRedisAction implements RedisActionInterface {
 
   public constructor(protected readonly _discord: Client) { }
 
-  public async execute(guildId: Snowflake, args: PingUserRedisActionArgs): Promise<Result<void, Error>> {
+  public async execute(_: Snowflake, args: PingUserRedisActionArgs): Promise<Result<void, Error>> {
     const user = await this._discord.users.fetch(args.userId);
 
     if (! user) {

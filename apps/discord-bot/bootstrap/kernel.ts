@@ -8,7 +8,7 @@ export default defineKernelConfig({
     () => import('#config/slash-commands'),
     () => import('#config/distube'),
     () => import('#config/prometheus'),
-    () => import('#config/redis-actions'),
+    () => import('#config/redis'),
   ],
   modules: [
     () => import('@module/discord/module'),
@@ -16,6 +16,6 @@ export default defineKernelConfig({
     () => import('@module/prometheus/module'),
     () => import('@module/distube/module'),
     () => import('@module/slash-commands/module'),
-    () => import('@module/redis-actions/module'),
+    () => import('@module/redis/module'),
   ],
 });
