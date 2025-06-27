@@ -23,8 +23,8 @@ export default class DeploymentManifestFactory implements DeploymentManifestFact
         },
       },
       spec: {
-        // TODO: Add support for auto-scale replicas and resource limits
-        replicas: 2,
+        // TODO: Add support for auto-scale esource limits
+        replicas: 1,
         selector: {
           matchLabels: {
             'app.kubernetes.io/name': watchObject.metadata.name,
