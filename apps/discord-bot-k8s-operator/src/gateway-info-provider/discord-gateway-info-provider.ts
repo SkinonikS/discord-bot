@@ -35,7 +35,11 @@ export default class DiscordGatewayInfoProvider implements GatwayInfoProviderInt
           maxConcurrency: json.session_start_limit.max_concurrency,
         },
       });
-    } catch {
+    } catch (e) {
+      if (e instanceof Error) {
+        return err(e);
+      }
+
       return err(new Error('Unable to fetch Discord Gateway bot info.'));
     }
   }
