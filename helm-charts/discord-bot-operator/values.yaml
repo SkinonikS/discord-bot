@@ -4,7 +4,7 @@ nameOverride: ""
 
 # This key can be used to fully override the resource name, ensuring that the specified name is used exactly as provided.
 # If left empty (""), the auto-generated name is used.
-fullnameOverride: ""
+fullnameOverride: "discord-bot-operator"
 
 # This section specifies the container image to be used for the deployment.
 container:
