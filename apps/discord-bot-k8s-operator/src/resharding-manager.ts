@@ -46,12 +46,12 @@ export default class ReshardingManager implements ReshardingManagerInterface{
       return interval;
     }
 
-    const first = parseInt(interval);
-    if (! isNaN(first)) {
-      return first;
+    const milliseconds = parseDuration(interval);
+    if (! milliseconds) {
+      const parsed = parseInt(interval, 10);
+      return isNaN(parsed) ? this._fallbackInterval : parsed;
     }
 
-    const second = parseDuration(interval);
-    return second ?? this._fallbackInterval;
+    return milliseconds;
   }
 }
