@@ -9,6 +9,7 @@ export default class Cluster {
     protected readonly _reshardingManager: ReshardingManagerInterface,
     protected readonly _gatewayInfoProvider: GatwayInfoProviderInterface,
     protected readonly _shardSpawnerConfig: ShardSpawnerInterface,
+    protected readonly _logger: Logger,
   ) { }
 
   public async destroy(watchObject: WatchObject): Promise<Result<void, Error>> {
