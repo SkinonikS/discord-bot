@@ -29,7 +29,7 @@ export default class ReshardingManager implements ReshardingManagerInterface{
     const interval = this._reshardIntervals.get(watchObject.metadata.uid);
 
     if (interval) {
-      clearInterval(interval);
+      clearTimeout(interval);
       this._reshardIntervals.delete(watchObject.metadata.uid);
       return true;
     }
