@@ -45,6 +45,25 @@ export default class Cluster {
       return err(spawnResult.error);
     }
 
+    this._reshardingManager.startInterval({
+      watchObject,
+      interval: watchObject.spec.sharding.reshardInterval,
+    }, async (watchObject) => {
+      this._logger.info(`Resharding for ${watchObject.metadata.name} in namespace ${watchObject.metadata.namespace}`);
+
+      const destroyResult = await this.destroy(watchObject);
+      if (destroyResult.isErr()) {
+        this._logger.error('Failed to destroy deployments during resharding: ', destroyResult.error);
+        return;
+      }
+
+      const createResult = await this.create(watchObject);
+      if (createResult.isErr()) {
+        this._logger.error('Failed to create deployments during resharding: ', createResult.error);
+        return;
+      }
+    });
+
     return ok();
   }
 }
