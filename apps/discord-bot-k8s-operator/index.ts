@@ -31,7 +31,7 @@ export const start = async () => {
   const shardSpawner = new ShardSpawner(deploymentFactory, deploymentStorage);
   const reshardingManager = new ReshardingManager();
   const gatewayInfoProvider = new DiscordGatewayInfoProvider();
-  const cluster = new Cluster(secretStorage, deploymentStorage, reshardingManager, gatewayInfoProvider, shardSpawner);
+  const cluster = new Cluster(secretStorage, deploymentStorage, reshardingManager, gatewayInfoProvider, shardSpawner, logger);
 
   const watcher = new Watcher(new k8s.Watch(kc), logger);
   const watchResult = await watcher.watchFor(cluster);
