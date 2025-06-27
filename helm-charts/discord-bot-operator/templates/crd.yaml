@@ -90,11 +90,11 @@ spec:
                     image:
                       type: string
                       description: The container image for the init container.
-                  imagePullPolicy:
-                    type: string
-                    description: The image pull policy for the container (e.g., Always, IfNotPresent).
+                    imagePullPolicy:
+                      type: string
+                      description: The image pull policy for the container (e.g., Always, IfNotPresent).
                     command:
                       type: array
                       items:
+                        description: The command to run in the init container.
                         type: string
-                      description: The command to run in the init container.
