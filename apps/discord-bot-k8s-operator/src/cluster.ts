@@ -1,5 +1,6 @@
 import type { Result } from 'neverthrow';
 import { err, ok } from 'neverthrow';
+import type { Logger } from 'winston';
 import type { DeploymentStorageInterface, GatwayInfoProviderInterface, ReshardingManagerInterface, SecretStorageInterface, ShardSpawnerInterface, WatchObject } from '#/types';
 
 export default class Cluster {
