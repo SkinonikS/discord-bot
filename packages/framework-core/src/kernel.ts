@@ -5,6 +5,8 @@ import { importModule, instantiateIfNeeded } from '#/helpers';
 import type { StartCallback, BootstrapperResolver } from '#/types';
 
 export default class Kernel {
+  protected _hasBeenBootstrapped = false;
+
   public constructor(
     protected readonly _app: Application,
   ) {
@@ -12,6 +14,12 @@ export default class Kernel {
   }
 
   public async bootstrapWith(bootstrappers: BootstrapperResolver[]): Promise<this> {
+    if (this._hasBeenBootstrapped) {
+      debug('Application has already been bootstrapped, skipping bootstrap');
+      return this;
+    }
+
+    this._hasBeenBootstrapped = true;
     debug('Bootstrapping application');
 
     for (const bootstrapperResolver of bootstrappers) {
