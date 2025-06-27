@@ -15,13 +15,11 @@ export default class ReshardingManager implements ReshardingManagerInterface{
       return err(new Error(`Resharding interval for resource '${watchObject.metadata.name}' in namespace '${watchObject.metadata.namespace}' already exists`));
     }
 
-    const _createInterval = () => setTimeout(async () => {
-      this._reshardIntervals.delete(watchObject.metadata.uid);
+    const timeoutId = setTimeout(async () => {
       await callback(watchObject);
-      this._reshardIntervals.set(watchObject.metadata.uid, _createInterval());
     }, this._normalizeInterval(interval));
 
-    this._reshardIntervals.set(watchObject.metadata.uid, _createInterval());
+    this._reshardIntervals.set(watchObject.metadata.uid, timeoutId);
     return ok();
   }
 
