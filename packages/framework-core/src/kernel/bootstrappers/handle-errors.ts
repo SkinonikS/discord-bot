@@ -16,18 +16,15 @@ export default class HandleErrors implements BootstrapperInterface {
     app.container.bindValue('errorHandler', errorHandler);
 
     onExit(() => {
-      console.trace();
       this._shutdown(app).finally(() => process.exit(0));
       return true;
     });
 
     process.on('uncaughtException', (error) => {
-      console.trace();
       this._handleError(app, errorHandler, error);
     });
 
     process.on('unhandledRejection', (reason) => {
-      console.trace();
       const error = reason instanceof Error ? reason : new Error(String(reason));
       this._handleError(app, errorHandler, error);
     });
