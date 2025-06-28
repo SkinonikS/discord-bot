@@ -1,7 +1,9 @@
+import type { ErrorHandler } from '@framework/core/app';
 import type { LoggerInterface } from '@module/logger';
 
 export default class Handler {
   public constructor(
+    protected readonly _errorHandler: ErrorHandler,
     protected readonly _logger: LoggerInterface,
   ) { }
 
@@ -10,6 +12,6 @@ export default class Handler {
   }
 
   public error(error: Error): void {
-    this._logger.error(error);
+    this._errorHandler.handle(error);
   }
 }

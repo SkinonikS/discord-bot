@@ -53,6 +53,7 @@ export default class DistubeModule implements ModuleInterface {
     const distube = await app.container.make('distube');
 
     const controller = new Handler(
+      await app.container.make('eventHandler'),
       await app.container.make('distube.logger'),
     );
 
