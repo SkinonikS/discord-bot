@@ -10,20 +10,33 @@
       "node": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
-    "./bootstrappers": {
-      "import": "./dist/src/bootstrappers/index.js",
-      "node": "./dist/src/bootstrappers/index.js",
-      "types": "./dist/src/bootstrappers/index.d.ts"
+    "./app": {
+      "import": "./dist/src/app/index.js",
+      "node": "./dist/src/app/index.js",
+      "types": "./dist/src/app/index.d.ts"
     },
-    "./bootstrappers/*": {
-      "import": "./dist/src/bootstrappers/*.js",
-      "node": "./dist/src/bootstrappers/*.js",
-      "types": "./dist/src/bootstrappers/*.d.ts"
+    "./kernel": {
+      "import": "./dist/src/kernel/index.js",
+      "node": "./dist/src/kernel/index.js",
+      "types": "./dist/src/kernel/index.d.ts"
+    },
+    "./utils": {
+      "import": "./dist/src/utils/index.js",
+      "node": "./dist/src/utils/index.js",
+      "types": "./dist/src/utils/index.d.ts"
+    },
+    "./config": {
+      "import": "./dist/src/config/index.js",
+      "node": "./dist/src/config/index.js",
+      "types": "./dist/src/config/index.d.ts"
+    },
+    "./kernel/bootstrappers/*": {
+      "import": "./dist/src/kernel/bootstrappers/*.js",
+      "node": "./dist/src/kernel/bootstrappers/*.js",
+      "types": "./dist/src/kernel/bootstrappers/*.d.ts"
     },
     "./package.json": "./package.json"
   },
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
   "files": [
     "dist"
   ],
@@ -31,14 +44,13 @@
     "build": "tsdown",
     "build:watch": "tsdown --watch"
   },
-  "types": "./dist/index.d.ts",
   "dependencies": {
     "@adonisjs/fold": "^10.2.0",
     "@module/logger": "workspace:*",
     "@poppinss/exception": "^1.2.1",
     "@poppinss/hooks": "^7.2.5",
     "@poppinss/utils": "^6.10.0",
-    "dotenv": "^16.5.0",
+    "dotenv": "16.5.0",
     "envalid": "^8.0.0",
     "neverthrow": "^8.2.0",
     "signal-exit": "^4.1.0"

@@ -2,18 +2,13 @@ import EventEmitter from 'node:events';
 import { Container } from '@adonisjs/fold';
 import Hooks from '@poppinss/hooks';
 import type { HookHandler } from '@poppinss/hooks/types';
-import debug from '#/debug';
-import { InvalidStateTransitionException } from '#/exceptions';
-import ModuleManager from '#/module-manager';
-import Path from '#/path';
-import type { ApplicationConfig, ContainerBindings, EventMap, HooksMap, ModuleResolver } from '#/types';
-
-export enum ApplicationState {
-  INITIAL,
-  BOOTED,
-  STARTED,
-  SHUTDOWN,
-}
+import debug from '#root/debug';
+import { InvalidStateTransitionException } from '#src/app/exceptions';
+import ModuleManager from '#src/app/module-manager';
+import Path from '#src/app/path';
+import { ApplicationState } from '#src/app/types';
+import type { ApplicationConfig, ContainerBindings, EventMap, HooksMap } from '#src/app/types';
+import type { ModuleResolver } from '#src/config/types';
 
 export default class Application
 {

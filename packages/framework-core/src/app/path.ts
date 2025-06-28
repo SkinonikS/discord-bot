@@ -1,5 +1,5 @@
 import path from 'node:path';
-import debug from '#/debug';
+import debug from '#root/debug';
 
 export default class Path {
   public constructor(

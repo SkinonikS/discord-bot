@@ -1,8 +1,8 @@
-import type Application from '#/application';
-import debug from '#/debug';
-import { ImportNotFoundException } from '#/exceptions';
-import { importModule, instantiateIfNeeded } from '#/helpers';
-import type { StartCallback, BootstrapperResolver } from '#/types';
+import debug from '#root/debug';
+import type Application from '#src/app/application';
+import type { StartCallback, BootstrapperResolver } from '#src/kernel/types';
+import { ImportNotFoundException } from '#src/utils/exceptions';
+import { importModule, instantiateIfNeeded } from '#src/utils/helpers';
 
 export default class Kernel {
   protected _hasBeenBootstrapped = false;

@@ -1,9 +1,9 @@
 import { randomUUID } from 'node:crypto';
 import fs from 'node:fs';
 import { config } from 'dotenv';
-import type Application from '#/application';
-import debug from '#/debug';
-import type { BootstrapperInterface, EnvVariablesResolver } from '#/types';
+import debug from '#root/debug';
+import type Application from '#src/app/application';
+import type { BootstrapperInterface, EnvVariablesResolver } from '#src/kernel/types';
 
 export default class LoadEnvironmentVariables implements BootstrapperInterface {
   public constructor(

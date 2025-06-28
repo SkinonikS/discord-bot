@@ -1,9 +1,9 @@
 import { debug } from 'console';
 import type { LoggerInterface } from '@module/logger';
 import { Exception } from '@poppinss/exception';
-import type Application from '#/application';
-import { ConfigNotFoundException } from '#/exceptions';
-import type { ReportableException, ReportCallback } from '#/types';
+import type Application from '#src/app/application';
+import { ConfigNotFoundException } from '#src/app/exceptions';
+import type { ReportableException, ReportCallback } from '#src/app/types';
 
 export default class ErrorHandler {
   protected readonly _reporters: Map<string, Set<ReportCallback>> = new Map();

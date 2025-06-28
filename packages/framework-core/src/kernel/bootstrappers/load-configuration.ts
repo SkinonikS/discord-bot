@@ -1,9 +1,10 @@
-import type Application from '#/application';
-import ConfigRepository from '#/config-repository';
-import { importModule } from '#/helpers';
-import type { BootstrapperInterface, ConfigFileResolver } from '#/types';
+import type Application from '#src/app/application';
+import ConfigRepository from '#src/app/config-repository';
+import type { ConfigFileResolver } from '#src/config/types';
+import type { BootstrapperInterface } from '#src/kernel/types';
+import { importModule } from '#src/utils/helpers';
 
-declare module '@framework/core' {
+declare module '@framework/core/app' {
   interface ContainerBindings {
     config: ConfigRepository;
   }

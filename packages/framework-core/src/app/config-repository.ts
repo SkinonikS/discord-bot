@@ -1,11 +1,18 @@
-import type { ConfigBindings } from '#/types';
+import { err, ok } from 'neverthrow';
+import type { Result } from 'neverthrow';
+import { ConfigNotFoundException } from '#src/app/exceptions';
+import type { ConfigBindings } from '#src/app/types';
 
 export default class ConfigRepository
 {
   protected readonly _config: Record<string, unknown> = {};
 
-  public get<K extends keyof ConfigBindings | string = keyof ConfigBindings>(key: K): K extends keyof ConfigBindings ? ConfigBindings[K] | undefined : unknown {
-    return this._config[key] as K extends keyof ConfigBindings ? ConfigBindings[K] : unknown;
+  public get<K extends keyof ConfigBindings | string = keyof ConfigBindings>(key: K): Result<K extends keyof ConfigBindings ? ConfigBindings[K] : unknown, ConfigNotFoundException> {
+    if (! this.has(key)) {
+      return err(new ConfigNotFoundException(key));
+    }
+
+    return ok(this._config[key] as K extends keyof ConfigBindings ? ConfigBindings[K] : unknown);
   }
 
   public set<K extends keyof ConfigBindings | string = keyof ConfigBindings>(key: K, value: K extends keyof ConfigBindings ? [K] : unknown): this {

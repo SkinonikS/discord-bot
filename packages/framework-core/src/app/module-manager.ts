@@ -1,7 +1,8 @@
-import type Application from '#/application';
-import debug from '#/debug';
-import { importModule, instantiateIfNeeded } from '#/helpers';
-import type { ModuleInterface, ModuleResolver } from '#/types';
+import debug from '#root/debug';
+import type Application from '#src/app/application';
+import type { ModuleInterface } from '#src/app/types';
+import type { ModuleResolver } from '#src/config/types';
+import { importModule, instantiateIfNeeded } from '#src/utils/helpers';
 
 export default class ModuleManager {
   protected _resolvedModules: Record<string, ModuleInterface> = {};
