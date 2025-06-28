@@ -41,7 +41,6 @@ export default class DeploymentManifestFactory implements DeploymentManifestFact
             },
           },
           spec: {
-            initContainers: watchObject.spec?.initContainers ?? [],
             resources: watchObject.spec.resources,
             initContainers: watchObject.spec?.initContainers,
             containers: [
@@ -50,6 +49,30 @@ export default class DeploymentManifestFactory implements DeploymentManifestFact
                 image: watchObject.spec.container.image,
                 imagePullPolicy: watchObject.spec.container.imagePullPolicy,
                 resources: watchObject.spec.container.resources,
+                readinessProbe: {
+                  initialDelaySeconds: 10,
+                  periodSeconds: 10,
+                  timeoutSeconds: 5,
+                  successThreshold: 1,
+                  failureThreshold: 3,
+                  httpGet: {
+                    scheme: 'HTTP',
+                    port: watchObject.spec.container.httpProbePort,
+                    path: '/readyz',
+                  },
+                },
+                livenessProbe: {
+                  initialDelaySeconds: 10,
+                  periodSeconds: 10,
+                  timeoutSeconds: 5,
+                  successThreshold: 1,
+                  failureThreshold: 3,
+                  httpGet: {
+                    scheme: 'HTTP',
+                    port: watchObject.spec.container.httpProbePort,
+                    path: '/livez',
+                  },
+                },
                 env: [
                   ...watchObject.spec.env ?? [],
                   {

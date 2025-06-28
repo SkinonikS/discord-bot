@@ -114,6 +114,7 @@ export interface Spec {
   container: {
     image: string;
     imagePullPolicy: string;
+    httpProbePort: number;
     resources?: Resources;
   };
   initContainers?: {
