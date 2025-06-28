@@ -1,11 +1,11 @@
-import { ConfigNotFoundException, importModule, ImportNotFoundException, instantiateIfNeeded } from '@framework/core';
-import type { Application, ConfigRepository, ModuleInterface } from '@framework/core';
+import type { Application, ConfigRepository, ModuleInterface } from '@framework/core/app';
+import { importModule, ImportNotFoundException, instantiateIfNeeded } from '@framework/core/utils';
 import type { LoggerFactoryInterface, LoggerInterface } from '@module/logger';
 import { Registry } from 'prom-client';
-import pkg from '../package.json';
-import type { PrometheusConfig } from '#/types';
+import pkg from '#root/package.json';
+import type { PrometheusConfig } from '#src/config/types';
 
-declare module '@framework/core' {
+declare module '@framework/core/app' {
   interface ContainerBindings {
     'prometheus': Registry;
     'prometheus.logger': LoggerInterface;
@@ -37,12 +37,11 @@ export default class PrometheusModule implements ModuleInterface{
     const registry = await app.container.make('prometheus');
     const config: ConfigRepository = await app.container.make('config');
     const prometheusConfig = config.get('prometheus');
-
-    if (! prometheusConfig) {
-      throw new ConfigNotFoundException('prometheus');
+    if (prometheusConfig.isErr()) {
+      throw prometheusConfig.error;
     }
 
-    for (const metricResolver of prometheusConfig.metrics) {
+    for (const metricResolver of prometheusConfig.value.metrics) {
       try {
         const resolvedMetric = await importModule(() => metricResolver());
         const metric = await instantiateIfNeeded(resolvedMetric, app);
