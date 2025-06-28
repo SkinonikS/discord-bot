@@ -11,6 +11,16 @@
       "node": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
+    "./connection": {
+      "import": "./dist/src/connection/index.js",
+      "node": "./dist/src/connection/index.js",
+      "types": "./dist/src/connection/index.d.ts"
+    },
+    "./config": {
+      "import": "./dist/src/config/index.js",
+      "node": "./dist/src/config/index.js",
+      "types": "./dist/src/config/index.d.ts"
+    },
     "./module": {
       "import": "./dist/src/module.js",
       "node": "./dist/src/module.js",
@@ -18,8 +28,6 @@
     },
     "./package.json": "./package.json"
   },
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
   "files": [
     "dist"
   ],
@@ -27,14 +35,18 @@
     "build": "tsdown",
     "build:watch": "tsdown --watch"
   },
-  "types": "./dist/index.d.ts",
   "dependencies": {
     "@framework/core": "workspace:*",
     "@module/logger": "workspace:*",
     "discord.js": "^14.21.0",
+    "luxon": "^3.6.1",
     "neverthrow": "^8.2.0",
+    "node-object-hash": "^3.1.1",
     "rate-limiter-flexible": "^7.1.1",
     "redis": "^4.7.1"
+  },
+  "devDependencies": {
+    "@types/luxon": "^3.6.2"
   },
   "packageManager": "pnpm@10.6.3"
 }
