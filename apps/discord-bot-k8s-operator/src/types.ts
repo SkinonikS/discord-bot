@@ -130,3 +130,13 @@ export interface Spec {
   resources?: Resources;
   env?: Env[];
 }
+
+export interface ErrorWatchObject {
+  kind: 'Status';
+  apiVersion: 'v1';
+  metadata: Record<string, unknown>;
+  status: string;
+  message: string;
+  reason: string;
+  code: number;
+}
