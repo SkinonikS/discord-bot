@@ -26,7 +26,7 @@ export default class Watcher {
         const addedResult = await cluster.create(watchObject);
 
         if (addedResult.isErr()) {
-          this._logger.error(`Error handling added Discord bot: ${addedResult.error.message}`);
+          this._logger.error(`Error handling added Discord bot: ${addedResult.error}`);
         } else {
           this._logger.info(`Discord bot added: ${watchObject.metadata.name} in namespace ${watchObject.metadata.namespace}`);
         }
@@ -35,7 +35,7 @@ export default class Watcher {
           .then(() => cluster.create(watchObject));
 
         if (modifiedResult.isErr()) {
-          this._logger.error(`Error handling modified Discord bot: ${modifiedResult.error.message}`);
+          this._logger.error(`Error handling modified Discord bot: ${modifiedResult.error}`);
         } else {
           this._logger.info(`Discord bot modified successfully: ${watchObject.metadata.name} in namespace ${watchObject.metadata.namespace}`);
         }
@@ -43,7 +43,7 @@ export default class Watcher {
         const deletedResult = await cluster.destroy(watchObject);
 
         if (deletedResult.isErr()) {
-          this._logger.error(`Error handling deleted Discord bot: ${deletedResult.error.message}`);
+          this._logger.error(`Error handling deleted Discord bot: ${deletedResult.error}`);
         } else {
           this._logger.info(`Discord bot deleted successfully: ${watchObject.metadata.name} in namespace ${watchObject.metadata.namespace}`);
         }

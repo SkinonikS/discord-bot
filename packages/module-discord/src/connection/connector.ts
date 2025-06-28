@@ -55,7 +55,7 @@ export default class Connector {
     const loginResult = await fromPromise(this._discord.login(token), (e) => e instanceof Error ? e : new Error('Unknown error'));
     if (loginResult.isErr()) {
       debug('Discord login failed, waiting 1s before retrying...');
-      this._logger.error(`Discord login failed: ${loginResult.error.message}`);
+      this._logger.error(`Discord login failed: ${loginResult.error}`);
       setTimeout(() => this._tryConnect(token), this._reconnectionTimeout);
       return;
     }
