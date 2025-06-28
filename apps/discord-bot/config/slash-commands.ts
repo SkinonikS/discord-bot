@@ -1,4 +1,4 @@
-import { defineSlashCommandsConfig } from '@module/slash-commands';
+import { defineSlashCommandsConfig } from '@module/slash-commands/config';
 
 export default defineSlashCommandsConfig({
   commands: [

@@ -1,5 +1,6 @@
-import type { Application, KernelConfig } from '@framework/core';
-import { Kernel } from '@framework/core';
+import type { Application } from '@framework/core/app';
+import type { KernelConfig } from '@framework/core/config';
+import { Kernel } from '@framework/core/kernel';
 
 export const createKernel = async (app: Application, config: KernelConfig): Promise<Kernel> => {
   await app.register([
@@ -9,11 +10,11 @@ export const createKernel = async (app: Application, config: KernelConfig): Prom
   const kernel = new Kernel(app);
 
   await kernel.bootstrapWith([
-    () => import('@framework/core/bootstrappers/load-environment-variables').then((m) => new m.default(() => import('#bootstrap/env'))),
-    () => import('@framework/core/bootstrappers/load-configuration').then((m) => new m.default(config.configFiles)),
-    () => import('@framework/core/bootstrappers/handle-errors'),
-    () => import('@framework/core/bootstrappers/register-modules').then((m) => new m.default(config.modules)),
-    () => import('@framework/core/bootstrappers/boot-modules'),
+    () => import('@framework/core/kernel/bootstrappers/load-environment-variables').then((m) => new m.default(() => import('#bootstrap/env'))),
+    () => import('@framework/core/kernel/bootstrappers/load-configuration').then((m) => new m.default(config.configFiles)),
+    () => import('@framework/core/kernel/bootstrappers/handle-errors'),
+    () => import('@framework/core/kernel/bootstrappers/register-modules').then((m) => new m.default(config.modules)),
+    () => import('@framework/core/kernel/bootstrappers/boot-modules'),
   ]);
 
   return kernel;

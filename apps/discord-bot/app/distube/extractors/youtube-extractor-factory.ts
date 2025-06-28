@@ -1,4 +1,4 @@
-import type { ExtractorFactoryInterface } from '@module/distube';
+import type { ExtractorFactoryInterface } from '@module/distube/config';
 import type { ExtractorPlugin } from 'distube';
 
 export default class YouTubeExtractorFactory implements ExtractorFactoryInterface {

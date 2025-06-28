@@ -4,11 +4,7 @@ export default defineConfig({
   entry: [
     'bin/start-bot.ts',
   ],
-  outDir: 'dist/src',
-  copy: [
-    // { from: '.env', to: 'dist/.env' }, // TODO: Replace
-    // { from: 'logs', to: 'dist/logs' },
-  ],
+  outDir: 'dist',
   sourcemap: true,
   unbundle: true,
   skipNodeModulesBundle: true,

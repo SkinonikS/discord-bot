@@ -1,8 +1,9 @@
-import type { TransportFactoryInterface } from '@module/logger';
+import type { Application } from '@framework/core/app';
+import type { TransportFactoryCreateOptions, TransportFactoryInterface } from '@module/logger/config';
 import type { transport as Transport } from 'winston';
 
 export default class ConsoleTransportFactory implements TransportFactoryInterface {
-  public async create(app, { module }): Promise<Transport> {
+  public async create(_: Application, { module }: TransportFactoryCreateOptions): Promise<Transport> {
     const winston = await import('winston');
 
     return new winston.transports.Console({

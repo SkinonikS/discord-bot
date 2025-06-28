@@ -1,5 +1,5 @@
-import type { Application } from '@framework/core';
-import type { TransportFactoryCreateOptions, TransportFactoryInterface } from '@module/logger';
+import type { Application } from '@framework/core/app';
+import type { TransportFactoryCreateOptions, TransportFactoryInterface } from '@module/logger/config';
 import type { transport as Transport } from 'winston';
 
 export interface LokiTransportFactoryConfig {

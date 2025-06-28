@@ -1,4 +1,4 @@
-import { definePrometheusConfig } from '@module/prometheus';
+import { definePrometheusConfig } from '@module/prometheus/config';
 
 export default definePrometheusConfig({
   metrics: [

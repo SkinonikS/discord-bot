@@ -1,4 +1,4 @@
-import { defineRedisConfig } from '@module/redis';
+import { defineRedisConfig } from '@module/redis/config';
 import { Env } from '#/bootstrap/env';
 
 export default defineRedisConfig({

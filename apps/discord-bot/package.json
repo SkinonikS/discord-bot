@@ -3,15 +3,20 @@
   "name": "@app/discord-bot",
   "version": "1.0.0",
   "type": "module",
-  "main": "dist/src/start-bot.js",
-  "module": "dist/src/start-bot.js",
+  "exports": {
+    ".": {
+      "import": "./dist/start-bot.js",
+      "node": "./dist/start-bot.js"
+    },
+    "./package.json": "./package.json"
+  },
   "files": [
     "dist"
   ],
   "scripts": {
     "build": "tsdown",
     "build:watch": "tsdown --watch",
-    "start": "node --enable-source-maps dist/src/start-bot.js"
+    "start": "node --enable-source-maps dist/start-bot.js"
   },
   "dependencies": {
     "@adonisjs/fold": "^10.2.0",
@@ -24,7 +29,6 @@
     "@module/logger": "workspace:*",
     "@module/prometheus": "workspace:*",
     "@module/redis": "workspace:*",
-    "@module/redis-events": "workspace:*",
     "@module/slash-commands": "workspace:*",
     "@oxc-project/runtime": "^0.72.3",
     "@poppinss/exception": "^1.2.1",

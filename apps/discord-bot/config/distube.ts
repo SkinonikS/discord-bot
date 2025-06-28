@@ -1,4 +1,4 @@
-import { defineDistubeConfig } from '@module/distube';
+import { defineDistubeConfig } from '@module/distube/config';
 import SoundCloudExtractorFactory from '#/app/distube/extractors/soundcloud-extractor-factory';
 import YouTubeExtractorFactory from '#/app/distube/extractors/youtube-extractor-factory';
 import { Env } from '#/bootstrap/env';

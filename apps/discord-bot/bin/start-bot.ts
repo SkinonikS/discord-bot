@@ -1,5 +1,5 @@
 import path from 'path';
-import { Application } from '@framework/core';
+import { Application } from '@framework/core/app';
 import kernelConfig from '#/bootstrap/kernel';
 import pkg from '#/package.json';
 import { createKernel } from '#start/kernel';

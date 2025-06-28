@@ -6,15 +6,16 @@ export const Env = cleanEnv(process.env, {
   DISCORD_TOKEN: str(),
   DISCORD_SHARD_ID: num({ default: 0 }),
   DISCORD_SHARD_COUNT: num({ default: 1 }),
+  DISCORD_RATE_LIMIT_TIMEOUT: num({ default: 1000 }),
   DISCORD_RATE_LIMIT_MAX_CONCURRENCY: num({ default: 5 }),
-  DISCORD_RATE_LIMIT_CHANNEL_NAME: str({ default: 'discord-bot-rate-limit' }),
+  DISCORD_RATE_LIMIT_CHANNEL: str({ default: 'discord-bot-rate-limit' }),
   DISCORD_RATE_LIMIT_DATABASE: num({ default: 0 }),
 
   DISTUBE_NSFW: bool({ default: false }),
   DISTUBE_FFMPEG_PATH: str({ default: undefined }),
 
-  HTTP_API_PORT: num({ default: 8080 }),
-  HTTP_API_HOST: str({ default: '127.0.0.1' }),
+  HTTP_API_PORT: num({ default: 3001 }),
+  HTTP_API_HOST: str({ default: '0.0.0.0' }),
 
   REDIS_SECURE: bool({ default: false }),
   REDIS_HOST: str({ default: 'localhost' }),
