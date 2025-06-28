@@ -1,12 +1,12 @@
-import { ConfigNotFoundException, type Application, type ConfigRepository, type ModuleInterface } from '@framework/core';
+import type { Application, ConfigRepository, ModuleInterface } from '@framework/core/app';
 import type { LoggerFactoryInterface, LoggerInterface } from '@module/logger';
 import type { Client } from 'discord.js';
 import { DisTube, Events } from 'distube';
-import pkg from '../package.json';
-import Controller from '#/controller';
-import type { DisTubeConfig } from '#/types';
+import pkg from '#root/package.json';
+import type { DisTubeConfig } from '#src/config/types';
+import Handler from '#src/handler';
 
-declare module '@framework/core' {
+declare module '@framework/core/app' {
   interface ContainerBindings {
     'distube': DisTube;
     'distube.logger': LoggerInterface;
@@ -27,19 +27,18 @@ export default class DistubeModule implements ModuleInterface {
       const discord: Client = await app.container.make('discord.client');
       const config: ConfigRepository = await app.container.make('config');
       const distubeConfig = config.get('distube');
-
-      if (! distubeConfig) {
-        throw new ConfigNotFoundException('distube');
+      if (distubeConfig.isErr()) {
+        throw distubeConfig.error;
       }
 
-      const plugins = distubeConfig.plugins.map((pluginFactory) => pluginFactory.create(app));
+      const plugins = distubeConfig.value.plugins.map((pluginFactory) => pluginFactory.create(app));
 
       return new DisTube(discord, {
         emitNewSongOnly: true,
         plugins: await Promise.all(plugins),
-        nsfw: distubeConfig.nsfw,
+        nsfw: distubeConfig.value.nsfw,
         ffmpeg: {
-          path: distubeConfig.ffmpeg?.path,
+          path: distubeConfig.value.ffmpeg?.path,
         },
       });
     });
@@ -52,12 +51,12 @@ export default class DistubeModule implements ModuleInterface {
 
   public async boot(app: Application): Promise<void> {
     const distube = await app.container.make('distube');
-    const logger = await app.container.make('distube.logger');
 
-    const controller = new Controller(logger);
+    const controller = new Handler(
+      await app.container.make('distube.logger'),
+    );
+
     distube.on(Events.DEBUG, (message) => controller.debug(message));
     distube.on(Events.ERROR, (error) => controller.error(error));
-    distube.on(Events.PLAY_SONG, (queue) => controller.playSong(queue));
-    distube.on(Events.FINISH, (queue) => controller.finish(queue));
   }
 }

@@ -11,6 +11,11 @@
       "node": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
+    "./config": {
+      "import": "./dist/src/config/index.js",
+      "node": "./dist/src/config/index.js",
+      "types": "./dist/src/config/index.d.ts"
+    },
     "./module": {
       "import": "./dist/src/module.js",
       "node": "./dist/src/module.js",
@@ -18,8 +23,6 @@
     },
     "./package.json": "./package.json"
   },
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
   "files": [
     "dist"
   ],
@@ -27,7 +30,6 @@
     "build": "tsdown",
     "build:watch": "tsdown --watch"
   },
-  "types": "./dist/index.d.ts",
   "dependencies": {
     "@discordjs/opus": "^0.10.0",
     "@discordjs/voice": "^0.18.0",

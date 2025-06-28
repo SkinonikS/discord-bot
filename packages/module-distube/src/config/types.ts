@@ -1,4 +1,4 @@
-import type { Application } from '@framework/core';
+import type { Application } from '@framework/core/app';
 import type { ExtractorPlugin } from 'distube';
 
 export interface DisTubeConfig {
