@@ -20,13 +20,13 @@ resources:
   # The scheduler uses these values to decide on which node to place the pod.
   requests:
     # The minimum amount of memory (RAM) that the container will be allocated.
-    memory: 64Mi
+    memory: 256Mi
     # The minimum amount of CPU that the container will be allocated.
-    cpu: 250m
+    cpu: 500m
   # Specifies the maximum amount of resources that the container can use.
   # If the container exceeds these values, it may be throttled or killed.
   limits:
     # The maximum amount of memory (RAM) that the container can use.
-    memory: 128Mi
+    memory: 512Mi
     # The maximum amount of CPU that the container can use.
-    cpu: 500m
+    cpu: 1000m

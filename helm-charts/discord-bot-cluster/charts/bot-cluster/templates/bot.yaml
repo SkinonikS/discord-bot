@@ -29,5 +29,9 @@ spec:
   container:
     image: {{ .Values.container.image | quote }}
     imagePullPolicy: {{ .Values.container.imagePullPolicy | quote }}
+    resources:
+      {{- toYaml .Values.container.resources | nindent 6 }}
+  resources:
+    {{- toYaml .Values.resources | nindent 4 }}
   env:
     {{- toYaml .Values.env | nindent 2 }}

@@ -94,6 +94,17 @@ export type Env = {
   value?: string;
 };
 
+export interface Resources {
+  limits?: {
+    cpu?: string;
+    memory?: string;
+  };
+  requests?: {
+    cpu?: string;
+    memory?: string;
+  };
+}
+
 export interface Spec {
   tokenSecretRef: {
     envVarName: string;
@@ -103,15 +114,18 @@ export interface Spec {
   container: {
     image: string;
     imagePullPolicy: string;
+    resources?: Resources;
   };
   initContainers?: {
     name: string;
     image: string;
     imagePullPolicy: string;
     command?: string[];
+    resources?: Resources;
   }[];
   sharding: {
     reshardInterval: string | number;
   };
+  resources?: Resources;
   env?: Env[];
 }

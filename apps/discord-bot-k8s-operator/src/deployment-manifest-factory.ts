@@ -42,11 +42,14 @@ export default class DeploymentManifestFactory implements DeploymentManifestFact
           },
           spec: {
             initContainers: watchObject.spec?.initContainers ?? [],
+            resources: watchObject.spec.resources,
+            initContainers: watchObject.spec?.initContainers,
             containers: [
               {
                 name: `discord-bot-shard-${shardOptions.shardId}`,
                 image: watchObject.spec.container.image,
                 imagePullPolicy: watchObject.spec.container.imagePullPolicy,
+                resources: watchObject.spec.container.resources,
                 env: [
                   ...watchObject.spec.env ?? [],
                   {

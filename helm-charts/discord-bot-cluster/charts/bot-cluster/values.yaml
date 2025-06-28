@@ -12,6 +12,22 @@ container:
   image: "discord-bot:latest"
   # The image pull policy for the container.
   imagePullPolicy: Never
+  # The port for the HTTP probe.
+  httpProbePort: 3001
+  # This section defines the resource requests and limits for the container.
+  resources:
+    # Specifies the minimum amount of resources that the container requires to run.
+    requests:
+      # The minimum amount of memory (RAM) that the container will be allocated.
+      memory: 256Mi
+      # The minimum amount of CPU that the container will be allocated.
+      cpu: 500m
+    # Specifies the maximum amount of resources that the container can use.
+    limits:
+      # The maximum amount of memory (RAM) that the container can use.
+      memory: 512Mi
+      # The maximum amount of CPU that the container can use.
+      cpu: 1000m
 
 tokenSecretRef:
   # The environment variable name that will hold the Discord bot token.
@@ -25,6 +41,21 @@ tokenSecretRef:
 sharding:
   # The interval at which the bot will reshard.
   reshardInterval: "24h"
+
+# This section defines the resource requests and limits for the container.
+resources:
+  # Specifies the minimum amount of resources that the container requires to run.
+  requests:
+    # The minimum amount of memory (RAM) that the container will be allocated.
+    memory: 256Mi
+    # The minimum amount of CPU that the container will be allocated.
+    cpu: 500m
+  # Specifies the maximum amount of resources that the container can use.
+  limits:
+    # The maximum amount of memory (RAM) that the container can use.
+    memory: 512Mi
+    # The maximum amount of CPU that the container can use.
+    cpu: 1000m
 
 # Environment variables.
 env: []

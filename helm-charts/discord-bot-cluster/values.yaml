@@ -7,10 +7,21 @@ redis:
 # see: charts/bot-cluster/values.yaml
 bot-cluster:
   fullnameOverride: "bot-cluster"
+
   tokenSecretRef:
     envVarName: "DISCORD_TOKEN"
     name: "bot-cluster"
     key: "discordToken"
+
+  container:
+    resources:
+      requests:
+        memory: 256Mi
+        cpu: 500m
+      limits:
+        memory: 512Mi
+        cpu: 1000m
+
   env:
   - name: "REDIS_HOST"
     value: "redis"

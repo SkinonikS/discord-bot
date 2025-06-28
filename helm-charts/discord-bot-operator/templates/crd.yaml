@@ -27,29 +27,42 @@ spec:
                 properties:
                   image:
                     type: string
-                    description: The container image for the Discord bot.
                   imagePullPolicy:
                     type: string
-                    description: The image pull policy for the container (e.g., Always, IfNotPresent).
+                  httpProbePort:
+                    type: integer
+                  resources:
+                    type: object
+                    properties:
+                      requests:
+                        type: object
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                      limits:
+                        type: object
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
               tokenSecretRef:
                 type: object
                 properties:
                   envVarName:
                     type: string
-                    description: The name of the environment variable that will hold the Discord bot token.
                   name:
                     type: string
-                    description: The name of the secret containing the Discord bot token.
                   key:
                     type: string
-                    description: The key in the secret that contains the token.
               sharding:
                 type: object
                 properties:
                   reshardInterval:
                     type: string
                     format: duration
-                    description: The interval for re-sharding the bot (e.g., "1h", "30m").
               env:
                 type: array
                 items:
@@ -57,13 +70,10 @@ spec:
                   properties:
                     name:
                       type: string
-                      description: The name of the environment variable.
                     value:
                       type: string
-                      description: The value of the environment variable.
                     valueFrom:
                       type: object
-                      description: Source for the environment variable's value.
                       properties:
                         secretKeyRef:
                           type: object
@@ -86,15 +96,45 @@ spec:
                   properties:
                     name:
                       type: string
-                      description: The name of the init container.
                     image:
                       type: string
-                      description: The container image for the init container.
                     imagePullPolicy:
                       type: string
-                      description: The image pull policy for the container (e.g., Always, IfNotPresent).
+                    resources:
+                      type: object
+                      properties:
+                        requests:
+                          type: object
+                          properties:
+                            cpu:
+                              type: string
+                            memory:
+                              type: string
+                        limits:
+                          type: object
+                          properties:
+                            cpu:
+                              type: string
+                            memory:
+                              type: string
                     command:
                       type: array
                       items:
-                        description: The command to run in the init container.
+                        type: string
+              resources:
+                type: object
+                properties:
+                  requests:
+                    type: object
+                    properties:
+                      cpu:
+                        type: string
+                      memory:
+                        type: string
+                  limits:
+                    type: object
+                    properties:
+                      cpu:
+                        type: string
+                      memory:
                         type: string
