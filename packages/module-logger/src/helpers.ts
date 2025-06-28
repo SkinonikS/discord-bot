@@ -1,5 +1,5 @@
-import { Application, defineBaseConfig } from '@framework/core';
-import type { LoggerConfig, LoggerInterface } from '#/types';
+import { Application } from '@framework/core/app';
+import type { LoggerInterface } from '#src/types';
 
 export const getDefaultLogger = async (app?: Application): Promise<LoggerInterface> => {
   app ??= Application.getInstance();
@@ -11,11 +11,3 @@ export const createLogSource = async (label: string, app?: Application): Promise
   const loggerFactory = await app.container.make('logger.factory');
   return loggerFactory.createLogger(label);
 };
-
-export const defineLoggerConfig = (config: Partial<LoggerConfig>) => defineBaseConfig<LoggerConfig>('logger', {
-  label: config.label ?? 'DiscordBOT',
-  defaultMeta: config.defaultMeta ?? {},
-  level: config.level ?? 'info',
-  showStackTraces: config.showStackTraces ?? false,
-  transports: config.transports ?? [],
-});

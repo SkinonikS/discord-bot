@@ -1,17 +1,17 @@
-import type { Application } from '@framework/core';
+import type { Application } from '@framework/core/app';
 import { createLogger, format, config } from 'winston';
-import type { LoggerInterface, LoggerFactoryInterface, LoggerConfig, TransportFactoryInterface } from '#/types';
-import WinstonLogger from '#/winston-logger';
+import type { LoggerConfig } from '#src/config/types';
+import type { LoggerInterface, LoggerFactoryInterface } from '#src/types';
+import WinstonLogger from '#src/winston/winston-logger';
 
 export default class WinstonLoggerFactory implements LoggerFactoryInterface {
   public constructor(
     protected readonly _app: Application,
     protected readonly _config: LoggerConfig,
-    protected readonly _transports: TransportFactoryInterface[],
   ) { }
 
   public async createLogger(module: string): Promise<LoggerInterface> {
-    const transports = this._transports.map(async (transportFactory) => {
+    const transports = this._config.transports.map(async (transportFactory) => {
       return transportFactory.create(this._app, { module });
     });
 

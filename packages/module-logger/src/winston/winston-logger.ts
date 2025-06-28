@@ -1,5 +1,5 @@
 import type { Logger } from 'winston';
-import type { LoggerInterface } from '#/types';
+import type { LoggerInterface } from '#src/types';
 
 export default class WinstonLogger implements LoggerInterface {
   public constructor(
