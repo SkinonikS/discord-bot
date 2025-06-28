@@ -1,10 +1,7 @@
-import { defineBaseConfig } from '@framework/core';
-import type { RedisConfig } from '#/types';
+import { Application } from '@framework/core/app';
+import type { RedisClientType } from 'redis';
 
-export const defineRedisConfig = (config: Partial<RedisConfig>) => defineBaseConfig<RedisConfig>('redis', {
-  host: config.host ?? 'localhost',
-  port: config.port ?? 6379,
-  password: config.password ?? undefined,
-  secure: config.secure ?? false,
-  database: config.database ?? 0,
-});
+export const getRedis = (app?: Application): Promise<RedisClientType> => {
+  app ??= Application.getInstance();
+  return app.container.make('redis.client');
+};

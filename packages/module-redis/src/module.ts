@@ -1,12 +1,14 @@
-import { ConfigNotFoundException, type Application, type ConfigRepository, type ModuleInterface } from '@framework/core';
+import type { Application, ConfigRepository, ModuleInterface } from '@framework/core/app';
 import type { LoggerFactoryInterface, LoggerInterface } from '@module/logger';
+import { fromPromise } from 'neverthrow';
 import { createClient } from 'redis';
-import pkg from '../package.json';
-import type { RedisConfig } from '#/types';
+import type { RedisClientType } from 'redis';
+import pkg from '#root/package.json';
+import type { RedisConfig } from '#src/config/types';
 
 declare module '@framework/core' {
   interface ContainerBindings {
-    'redis.client': ReturnType<typeof createClient>;
+    'redis.client': RedisClientType;
     'redis.logger': LoggerInterface;
   }
 
@@ -24,15 +26,14 @@ export default class RedisModule implements ModuleInterface {
     app.container.singleton('redis.client', async () => {
       const config: ConfigRepository = await app.container.make('config');
       const redisConfig = config.get('redis');
-
-      if (! redisConfig) {
-        throw new ConfigNotFoundException('redis');
+      if (redisConfig.isErr()) {
+        throw redisConfig.error;
       }
 
       return createClient({
-        url: `${redisConfig.secure ? 'rediss' : 'redis'}://${redisConfig.host}:${redisConfig.port}`,
-        database: redisConfig.database,
-        password: redisConfig.password ?? undefined,
+        url: `${redisConfig.value.secure ? 'rediss' : 'redis'}://${redisConfig.value.host}:${redisConfig.value.port}`,
+        database: redisConfig.value.database,
+        password: redisConfig.value.password ?? undefined,
         socket: {
           reconnectStrategy: false,
         },
@@ -49,10 +50,13 @@ export default class RedisModule implements ModuleInterface {
     const redis = await app.container.make('redis.client');
     const logger = await app.container.make('redis.logger');
 
-    redis.connect().then(() => {
-      logger.info('Redis client connected successfully');
-    }).catch((error) => {
-      logger.warn(error);
+    fromPromise(
+      redis.connect(),
+      (e) => e instanceof Error ? e : new Error('Unknown error occurred while connecting to Redis'),
+    ).then((connectResult) => {
+      if (connectResult.isErr()) {
+        logger.warn(connectResult.error);
+      }
     });
   }
 }
