@@ -1,13 +1,14 @@
-import { importModule, ImportNotFoundException, instantiateIfNeeded } from '@framework/core';
-import type { Application } from '@framework/core';
+import type { Application } from '@framework/core/app';
+import { importModule, ImportNotFoundException, instantiateIfNeeded } from '@framework/core/utils';
 import type { LoggerInterface } from '@module/logger';
 import { Collection, MessageFlags } from 'discord.js';
 import type { AutocompleteInteraction, ChatInputCommandInteraction, Client, Guild } from 'discord.js';
 import { DateTime } from 'luxon';
 import { err, ok } from 'neverthrow';
 import type { Result } from 'neverthrow';
-import { DiscordClientNotReadyException, SlashCommandCooldownException, SlashCommandNotFoundException } from '#/exceptions';
-import type { SlashCommandInterface, SlashCommandResolver } from '#/types';
+import type { SlashCommandResolver } from '#src/config/types';
+import { DiscordClientNotReadyException, SlashCommandCooldownException, SlashCommandNotFoundException } from '#src/exceptions';
+import type { SlashCommandInterface } from '#src/types';
 
 export default class SlashCommandManager {
   protected readonly _commands = new Collection<string, SlashCommandInterface>();

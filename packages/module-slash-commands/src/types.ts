@@ -1,7 +1,4 @@
-import type { BaseResolver } from '@framework/core';
 import type { AutocompleteInteraction, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-
-export type SlashCommandResolver = BaseResolver<new (...args: unknown[]) => SlashCommandInterface>;
 
 export interface SlashCommandInterface {
   readonly name: string;
@@ -9,8 +6,4 @@ export interface SlashCommandInterface {
   get metadata(): SlashCommandBuilder;
   execute(interaction: ChatInputCommandInteraction): Promise<void>;
   autocomplete?(interaction: AutocompleteInteraction): Promise<void>;
-}
-
-export interface SlashCommandConfig extends Record<string, unknown> {
-  commands: SlashCommandResolver[];
 }

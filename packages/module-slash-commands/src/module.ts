@@ -1,11 +1,11 @@
-import type { ConfigRepository, ModuleInterface, Application } from '@framework/core';
+import type { ConfigRepository, ModuleInterface, Application } from '@framework/core/app';
 import type { LoggerFactoryInterface, LoggerInterface } from '@module/logger';
 import { type Client, Events } from 'discord.js';
-import pkg from '../package.json';
-import SlashCommandManager from '#/slash-command-manager';
-import type { SlashCommandConfig } from '#/types';
+import pkg from '#root/package.json';
+import type { SlashCommandConfig } from '#src/config/types';
+import SlashCommandManager from '#src/slash-command-manager';
 
-declare module '@framework/core' {
+declare module '@framework/core/app' {
   interface ContainerBindings {
     'slash-commands': SlashCommandManager;
     'slash-commands.logger': LoggerInterface;
@@ -58,9 +58,12 @@ export default class SlashCommandModule implements ModuleInterface {
 
     const config: ConfigRepository = await app.container.make('config');
     const slashCommandConfig = config.get('slash-commands');
+    if (slashCommandConfig.isErr()) {
+      throw slashCommandConfig.error;
+    }
 
     if (slashCommandConfig) {
-      await manager.register(slashCommandConfig.commands);
+      await manager.register(slashCommandConfig.value.commands);
     }
   }
 }

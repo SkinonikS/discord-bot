@@ -1,4 +1,4 @@
-export { default as SlashCommandManager } from '#/slash-command-manager';
-export * from '#/types';
-export * from '#/helpers';
-export * from '#/exceptions';
+export { default as SlashCommandManager } from '#src/slash-command-manager';
+export * from '#src/types';
+export * from '#src/helpers';
+export * from '#src/exceptions';
