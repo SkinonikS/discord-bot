@@ -1,32 +1,20 @@
 {
   "private": true,
-  "type": "module",
   "name": "@module/http-api",
   "version": "1.0.0",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "scripts": {
-    "build": "tsdown",
-    "build:watch": "tsdown --watch"
-  },
-  "author": "Vadim SkinonikS.#",
   "license": "MIT",
-  "packageManager": "pnpm@10.6.3",
-  "dependencies": {
-    "@framework/core": "workspace:*",
-    "@module/logger": "workspace:*",
-    "@poppinss/utils": "^6.10.0",
-    "h3": "^1.15.3"
-  },
-  "files": [
-    "dist"
-  ],
+  "author": "Vadim SkinonikS.#",
+  "type": "module",
   "exports": {
     ".": {
       "import": "./dist/index.js",
       "node": "./dist/index.js",
       "types": "./dist/index.d.ts"
+    },
+    "./config": {
+      "import": "./dist/src/config/index.js",
+      "node": "./dist/src/config/index.js",
+      "types": "./dist/src/config/index.d.ts"
     },
     "./module": {
       "import": "./dist/src/module.js",
@@ -34,5 +22,19 @@
       "types": "./dist/src/module.d.ts"
     },
     "./package.json": "./package.json"
-  }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "build:watch": "tsdown --watch"
+  },
+  "dependencies": {
+    "@framework/core": "workspace:*",
+    "@module/logger": "workspace:*",
+    "@poppinss/utils": "^6.10.0",
+    "h3": "^1.15.3"
+  },
+  "packageManager": "pnpm@10.6.3"
 }

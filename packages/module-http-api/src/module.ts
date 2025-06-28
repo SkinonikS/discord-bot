@@ -1,12 +1,12 @@
 import { createServer } from 'node:http';
-import type { Application, ConfigRepository, ModuleInterface } from '@framework/core';
-import { ConfigNotFoundException, report, importModule } from '@framework/core';
+import type { Application, ConfigRepository, ErrorHandler, ModuleInterface } from '@framework/core/app';
+import { importModule } from '@framework/core/utils';
 import type { LoggerFactoryInterface, LoggerInterface } from '@module/logger';
 import { toNodeListener, createApp } from 'h3';
-import pkg from '../package.json';
-import type { HttpApiConfig } from '#/types';
+import pkg from '#root/package.json';
+import type { HttpApiConfig } from '#src/config/types';
 
-declare module '@framework/core' {
+declare module '@framework/core/app' {
   interface ContainerBindings {
     'http.api.app': ReturnType<typeof createApp>;
     'http.api.server': ReturnType<typeof createServer>;
@@ -56,35 +56,33 @@ export default class HttpApiModule implements ModuleInterface {
     const h3 = await app.container.make('http.api.app');
     const config: ConfigRepository = await app.container.make('config');
     const httpApiConfig = config.get('http.api');
-
-    if (! httpApiConfig) {
-      throw new ConfigNotFoundException('http.api');
+    if (httpApiConfig.isErr()) {
+      throw httpApiConfig.error;
     }
 
-    for (const routerResolver of httpApiConfig.routes) {
+    for (const routerResolver of httpApiConfig.value.routes) {
       const router = await importModule(() => routerResolver());
       h3.use(router);
     }
   }
 
   public async start(app: Application): Promise<void> {
+    const errorHandler: ErrorHandler = await app.container.make('errorHandler');
     const server = await app.container.make('http.api.server');
     const logger = await app.container.make('http.api.logger');
     const config: ConfigRepository = await app.container.make('config');
     const httpApiConfig = config.get('http.api');
-
-    if (! httpApiConfig) {
-      throw new ConfigNotFoundException('http.api');
+    if (httpApiConfig.isErr()) {
+      throw httpApiConfig.error;
     }
 
     server.on('error', (error) => {
-      logger.error(error);
-      report(error).then(() => process.exit(1));
+      errorHandler.handle(error);
     });
 
     server.listen({
-      port: httpApiConfig.port,
-      host: httpApiConfig.host,
+      port: httpApiConfig.value.port,
+      host: httpApiConfig.value.host,
     }, () => {
       const address = server.address();
       const port = typeof address === 'string' ? address : address?.port;
