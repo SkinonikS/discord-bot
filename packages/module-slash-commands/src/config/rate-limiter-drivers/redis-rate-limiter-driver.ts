@@ -25,6 +25,7 @@ export default class RedisRateLimiterDriver implements RateLimiterDriverInterfac
       storeClient: rateLimiterRedis,
       points: config.points,
       duration: config.durationMs / 1000,
+      keyPrefix: '',
     }));
   }
 }

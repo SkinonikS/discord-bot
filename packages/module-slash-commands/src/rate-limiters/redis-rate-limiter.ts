@@ -49,23 +49,15 @@ export default class RedisRateLimiter implements RateLimiterInterface {
     const consumeResult = await fromPromise(
       this._redisRateLimiter.consume(this._createKey(userId)),
       (e) => {
-        if (e instanceof RateLimiterRes) {
-          return new RedisRateLimitHitException(userId, {
-            isFirst: e.isFirstInDuration,
-            remaining: e.remainingPoints,
-            resetInMs: e.msBeforeNext,
-          });
+        if (e instanceof RateLimiterRes || e instanceof Error) {
+          return e;
         }
 
-        return e instanceof Error ? e : new Error('Unknown error occurred while consuming rate limit');
+        return new Error(`Unknown error occurred while hitting rate limit: ${String(e)}`);
       },
-    );
+    ).orElse((e) => e instanceof RateLimiterRes ? ok(e) : err(e));
 
     if (consumeResult.isErr()) {
-      if (consumeResult.error instanceof RedisRateLimitHitException) {
-        return ok(consumeResult.error.rateLimits);
-      }
-
       return err(consumeResult.error);
     }
 
