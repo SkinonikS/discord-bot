@@ -3,7 +3,7 @@ import type { LoggerFactoryInterface, LoggerInterface } from '@module/logger';
 import { type Client, Events } from 'discord.js';
 import pkg from '#root/package.json';
 import type { SlashCommandConfig } from '#src/config/types';
-import Manager from '#src/slash-command-manager';
+import Manager from '#src/manager';
 import type { RateLimiterInterface } from '#src/types';
 
 declare module '@framework/core/app' {
