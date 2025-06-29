@@ -8,15 +8,16 @@ import { err, ok } from 'neverthrow';
 import type { Result } from 'neverthrow';
 import type { SlashCommandResolver } from '#src/config/types';
 import { DiscordClientNotReadyException, SlashCommandCooldownException, SlashCommandNotFoundException } from '#src/exceptions';
-import type { SlashCommandInterface } from '#src/types';
+import type { RateLimiterInterface, SlashCommandInterface } from '#src/types';
 
-export default class SlashCommandManager {
+export default class Manager {
   protected readonly _commands = new Collection<string, SlashCommandInterface>();
   protected readonly _cooldowns: Collection<string, Collection<string, number>> = new Collection();
 
   public constructor(
     protected readonly _app: Application,
     protected readonly _discord: Client,
+    protected readonly _rateLimiter: RateLimiterInterface,
     protected readonly _logger: LoggerInterface,
   ) {
     //
@@ -49,36 +50,32 @@ export default class SlashCommandManager {
       return err(new SlashCommandNotFoundException(interaction.commandName));
     }
 
-    if (! this._cooldowns.has(command.name)) {
-      this._cooldowns.set(command.name, new Collection());
+    const rateLimitResult = await this._rateLimiter.hit(interaction.user.id);
+    if (rateLimitResult.isErr()) {
+      this._logger.debug(`Failed to get rate limits for user ${interaction.user.id}: ${rateLimitResult.error.message}`);
+      return err(rateLimitResult.error);
     }
 
-    const now = DateTime.now().toMillis();
-    const timestamps: Collection<string, number> = this._cooldowns.get(command.name) ?? new Collection();
-    const cooldownAmount = command.cooldown * 1_000;
+    if (! rateLimitResult.value.isFirst && rateLimitResult.value.remaining <= 0) {
+      const expiredTimestamp = Math.round(DateTime.now().plus({ millisecond: rateLimitResult.value.resetInMs }).toSeconds());
 
-    if (timestamps.has(interaction.user.id)) {
-      const expirationTime = (timestamps.get(interaction.user.id) ?? 0) + cooldownAmount;
+      await interaction.reply({
+        // TODO: Add localization support for this message
+        content: `Please wait, you are on a cooldown for \`${command.name}\`. You can use it again <t:${expiredTimestamp}:R>.`,
+        flags: MessageFlags.Ephemeral,
+      });
 
-      if (now < expirationTime) {
-        const expiredTimestamp = Math.round(expirationTime / 1_000);
-
-        await interaction.reply({
-          // TODO: Add localization support for this message
-          content: `Please wait, you are on a cooldown for \`${command.name}\`. You can use it again <t:${expiredTimestamp}:T>.`,
-          flags: MessageFlags.Ephemeral,
-        });
-
-        return err(new SlashCommandCooldownException(interaction.user.id, command.name));
-      }
+      this._logger.debug(`User ${interaction.user.tag} (${interaction.user.id}) is rate limited for command: ${command.name}`);
+      return err(new SlashCommandCooldownException(interaction.user.id, command.name));
     }
 
-    timestamps.set(interaction.user.id, now);
-    setTimeout(() => timestamps.delete(interaction.user.id), cooldownAmount);
+    const executeResult = await command.execute(interaction);
+    if (executeResult.isErr()) {
+      this._logger.error(executeResult.error);
+      return err(executeResult.error);
+    }
 
-    await command.execute(interaction);
     this._logger.debug(`Executed command: ${command.name} for user: ${interaction.user.tag} (${interaction.user.id})`);
-
     return ok();
   }
 

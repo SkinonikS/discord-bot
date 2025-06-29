@@ -39,7 +39,9 @@
     "@poppinss/utils": "^6.10.0",
     "discord.js": "^14.21.0",
     "luxon": "^3.6.1",
-    "neverthrow": "^8.2.0"
+    "neverthrow": "^8.2.0",
+    "rate-limiter-flexible": "^7.1.1",
+    "redis": "4"
   },
   "devDependencies": {
     "@types/luxon": "^3.6.2"
