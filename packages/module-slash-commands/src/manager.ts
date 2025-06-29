@@ -1,18 +1,17 @@
 import type { Application } from '@framework/core/app';
 import { importModule, ImportNotFoundException, instantiateIfNeeded } from '@framework/core/utils';
+import { err, ok } from '@framework/core/vendors/neverthrow';
+import type { Result } from '@framework/core/vendors/neverthrow';
+import type { AutocompleteInteraction, ChatInputCommandInteraction, Client, Guild } from '@module/discord/vendors/discordjs';
+import { Collection, MessageFlags } from '@module/discord/vendors/discordjs';
 import type { LoggerInterface } from '@module/logger';
-import { Collection, MessageFlags } from 'discord.js';
-import type { AutocompleteInteraction, ChatInputCommandInteraction, Client, Guild } from 'discord.js';
 import { DateTime } from 'luxon';
-import { err, ok } from 'neverthrow';
-import type { Result } from 'neverthrow';
 import type { SlashCommandResolver } from '#src/config/types';
 import { DiscordClientNotReadyException, SlashCommandCooldownException, SlashCommandNotFoundException } from '#src/exceptions';
 import type { RateLimiterInterface, SlashCommandInterface } from '#src/types';
 
 export default class Manager {
   protected readonly _commands = new Collection<string, SlashCommandInterface>();
-  protected readonly _cooldowns: Collection<string, Collection<string, number>> = new Collection();
 
   public constructor(
     protected readonly _app: Application,
@@ -71,7 +70,7 @@ export default class Manager {
 
     const executeResult = await command.execute(interaction);
     if (executeResult.isErr()) {
-      this._logger.error(executeResult.error);
+      this._logger.error(executeResult.error, { command: command.name, user: interaction.user.id });
       return err(executeResult.error);
     }
 
@@ -88,7 +87,11 @@ export default class Manager {
     }
 
     if (command.autocomplete) {
-      await command.autocomplete(interaction);
+      const autocompleteResult = await command.autocomplete(interaction);
+      if (autocompleteResult.isErr()) {
+        this._logger.error(autocompleteResult.error, { command: command.name, user: interaction.user.id });
+        return err(autocompleteResult.error);
+      }
     } else {
       this._logger.debug(`No autocomplete handler for command '${command.name}', skipping...`);
     }

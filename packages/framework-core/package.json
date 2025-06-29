@@ -35,6 +35,11 @@
       "node": "./dist/src/kernel/bootstrappers/*.js",
       "types": "./dist/src/kernel/bootstrappers/*.d.ts"
     },
+    "./vendors/*": {
+      "import": "./dist/src/vendors/*.js",
+      "node": "./dist/src/vendors/*.js",
+      "types": "./dist/src/vendors/*.d.ts"
+    },
     "./package.json": "./package.json"
   },
   "files": [
@@ -49,7 +54,6 @@
     "@module/logger": "workspace:*",
     "@poppinss/exception": "^1.2.1",
     "@poppinss/hooks": "^7.2.5",
-    "@poppinss/utils": "^6.10.0",
     "dotenv": "16.5.0",
     "envalid": "^8.0.0",
     "neverthrow": "^8.2.0",

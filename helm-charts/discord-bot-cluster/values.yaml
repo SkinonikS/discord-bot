@@ -8,6 +8,9 @@ redis:
 bot-cluster:
   fullnameOverride: "bot-cluster"
 
+  sharding:
+    reshardInterval: "1h"
+
   tokenSecretRef:
     envVarName: "DISCORD_TOKEN"
     name: "bot-cluster"

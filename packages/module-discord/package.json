@@ -26,6 +26,11 @@
       "node": "./dist/src/module.js",
       "types": "./dist/src/module.d.ts"
     },
+    "./vendors/*": {
+      "import": "./dist/src/vendors/*.js",
+      "node": "./dist/src/vendors/*.js",
+      "types": "./dist/src/vendors/*.d.ts"
+    },
     "./package.json": "./package.json"
   },
   "files": [
@@ -38,15 +43,9 @@
   "dependencies": {
     "@framework/core": "workspace:*",
     "@module/logger": "workspace:*",
+    "@module/redis": "workspace:*",
     "discord.js": "^14.21.0",
-    "luxon": "^3.6.1",
-    "neverthrow": "^8.2.0",
-    "node-object-hash": "^3.1.1",
-    "rate-limiter-flexible": "^7.1.1",
-    "redis": "^4.7.1"
-  },
-  "devDependencies": {
-    "@types/luxon": "^3.6.2"
+    "rate-limiter-flexible": "^7.1.1"
   },
   "packageManager": "pnpm@10.6.3"
 }

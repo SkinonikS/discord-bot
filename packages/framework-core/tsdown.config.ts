@@ -9,6 +9,7 @@ export default defineConfig({
     'src/utils/index.ts',
     'src/kernel/bootstrappers/index.ts',
     'src/kernel/bootstrappers/*.ts',
+    'src/vendors/*.ts',
   ],
   outDir: 'dist',
   format: 'esm',

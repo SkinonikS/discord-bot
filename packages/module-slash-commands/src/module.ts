@@ -1,6 +1,6 @@
 import type { ConfigRepository, ModuleInterface, Application } from '@framework/core/app';
+import { type Client, Events } from '@module/discord/vendors/discordjs';
 import type { LoggerFactoryInterface, LoggerInterface } from '@module/logger';
-import { type Client, Events } from 'discord.js';
 import pkg from '#root/package.json';
 import type { SlashCommandConfig } from '#src/config/types';
 import Manager from '#src/manager';
@@ -58,9 +58,9 @@ export default class SlashCommandModule implements ModuleInterface {
     const discord: Client = await app.container.make('discord.client');
     const manager = await app.container.make('slash-commands');
 
-    // TODO: Added just for testing purposes, remove later
     discord.on(Events.ClientReady, async (discord) => {
       const guilds = Array.from(discord.guilds.cache.values());
+      // TODO: Added just for testing purposes, remove later
       manager.deployToGuilds(guilds);
     });
 
@@ -82,26 +82,6 @@ export default class SlashCommandModule implements ModuleInterface {
 
     if (slashCommandConfig) {
       await manager.register(slashCommandConfig.value.commands);
-    }
-  }
-
-  public async start(app: Application): Promise<void> {
-    const logger = await app.container.make('slash-commands.logger');
-    const rateLimiter = await app.container.make('slash-commands.rate-limiter');
-
-    const setupResult = await rateLimiter.setup();
-    if (setupResult.isErr()) {
-      logger.error(setupResult.error);
-    }
-  }
-
-  public async shutdown(app: Application): Promise<void> {
-    const logger = await app.container.make('slash-commands.logger');
-    const rateLimiter = await app.container.make('slash-commands.rate-limiter');
-
-    const disposeResult = await rateLimiter.dispose();
-    if (disposeResult.isErr()) {
-      logger.error(disposeResult.error);
     }
   }
 }

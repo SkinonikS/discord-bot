@@ -1,8 +1,8 @@
 import { defineLoggerConfig } from '@module/logger/config';
 import type { LoggerConfig } from '@module/logger/config';
-import ConsoleTransportFactory from '#/app/logger/transports/console-transport-factory';
-import { Env } from '#/bootstrap/env';
-import pkg from '#/package.json';
+import ConsoleTransportFactory from '#app/logger/transports/console-transport-factory';
+import { Env } from '#bootstrap/env';
+import pkg from '#root/package.json';
 
 export default defineLoggerConfig({
   label: pkg.name,

@@ -1,17 +1,15 @@
-import type { AutocompleteInteraction, ChatInputCommandInteraction, SlashCommandBuilder, Snowflake } from 'discord.js';
-import type { Result } from 'neverthrow';
+import type { Result } from '@framework/core/vendors/neverthrow';
+import type { AutocompleteInteraction, ChatInputCommandInteraction, SlashCommandBuilder, Snowflake } from '@module/discord/vendors/discordjs';
 
 export interface SlashCommandInterface {
   readonly name: string;
   get metadata(): SlashCommandBuilder;
-  execute(interaction: ChatInputCommandInteraction): Promise<Result<void, Error>> | Result<void, Error>;
-  autocomplete?(interaction: AutocompleteInteraction): Promise<Result<void, Error>> | Result<void, Error>;
+  execute(interaction: ChatInputCommandInteraction): Promise<Result<void, Error>>;
+  autocomplete?(interaction: AutocompleteInteraction): Promise<Result<void, Error>>;
 }
 
 export interface RateLimiterInterface {
-  setup(): Promise<Result<void, Error>> | Result<void, Error>;
-  dispose(): Promise<Result<void, Error>> | Result<void, Error>;
-  hit(userId: Snowflake): Promise<Result<RateLimitResponse, Error>>  | Result<RateLimitResponse, Error>;
+  hit(userId: Snowflake): Promise<Result<RateLimitResponse, Error>> | Result<RateLimitResponse, Error>;
 }
 
 export interface RateLimitResponse {

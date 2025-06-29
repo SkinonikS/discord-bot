@@ -1,10 +1,10 @@
 import type { Application } from '@framework/core/app';
 import type { TransportFactoryCreateOptions, TransportFactoryInterface } from '@module/logger/config';
-import type { transport as Transport } from 'winston';
+import type { StreamTransport } from '@module/logger/vendors/winstion';
 
 export default class ConsoleTransportFactory implements TransportFactoryInterface {
-  public async create(_: Application, { module }: TransportFactoryCreateOptions): Promise<Transport> {
-    const winston = await import('winston');
+  public async create(_: Application, { module }: TransportFactoryCreateOptions): Promise<StreamTransport> {
+    const winston = await import('@module/logger/vendors/winstion');
 
     return new winston.transports.Console({
       format: winston.format.combine(

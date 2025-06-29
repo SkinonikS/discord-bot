@@ -1,27 +1,23 @@
-import type { LoggerInterface } from '@module/logger';
-import type { SlashCommandInterface } from '@module/slash-commands';
-import { GuildMember } from 'discord.js';
-import { type ChatInputCommandInteraction, MessageFlags } from 'discord.js';
-import { SlashCommandBuilder } from 'discord.js';
-import type { DisTubeError } from 'distube';
-import type { DisTube } from 'distube';
-import { fromPromise } from 'neverthrow';
+import type { Result } from '@framework/core/vendors/neverthrow';
+import { err, fromPromise, ok } from '@framework/core/vendors/neverthrow';
+import { GuildMember, MessageFlags, SlashCommandBuilder } from '@module/discord/vendors/discordjs';
+import type { ChatInputCommandInteraction } from '@module/discord/vendors/discordjs';
+import type { DisTubeError, DisTube } from '@module/distube/vendors/distube';
+import type { SlashCommandInterface  } from '@module/slash-commands';
 
 // Just a simple command to test the music functionality of the bot.
 // Will be changed later.
 export default class MusicCommand implements SlashCommandInterface {
   static containerInjections = {
     _constructor: {
-      dependencies: ['distube', 'logger'],
+      dependencies: ['distube'],
     },
   };
 
   public readonly name = 'music';
-  public readonly cooldown = 5;
 
   public constructor(
     protected readonly _distube: DisTube,
-    protected readonly _logger: LoggerInterface,
   ) { }
 
   public get metadata(): SlashCommandBuilder {
@@ -70,35 +66,35 @@ export default class MusicCommand implements SlashCommandInterface {
     return builder;
   }
 
-  public async execute(interaction: ChatInputCommandInteraction): Promise<void> {
+  public async execute(interaction: ChatInputCommandInteraction): Promise<Result<void, Error>> {
     const deferReply = await interaction.deferReply({
       flags: MessageFlags.Ephemeral,
     });
 
     if (! interaction.inGuild()) {
       await deferReply.edit('This command can only be used in servers!');
-      return;
+      return ok();
     }
 
     if (! (interaction.member instanceof GuildMember)) {
-      return;
+      return ok();
     }
 
     if (! interaction.member.voice.channel) {
       deferReply.edit('You must be in a voice channel to use music commands!');
-      return;
+      return ok();
     }
 
     const queue = this._distube.getQueue(interaction.guildId);
 
     if (! interaction.member.voice.channel.joinable) {
       await deferReply.edit('I cannot join your voice channel. Please check my permissions.');
-      return;
+      return ok();
     }
 
     if (queue && queue.voice.channel.id !== interaction.member.voice.channel.id) {
       await deferReply.edit('You must be in the same voice channel as the bot to use music commands!');
-      return;
+      return ok();
     }
 
     const subcommand = interaction.options.getSubcommand();
@@ -107,7 +103,7 @@ export default class MusicCommand implements SlashCommandInterface {
       case 'play': {
         const query = interaction.options.getString('query', true);
 
-        const res = await fromPromise<unknown, DisTubeError | Error>(this._distube.play(interaction.member.voice.channel, query, {
+        const playResult = await fromPromise<unknown, DisTubeError | Error>(this._distube.play(interaction.member.voice.channel, query, {
           textChannel: interaction.channel ?? undefined,
           member: interaction.member,
         }), (error) => {
@@ -118,19 +114,18 @@ export default class MusicCommand implements SlashCommandInterface {
           return error;
         });
 
-        if (res.isErr()) {
-          this._logger.error(res.error.message);
-          await deferReply.edit(`❌ Error: ${res.error.message}`);
-          return;
+        if (playResult.isErr()) {
+          await deferReply.edit('Error while trying to play the song.');
+          return err(playResult.error);
         }
 
-        await deferReply.edit(`🎵 Playing: ${query}`);
+        await deferReply.edit(`Playing: ${query}`);
         break;
       }
       case 'pause': {
         if (! queue) {
           await deferReply.edit('There is nothing playing to pause!');
-          return;
+          return ok();
         }
 
         await queue.pause();
@@ -140,7 +135,7 @@ export default class MusicCommand implements SlashCommandInterface {
       case 'resume': {
         if (! queue) {
           await deferReply.edit('There is nothing paused to resume!');
-          return;
+          return ok();
         }
 
         await queue.resume();
@@ -150,28 +145,29 @@ export default class MusicCommand implements SlashCommandInterface {
       case 'skip': {
         if (! queue) {
           await deferReply.edit('There is nothing playing to skip!');
-          return;
+          return ok();
         }
 
         await queue.skip();
-        await deferReply.edit('⏩ Skipped the song.');
+        await deferReply.edit('Skipped the song.');
         break;
       }
       case 'stop': {
         if (! queue) {
           await deferReply.edit('There is no music playing to stop!');
-          return;
+          return ok();
         }
 
         await queue.stop();
-        await deferReply.edit('⛔ Stopped the music and cleared the queue.');
+        await deferReply.edit('Stopped the music and cleared the queue.');
         break;
       }
       case 'queue': {
         if (! queue) {
           deferReply.edit('The queue is empty!');
-          return;
+          return ok();
         }
+
         const queueString = queue.songs.map((song, index) => `${index + 1}. ${song.name} (${song.formattedDuration})`).join('\n');
         await deferReply.edit(`📜 **Music Queue:**\n${queueString}`);
         break;
@@ -180,12 +176,12 @@ export default class MusicCommand implements SlashCommandInterface {
         const level = interaction.options.getInteger('level', true);
         if (! queue) {
           deferReply.edit('There is no music playing to change the volume!');
-          return;
+          return ok();
         }
 
         if (level < 1 || level > 100) {
           deferReply.edit('Volume level must be between 1 and 100!');
-          return;
+          return ok();
         }
 
         await queue.setVolume(level);
@@ -194,8 +190,10 @@ export default class MusicCommand implements SlashCommandInterface {
       }
       default: {
         await deferReply.edit('Unknown subcommand. Please use a valid music command.');
-        return;
+        return ok();
       }
     }
+
+    return ok();
   }
 }

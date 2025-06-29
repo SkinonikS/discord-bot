@@ -21,6 +21,11 @@
       "node": "./dist/src/module.js",
       "types": "./dist/src/module.d.ts"
     },
+    "./vendors/*": {
+      "import": "./dist/src/vendors/*.js",
+      "node": "./dist/src/vendors/*.js",
+      "types": "./dist/src/vendors/*.d.ts"
+    },
     "./package.json": "./package.json"
   },
   "files": [
@@ -35,7 +40,7 @@
     "@discordjs/voice": "^0.18.0",
     "@framework/core": "workspace:*",
     "@module/logger": "workspace:*",
-    "discord.js": "^14.21.0",
+    "@module/discord": "workspace:*",
     "distube": "^5.0.7"
   },
   "packageManager": "pnpm@10.6.3"

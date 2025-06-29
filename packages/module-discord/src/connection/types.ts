@@ -1,9 +1,6 @@
-import type { Result } from 'neverthrow';
+import type { Result } from '@framework/core/vendors/neverthrow';
 
 export interface RateLimiterInterface {
-  get available(): boolean;
-  setup(): Promise<Result<void, Error>> | Result<void, Error>;
-  dispose(): Promise<Result<void, Error>> | Result<void, Error>;
   consume(): Promise<Result<RateLimitResponse, Error>> | Result<RateLimitResponse, Error>;
 }
 

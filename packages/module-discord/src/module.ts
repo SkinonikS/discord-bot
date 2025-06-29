@@ -87,7 +87,11 @@ export default class DiscordModule implements ModuleInterface {
     debug('Starting Discord module...');
 
     const connector = await app.container.make('discord.connector');
-    connector.connect();
+    connector.connect().then((connectResult) => {
+      if (connectResult.isErr()) {
+        throw connectResult.error;
+      }
+    });
   }
 
   public async shutdown(app: Application): Promise<void> {
@@ -97,9 +101,10 @@ export default class DiscordModule implements ModuleInterface {
     const connector = await app.container.make('discord.connector');
     const disconnectResult = await connector.disconnect();
 
-    if (disconnectResult.isOk()) {
+    if (disconnectResult.isErr()) {
+      throw disconnectResult.error;
+    } else {
       logger.info('Discord client has been destroyed');
-      debug('Discord client has been destroyed');
     }
   }
 }

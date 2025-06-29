@@ -8,6 +8,7 @@ export default defineConfig({
     'src/config/index.ts',
     'src/config/rate-limiter-drivers/*.ts',
     'src/module.ts',
+    'src/vendors/*.ts',
   ],
   outDir: 'dist',
   format: 'esm',

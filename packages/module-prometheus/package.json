@@ -21,6 +21,11 @@
       "node": "./dist/src/module.js",
       "types": "./dist/src/module.d.ts"
     },
+    "./vendors/*": {
+      "import": "./dist/src/vendors/*.js",
+      "node": "./dist/src/vendors/*.js",
+      "types": "./dist/src/vendors/*.d.ts"
+    },
     "./package.json": "./package.json"
   },
   "files": [
@@ -33,7 +38,6 @@
   "dependencies": {
     "@framework/core": "workspace:*",
     "@module/logger": "workspace:*",
-    "@poppinss/utils": "^6.10.0",
     "prom-client": "^15.1.3"
   },
   "packageManager": "pnpm@10.6.3"

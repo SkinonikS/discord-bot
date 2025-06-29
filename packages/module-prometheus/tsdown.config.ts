@@ -5,6 +5,7 @@ export default defineConfig({
     'index.ts',
     'src/config/index.ts',
     'src/module.ts',
+    'src/vendors/*.ts',
   ],
   outDir: 'dist',
   format: 'esm',

@@ -4,11 +4,23 @@
     "rootDir": "./",
     "outDir": "./dist",
     "paths": {
-      "#": [
+      "#root": [
         "./"
       ],
-      "#/*": [
+      "#root/*": [
         "./*"
+      ],
+      "#app": [
+        "./app"
+      ],
+      "#app/*": [
+        "./app/*"
+      ],
+      "#locales": [
+        "./locales"
+      ],
+      "#locales/*": [
+        "./locales/*"
       ],
       "#start": [
         "./start"

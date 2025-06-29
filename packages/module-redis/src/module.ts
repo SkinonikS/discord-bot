@@ -1,13 +1,13 @@
 import type { Application, ConfigRepository, ModuleInterface } from '@framework/core/app';
 import type { LoggerFactoryInterface, LoggerInterface } from '@module/logger';
-import { fromPromise } from 'neverthrow';
-import { createClient } from 'redis';
 import type { RedisClientType } from 'redis';
 import pkg from '#root/package.json';
 import type { RedisConfig } from '#src/config/types';
+import Manager from '#src/manager';
 
-declare module '@framework/core' {
+declare module '@framework/core/app' {
   interface ContainerBindings {
+    'redis': Manager;
     'redis.client': RedisClientType;
     'redis.logger': LoggerInterface;
   }
@@ -23,21 +23,24 @@ export default class RedisModule implements ModuleInterface {
   public readonly version: string = pkg.version;
 
   public register(app: Application): void {
-    app.container.singleton('redis.client', async () => {
-      const config: ConfigRepository = await app.container.make('config');
+    app.container.singleton('redis', async (container) => {
+      const config: ConfigRepository = await container.make('config');
       const redisConfig = config.get('redis');
       if (redisConfig.isErr()) {
         throw redisConfig.error;
       }
 
-      return createClient({
-        url: `${redisConfig.value.secure ? 'rediss' : 'redis'}://${redisConfig.value.host}:${redisConfig.value.port}`,
-        database: redisConfig.value.database,
-        password: redisConfig.value.password ?? undefined,
-        socket: {
-          reconnectStrategy: false,
-        },
-      });
+      return new Manager(redisConfig.value);
+    });
+
+    app.container.bind('redis.client', async (container) => {
+      const manager = await container.make('redis');
+      const redis = manager.client();
+      if (redis.isErr()) {
+        throw redis.error;
+      }
+
+      return redis.value;
     });
 
     app.container.singleton('redis.logger', async (container) => {
@@ -47,16 +50,19 @@ export default class RedisModule implements ModuleInterface {
   }
 
   public async start(app: Application): Promise<void> {
-    const redis = await app.container.make('redis.client');
+    const manager = await app.container.make('redis');
     const logger = await app.container.make('redis.logger');
 
-    fromPromise(
-      redis.connect(),
-      (e) => e instanceof Error ? e : new Error('Unknown error occurred while connecting to Redis'),
-    ).then((connectResult) => {
-      if (connectResult.isErr()) {
-        logger.warn(connectResult.error);
-      }
-    });
+    const connectResult = await manager.connect();
+    if (connectResult.isErr()) {
+      throw connectResult.error;
+    } else {
+      logger.info('Successfully connected to Redis');
+    }
+  }
+
+  public async shutdown(app: Application): Promise<void> {
+    const manager = await app.container.make('redis');
+    await manager.disconnect();
   }
 }

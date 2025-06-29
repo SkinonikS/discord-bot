@@ -1,4 +1,4 @@
-import { Application } from '@framework/core';
+import { Application } from '@framework/core/app';
 import type { Registry } from 'prom-client';
 
 export const getPrometheusRegistry = (app?: Application): Promise<Registry> => {

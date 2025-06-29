@@ -1,7 +1,7 @@
+import type { Client } from '@module/discord/vendors/discordjs';
 import type { MetricInterface } from '@module/prometheus';
-import type { Client } from 'discord.js';
-import { Gauge } from 'prom-client';
-import type { Metric } from 'prom-client';
+import type { Metric } from '@module/prometheus/vendors/prometheus';
+import { Gauge } from '@module/prometheus/vendors/prometheus';
 
 export default class PingMetric implements MetricInterface {
   static containerInjections = {

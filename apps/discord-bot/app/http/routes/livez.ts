@@ -1,4 +1,4 @@
-import { defineEventHandler, setResponseStatus } from 'h3';
+import { defineEventHandler, setResponseStatus } from '@module/http-api/vendors/h3';
 
 export default defineEventHandler(async (event) => {
   const discord = await event.context.container.make('discord.client');

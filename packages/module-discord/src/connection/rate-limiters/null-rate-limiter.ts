@@ -1,5 +1,5 @@
-import { ok } from 'neverthrow';
-import type { Result } from 'neverthrow';
+import { ok } from '@framework/core/vendors/neverthrow';
+import type { Result } from '@framework/core/vendors/neverthrow';
 import type { RateLimiterInterface, RateLimitResponse } from '#src/connection';
 
 export default class NullRateLimiter implements RateLimiterInterface {

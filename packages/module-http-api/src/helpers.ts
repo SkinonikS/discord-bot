@@ -1,5 +1,5 @@
 import type { Server } from 'node:http';
-import { Application } from '@framework/core';
+import { Application } from '@framework/core/app';
 import type { App, Router } from 'h3';
 
 export const getH3App = (app?: Application): Promise<App> => {

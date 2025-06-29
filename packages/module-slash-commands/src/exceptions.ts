@@ -1,4 +1,4 @@
-import { Exception } from '@poppinss/exception';
+import { Exception } from '@framework/core/vendors/exceptions';
 
 export class SlashCommandNotFoundException extends Exception {
   public static status = 404;
@@ -26,7 +26,7 @@ export class DiscordClientNotReadyException extends Exception {
   public static status = 503;
   public static code = 'E_DISCORD_CLIENT_NOT_READY';
 
-  public constructor(cause?: Error) {
+  public constructor(cause?: unknown) {
     super('Discord client is not ready. Cannot deploy commands.', { cause });
   }
 }

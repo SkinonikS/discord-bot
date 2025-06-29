@@ -31,17 +31,12 @@
     "build:watch": "tsdown --watch"
   },
   "dependencies": {
-    "@adonisjs/fold": "^10.2.0",
     "@framework/core": "workspace:*",
     "@module/discord": "workspace:*",
     "@module/logger": "workspace:*",
-    "@poppinss/exception": "^1.2.1",
-    "@poppinss/utils": "^6.10.0",
-    "discord.js": "^14.21.0",
+    "@module/redis": "workspace:*",
     "luxon": "^3.6.1",
-    "neverthrow": "^8.2.0",
-    "rate-limiter-flexible": "^7.1.1",
-    "redis": "4"
+    "rate-limiter-flexible": "^7.1.1"
   },
   "devDependencies": {
     "@types/luxon": "^3.6.2"

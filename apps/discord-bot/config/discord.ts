@@ -1,6 +1,5 @@
 import { defineDiscordConfig, RedisRateLimiterDriver } from '@module/discord/config';
-import { ActivityType } from 'discord.js';
-import { IntentsBitField } from 'discord.js';
+import { ActivityType, IntentsBitField } from '@module/discord/vendors/discordjs';
 import { Env } from '#bootstrap/env';
 
 export default defineDiscordConfig({
@@ -23,7 +22,7 @@ export default defineDiscordConfig({
     }],
   },
   rateLimiter: {
-    driver: new RedisRateLimiterDriver({ database: Env.DISCORD_RATE_LIMIT_REDIS_DATABASE }),
+    driver: new RedisRateLimiterDriver({ client: 'default' }),
     points: 5,
     durationMs: 6000,
   },

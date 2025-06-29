@@ -7,9 +7,9 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/src/index.js",
-      "node": "./dist/src/index.js",
-      "types": "./dist/src/index.d.ts"
+      "import": "./dist/index.js",
+      "node": "./dist/index.js",
+      "types": "./dist/index.d.ts"
     },
     "./config": {
       "import": "./dist/src/config/index.js",
@@ -20,6 +20,11 @@
       "import": "./dist/src/module.js",
       "node": "./dist/src/module.js",
       "types": "./dist/src/module.d.ts"
+    },
+    "./vendors/*": {
+      "import": "./dist/src/vendors/*.js",
+      "node": "./dist/src/vendors/*.js",
+      "types": "./dist/src/vendors/*.d.ts"
     },
     "./package.json": "./package.json"
   },
@@ -33,7 +38,6 @@
   "dependencies": {
     "@framework/core": "workspace:*",
     "@module/logger": "workspace:*",
-    "neverthrow": "^8.2.0",
     "redis": "^4.7.1"
   },
   "packageManager": "pnpm@10.6.3"
