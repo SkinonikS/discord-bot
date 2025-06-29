@@ -7,18 +7,19 @@ export default class NullRateLimiter implements RateLimiterInterface {
     return true;
   }
 
-  public async open(): Promise<Result<void, Error>> {
+  public setup(): Result<void, Error> {
     return ok();
   }
 
-  public async dispose(): Promise<Result<void, Error>> {
+  public dispose(): Result<void, Error> {
     return ok();
   }
 
-  public async consume(): Promise<Result<RateLimitResponse, Error>> {
+  public consume(): Result<RateLimitResponse, Error> {
     return ok({
+      isFirst: true,
       remaining: Infinity,
-      resetIn: 0,
+      resetInMs: 0,
     });
   }
 }

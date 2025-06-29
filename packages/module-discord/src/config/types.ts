@@ -8,9 +8,18 @@ export interface DiscordConfig extends Record<string, unknown> {
   richPresence: PresenceData;
   shardId: number;
   shardCount: number;
-  rateLimiter: RateLimiterDriverInterface;
+  rateLimiter: {
+    driver: RateLimiterDriverInterface;
+    points: number;
+    durationMs: number;
+  };
+}
+
+export interface RateLimiterGlobalConfig {
+  points: number;
+  durationMs: number;
 }
 
 export interface RateLimiterDriverInterface {
-  create(app: Application): Promise<RateLimiterInterface> | RateLimiterInterface;
+  create(app: Application, config: RateLimiterGlobalConfig): Promise<RateLimiterInterface> | RateLimiterInterface;
 }

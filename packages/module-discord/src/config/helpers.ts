@@ -9,5 +9,9 @@ export const defineDiscordConfig = (config: Partial<DiscordConfig>) => defineBas
   richPresence: config.richPresence ?? {},
   shardCount: config.shardCount ?? 1,
   shardId: config.shardId ?? 0,
-  rateLimiter: config.rateLimiter ?? new NullRateLimiterDriver(),
+  rateLimiter: config.rateLimiter ?? {
+    driver: new NullRateLimiterDriver(),
+    points: 5,
+    durationMs: 6000,
+  },
 });

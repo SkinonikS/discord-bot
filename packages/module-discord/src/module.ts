@@ -10,6 +10,7 @@ import Handler from '#src/handler';
 declare module '@framework/core/app' {
   interface ContainerBindings {
     'discord.client': Client;
+    'discord.connector': Connector;
     'discord.logger': LoggerInterface;
   }
 
@@ -24,6 +25,28 @@ export default class DiscordModule implements ModuleInterface {
   readonly version = pkg.version;
 
   public register(app: Application): void {
+    app.container.singleton('discord.connector', async (container) => {
+      const app = await container.make('app');
+      const config: ConfigRepository = await container.make('config');
+      const discordConfig = config.get('discord');
+      if (discordConfig.isErr()) {
+        throw discordConfig.error;
+      }
+
+      const rateLimiter = await discordConfig.value.rateLimiter.driver.create(app, {
+        durationMs: discordConfig.value.rateLimiter.durationMs,
+        points: discordConfig.value.rateLimiter.points,
+      });
+
+      const discord = await container.make('discord.client');
+      return new Connector(
+        discord,
+        rateLimiter,
+        await container.make('discord.logger'),
+        discordConfig.value.token,
+      );
+    });
+
     app.container.singleton('discord.client', async (container) => {
       const config: ConfigRepository = await container.make('config');
       const discordConfig = config.get('discord');
@@ -63,36 +86,20 @@ export default class DiscordModule implements ModuleInterface {
   public async start(app: Application): Promise<void> {
     debug('Starting Discord module...');
 
-    const config: ConfigRepository = await app.container.make('config');
-    const discordConfig = config.get('discord');
-    if (discordConfig.isErr()) {
-      throw discordConfig.error;
-    }
-
-    const discord = await app.container.make('discord.client');
-    const connector = new Connector(
-      discord,
-      await discordConfig.value.rateLimiter.create(app),
-      await app.container.make('discord.logger'),
-    );
-
-    connector.connect(discordConfig.value.token);
+    const connector = await app.container.make('discord.connector');
+    connector.connect();
   }
 
   public async shutdown(app: Application): Promise<void> {
     debug('Shutting down Discord module...');
 
-    const discord = await app.container.make('discord.client');
-    const logger = await app.container.make('discord.logger');
+    const logger: LoggerInterface = await app.container.make('discord.logger');
+    const connector = await app.container.make('discord.connector');
+    const disconnectResult = await connector.disconnect();
 
-    debug('Shutting down Discord module...');
-    if (discord.isReady()) {
-      await discord.destroy();
+    if (disconnectResult.isOk()) {
       logger.info('Discord client has been destroyed');
       debug('Discord client has been destroyed');
-    } else {
-      logger.notice('Discord client was not ready, nothing to destroy');
-      debug('Discord client was not ready, nothing to destroy');
     }
   }
 }
