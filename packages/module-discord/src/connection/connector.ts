@@ -1,6 +1,7 @@
 import type { LoggerInterface } from '@module/logger';
 import type { Client } from 'discord.js';
-import { fromPromise } from 'neverthrow';
+import type { Result } from 'neverthrow';
+import { err, fromPromise, ok } from 'neverthrow';
 import { debug } from '#root/debug';
 import type { RateLimiterInterface } from '#src/connection/types';
 
@@ -9,57 +10,79 @@ export default class Connector {
     protected readonly _discord: Client,
     protected readonly _rateLimiter: RateLimiterInterface,
     protected readonly _logger: LoggerInterface,
+    protected readonly _token: string,
     protected readonly _reconnectionTimeout: number = 1000,
   ) {
     //
   }
 
-  public async connect(token: string): Promise<void> {
+  public async disconnect(): Promise<Result<void, Error>> {
+    debug('Disconnecting Discord client...');
+
+    if (! this._discord.isReady()) {
+      return ok();
+    }
+
+    return fromPromise(
+      this._discord.destroy(),
+      (e) => e instanceof Error ? e : new Error('Unknown error'),
+    );
+  }
+
+  public async connect(): Promise<Result<void, Error>> {
+    debug('Connecting to Discord...');
+
     if (this._discord.isReady()) {
       debug('Discord client is already connected, skipping connection attempt');
-      return;
+      return ok();
     }
 
-    const openResult = await this._rateLimiter.open();
-    if (openResult.isErr()) {
+    const setupResult = await this._rateLimiter.setup();
+    if (setupResult.isErr() || ! this._rateLimiter.available) {
       debug('Failed to open rate limiter, cannot connect to Discord');
       this._logger.warn('Failed to open rate limiter. Skipping rate limiting.');
-
-      await this._discord.login(token);
-      return;
+      return this._loginToDiscord();
     }
 
-    if (! this._rateLimiter.available) {
-      debug('Rate Limiter is not available, connecting to Discord without rate limiting');
-      this._logger.warn('Rate Limiter is not available, connecting to Discord without rate limiting');
-
-      await this._discord.login(token);
-      return;
-    }
-
-    return this._tryConnect(token).then(async () => {
-      await this._rateLimiter.dispose();
+    return this._tryConnect().then(async (connectResult) => {
+      if (connectResult.isErr()) {
+        this._logger.error(connectResult.error);
+        setTimeout(() => this._tryConnect(), this._reconnectionTimeout);
+        return ok();
+      } else {
+        return this._rateLimiter.dispose();
+      }
     });
   }
 
-  protected async _tryConnect(token: string): Promise<void> {
+  protected async _tryConnect(): Promise<Result<void, Error>> {
     const consumeResult = await this._rateLimiter.consume();
-
     if (consumeResult.isErr()) {
       debug(`Discord hit the rate limit, waiting ${this._reconnectionTimeout} before retrying...`);
-      this._logger.notice(`Discord hit the gateway rate limit, waiting ${this._reconnectionTimeout}ms before retrying...`);
-      setTimeout(() => this._tryConnect(token), this._reconnectionTimeout);
-      return;
+      return err(new Error(`Discord hit the gateway rate limit, waiting ${this._reconnectionTimeout}ms before retrying...`));
     }
 
-    const loginResult = await fromPromise(this._discord.login(token), (e) => e instanceof Error ? e : new Error('Unknown error'));
+    if (! consumeResult.value.isFirst && consumeResult.value.remaining <= 0) {
+      debug(`Discord hit the rate limit, waiting ${consumeResult.value.resetInMs}ms before retrying...`);
+      return err(new Error(`Discord hit the gateway rate limit, waiting ${consumeResult.value.resetInMs}ms before retrying...`));
+    }
+
+    const loginResult = await this._loginToDiscord();
     if (loginResult.isErr()) {
-      debug('Discord login failed, waiting 1s before retrying...');
-      this._logger.error(`Discord login failed: ${loginResult.error}`);
-      setTimeout(() => this._tryConnect(token), this._reconnectionTimeout);
-      return;
+      debug('Discord login failed, waiting before retrying...');
+      return err(new Error(`Discord login failed: ${loginResult.error}`));
     }
 
     debug('Discord client connected successfully');
+    return ok();
+  }
+
+  protected async _loginToDiscord(): Promise<Result<void, Error>> {
+    const loginResult = await fromPromise(
+      this._discord.login(this._token),
+      (e) => e instanceof Error ? e : new Error('Unknown error'),
+    );
+
+    return loginResult.isErr() ? err(loginResult.error) : ok();
   }
 }
