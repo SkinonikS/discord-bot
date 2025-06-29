@@ -22,12 +22,11 @@ export default defineDiscordConfig({
       url: 'https://github.com/SkinonikS/discord-bot',
     }],
   },
-  rateLimiter: new RedisRateLimiterDriver({
-    maxConcurrency: Env.DISCORD_RATE_LIMIT_MAX_CONCURRENCY,
-    timeout: Env.DISCORD_RATE_LIMIT_TIMEOUT,
-    channel: Env.DISCORD_RATE_LIMIT_CHANNEL,
-    database: Env.REDIS_DATABASE,
-  }),
+  rateLimiter: {
+    driver: new RedisRateLimiterDriver({ database: Env.DISCORD_RATE_LIMIT_REDIS_DATABASE }),
+    points: 5,
+    durationMs: 6000,
+  },
   shardId: Env.DISCORD_SHARD_ID,
   shardCount: Env.DISCORD_SHARD_COUNT,
 });

@@ -6,10 +6,7 @@ export const Env = cleanEnv(process.env, {
   DISCORD_TOKEN: str(),
   DISCORD_SHARD_ID: num({ default: 0 }),
   DISCORD_SHARD_COUNT: num({ default: 1 }),
-  DISCORD_RATE_LIMIT_TIMEOUT: num({ default: 1000 }),
-  DISCORD_RATE_LIMIT_MAX_CONCURRENCY: num({ default: 5 }),
-  DISCORD_RATE_LIMIT_CHANNEL: str({ default: 'discord-bot-rate-limit' }),
-  DISCORD_RATE_LIMIT_DATABASE: num({ default: 0 }),
+  DISCORD_RATE_LIMIT_REDIS_DATABASE: num({ default: 0 }),
 
   DISTUBE_NSFW: bool({ default: false }),
   DISTUBE_FFMPEG_PATH: str({ default: undefined }),
