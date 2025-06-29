@@ -1,10 +1,12 @@
 import winston from 'winston';
+import { Env } from '#/env';
 
 export const createLogger = (): winston.Logger => {
   return winston.createLogger({
-    level: 'info',
+    level: Env.LOG_LEVEL,
+    levels: winston.config.syslog.levels,
     format: winston.format.combine(
-      winston.format.errors({ stack: true }),
+      winston.format.errors({ stack: Env.LOG_SHOW_STACK_TRACES }),
       winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     ),
     transports: [

@@ -20,6 +20,7 @@ process.on('uncaughtException', (error) => {
 });
 
 export const start = async () => {
+  await import('#/env'); // Ensure environment variables are loaded and validated before using them
   const kc = new k8s.KubeConfig();
   kc.loadFromDefault();
   const appsApi = kc.makeApiClient(k8s.AppsV1Api);
