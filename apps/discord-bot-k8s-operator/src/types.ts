@@ -1,7 +1,17 @@
 import type * as k8s from '@kubernetes/client-node';
 import type { Result } from 'neverthrow';
 
+export interface ErrorResult {
+  error: Error;
+  code: number;
+}
+
 export interface DeleteDeploymentsOptions {
+  name: string;
+  namespace: string;
+}
+
+export interface ListDeploymentsOptions {
   name: string;
   namespace: string;
 }
@@ -9,11 +19,6 @@ export interface DeleteDeploymentsOptions {
 export interface CreateDeploymentOptions {
   namespace: string;
   resource: k8s.V1Deployment;
-}
-
-export interface ListDeploymentsOptions {
-  name: string;
-  namespace: string;
 }
 
 export interface DeploymentStorageInterface {

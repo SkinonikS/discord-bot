@@ -1,7 +1,7 @@
 import type { Result } from 'neverthrow';
 import { err, ok } from 'neverthrow';
 import type { Logger } from 'winston';
-import type { DeploymentStorageInterface, GatwayInfoProviderInterface, ReshardingManagerInterface, SecretStorageInterface, ShardSpawnerInterface, WatchObject } from '#/types';
+import type { DeploymentStorageInterface, ErrorResult, GatwayInfoProviderInterface, ReshardingManagerInterface, SecretStorageInterface, ShardSpawnerInterface, WatchObject } from '#/types';
 
 export default class Cluster {
   public constructor(
@@ -27,24 +27,39 @@ export default class Cluster {
     return ok();
   }
 
-  public async create(watchObject: WatchObject): Promise<Result<void, Error>> {
+  public async create(watchObject: WatchObject): Promise<Result<void, ErrorResult>> {
+    const readResult = await this._deploymentStorage.listDeployments({
+      namespace: watchObject.metadata.namespace,
+      name: watchObject.metadata.name,
+    });
+
+    if (readResult.isErr()) {
+      return err({ error: readResult.error, code: 500 });
+    }
+
+    if (readResult.value.items.length > 0) {
+      const error = new Error(`Deployments for '${watchObject.metadata.name}' already exists in namespace '${watchObject.metadata.namespace}'.`);
+      return err({ error, code: 409 });
+    }
+
     const secretResult = await this._secretStorage.getSecretOpaque({
       key: watchObject.spec.tokenSecretRef.key,
       name: watchObject.spec.tokenSecretRef.name,
       namespace: watchObject.metadata.namespace,
     });
+
     if (secretResult.isErr()) {
-      return err(secretResult.error);
+      return err({ error: secretResult.error, code: 500 });
     }
 
     const gatewayInfo = await this._gatewayInfoProvider.fetchInfo(secretResult.value);
     if (gatewayInfo.isErr()) {
-      return err(gatewayInfo.error);
+      return err({ error: gatewayInfo.error, code: 500 });
     }
 
     const spawnResult = await this._shardSpawnerConfig.spawn(watchObject, gatewayInfo.value);
     if (spawnResult.isErr()) {
-      return err(spawnResult.error);
+      return err({ error: spawnResult.error, code: 500 });
     }
 
     this._reshardingManager.startInterval({

@@ -21,6 +21,7 @@ process.on('uncaughtException', (error) => {
 
 export const start = async () => {
   await import('#/env'); // Ensure environment variables are loaded and validated before using them
+
   const kc = new k8s.KubeConfig();
   kc.loadFromDefault();
   const appsApi = kc.makeApiClient(k8s.AppsV1Api);
@@ -40,7 +41,7 @@ export const start = async () => {
   if (watchResult.isErr()) {
     logger.error(watchResult.error);
   } else {
-    logger.info('Shard manager started watching for deployments');
+    logger.info('Discord bot operator started watching');
   }
 };
 
