@@ -1,0 +1,40 @@
+{
+  "name": "@module/i18n",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": "Vadim SkinonikS.#",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "node": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./config": {
+      "import": "./dist/src/config/index.js",
+      "node": "./dist/src/config/index.js",
+      "types": "./dist/src/config/index.d.ts"
+    },
+    "./module": {
+      "import": "./dist/src/module.js",
+      "node": "./dist/src/module.js",
+      "types": "./dist/src/module.d.ts"
+    },
+    "./vendors/*": {
+      "import": "./dist/src/vendors/*.js",
+      "node": "./dist/src/vendors/*.js",
+      "types": "./dist/src/vendors/*.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "build:watch": "tsdown --watch"
+  },
+  "packageManager": "pnpm@10.6.3",
+  "dependencies": {
+    "@framework/core": "workspace:*",
+    "@module/logger": "workspace:*",
+    "i18next": "^25.2.1"
+  }
+}
