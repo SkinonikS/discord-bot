@@ -5,7 +5,6 @@ import { debug } from '#root/debug';
 import pkg from '#root/package.json';
 import type { DiscordConfig } from '#src/config/types';
 import { Connector } from '#src/connection';
-import Handler from '#src/handler';
 
 declare module '@framework/core/app' {
   interface ContainerBindings {
@@ -38,11 +37,13 @@ export default class DiscordModule implements ModuleInterface {
         points: discordConfig.value.rateLimiter.points,
       });
 
+      const logger = await container.make('discord.logger');
       const discord = await container.make('discord.client');
+
       return new Connector(
         discord,
         rateLimiter,
-        await container.make('discord.logger'),
+        logger,
         discordConfig.value.token,
       );
     });
@@ -54,33 +55,26 @@ export default class DiscordModule implements ModuleInterface {
         throw discordConfig.error;
       }
 
-      return new Client({
+      const logger = await container.make('discord.logger');
+
+      const discord = new Client({
         intents: discordConfig.value.intents,
         presence: discordConfig.value.richPresence,
         shardCount: discordConfig.value.shardCount,
         shards: discordConfig.value.shardId,
       });
+
+      discord.on(Events.ClientReady, (client) => logger.info(`Discord client is ready as ${client.user.tag}`));
+      discord.on(Events.Debug, (message) => logger.debug(message));
+      discord.on(Events.Error, (error) => logger.error(error));
+
+      return discord;
     });
 
     app.container.singleton('discord.logger', async (container) => {
       const factory: LoggerFactoryInterface = await container.make('logger.factory');
       return factory.createLogger(this.id);
     });
-  }
-
-  public async boot(app: Application): Promise<void> {
-    debug('Booting Discord module...');
-
-    const discord = await app.container.make('discord.client');
-
-    const controller = new Handler(
-      await app.container.make('errorHandler'),
-      await app.container.make('discord.logger'),
-    );
-
-    discord.on(Events.ClientReady, (client) => controller.clientReady(client));
-    discord.on(Events.Debug, (message) => controller.debug(message));
-    discord.on(Events.Error, (error) => controller.error(error));
   }
 
   public async start(app: Application): Promise<void> {
@@ -101,9 +95,7 @@ export default class DiscordModule implements ModuleInterface {
     const connector = await app.container.make('discord.connector');
     const disconnectResult = await connector.disconnect();
 
-    if (disconnectResult.isErr()) {
-      throw disconnectResult.error;
-    } else {
+    if (disconnectResult.isOk()) {
       logger.info('Discord client has been destroyed');
     }
   }
