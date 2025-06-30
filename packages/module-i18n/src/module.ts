@@ -33,8 +33,13 @@ export default class I18nModule implements ModuleInterface {
 
       const i18nInstance = createInstance();
 
-      i18nInstance.use(new I18nLoader(i18nConfig.value.translations, logger));
+      i18nInstance.use(new I18nLoader(i18nConfig.value.translations));
+      i18nInstance.on('languageChanged', (lng) => logger.debug(`Language changed to: ${lng}`));
+      i18nInstance.on('initialized', () => logger.debug(`i18n initialized with locale: ${i18nConfig.value.locale}, fallbackLocale: ${i18nConfig.value.fallbackLocale}`));
       i18nInstance.on('failedLoading', (lng, ns, msg) => logger.error(msg));
+      i18nInstance.on('loaded', (loaded) => logger.debug(`Translations loaded: ${JSON.stringify(loaded)}`));
+      i18nInstance.on('added', (lng, ns) => logger.debug(`Translations added for language: ${lng}, namespace: ${ns}`));
+      i18nInstance.on('removed', (lng, ns) => logger.debug(`Translations removed for language: ${lng}, namespace: ${ns}`));
 
       await i18nInstance.init({
         partialBundledLanguages: true,
