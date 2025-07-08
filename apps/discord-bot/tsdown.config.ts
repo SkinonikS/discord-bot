@@ -2,7 +2,7 @@ import { defineConfig } from 'tsdown/config';
 
 export default defineConfig({
   entry: [
-    'bin/start-bot.ts',
+    'bin/*.ts',
   ],
   outDir: 'dist',
   sourcemap: true,
