@@ -1,6 +1,6 @@
 import type { Application, ConfigRepository, ModuleInterface } from '@framework/core/app';
 import type { Client } from '@module/discord/vendors/discordjs';
-import type { LoggerFactoryInterface, LoggerInterface } from '@module/logger';
+import type { LoggerInterface } from '@module/logger';
 import { DisTube, Events } from 'distube';
 import pkg from '#root/package.json';
 import type { DisTubeConfig } from '#src/config/types';
@@ -49,8 +49,8 @@ export default class DistubeModule implements ModuleInterface {
     });
 
     app.container.singleton('distube.logger', async (container) => {
-      const factory: LoggerFactoryInterface = await container.make('logger.factory');
-      return factory.createLogger(this.id);
+      const logger: LoggerInterface = await container.make('logger');
+      return logger.copy(this.id);
     });
   }
 }

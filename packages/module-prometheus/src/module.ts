@@ -1,6 +1,6 @@
 import type { Application, ConfigRepository, ModuleInterface } from '@framework/core/app';
 import { importModule, ImportNotFoundException, instantiateIfNeeded } from '@framework/core/utils';
-import type { LoggerFactoryInterface, LoggerInterface } from '@module/logger';
+import type { LoggerInterface } from '@module/logger';
 import { Registry } from 'prom-client';
 import pkg from '#root/package.json';
 import type { PrometheusConfig } from '#src/config/types';
@@ -27,8 +27,8 @@ export default class PrometheusModule implements ModuleInterface{
     });
 
     app.container.singleton('prometheus.logger', async (container) => {
-      const loggerFactory: LoggerFactoryInterface = await container.make('logger.factory');
-      return loggerFactory.createLogger(this.id);
+      const logger: LoggerInterface = await container.make('logger');
+      return logger.copy(this.id);
     });
   }
 

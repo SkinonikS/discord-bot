@@ -54,8 +54,8 @@ export default class I18nModule implements ModuleInterface {
     });
 
     app.container.singleton('i18n.logger', async (container) => {
-      const loggerFactory: LoggerFactoryInterface = await container.make('logger.factory');
-      return loggerFactory.createLogger(this.id);
+      const logger: LoggerInterface = await container.make('logger');
+      return logger.copy(this.id);
     });
   }
 }

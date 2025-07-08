@@ -1,7 +1,7 @@
 import { createServer } from 'node:http';
 import type { Application, ConfigRepository, ErrorHandler, ModuleInterface } from '@framework/core/app';
 import { importModule } from '@framework/core/utils';
-import type { LoggerFactoryInterface, LoggerInterface } from '@module/logger';
+import type { LoggerInterface } from '@module/logger';
 import { toNodeListener, createApp } from 'h3';
 import pkg from '#root/package.json';
 import type { HttpApiConfig } from '#src/config/types';
@@ -47,8 +47,8 @@ export default class HttpApiModule implements ModuleInterface {
     });
 
     app.container.singleton('http.api.logger', async (container) => {
-      const logger: LoggerFactoryInterface = await container.make('logger.factory');
-      return logger.createLogger(this.id);
+      const logger: LoggerInterface = await container.make('logger');
+      return logger.copy(this.id);
     });
   }
 

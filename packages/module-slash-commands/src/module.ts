@@ -1,6 +1,6 @@
 import type { ConfigRepository, ModuleInterface, Application } from '@framework/core/app';
 import { type Client, Events } from '@module/discord/vendors/discordjs';
-import type { LoggerFactoryInterface, LoggerInterface } from '@module/logger';
+import type { LoggerInterface } from '@module/logger';
 import pkg from '#root/package.json';
 import type { SlashCommandConfig } from '#src/config/types';
 import Manager from '#src/manager';
@@ -49,8 +49,8 @@ export default class SlashCommandModule implements ModuleInterface {
     });
 
     app.container.singleton('slash-commands.logger', async (container) => {
-      const factory: LoggerFactoryInterface = await container.make('logger.factory');
-      return factory.createLogger(this.id);
+      const logger: LoggerInterface = await container.make('logger');
+      return logger.copy(this.id);
     });
   }
 

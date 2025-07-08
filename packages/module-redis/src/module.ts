@@ -1,5 +1,5 @@
 import type { Application, ConfigRepository, ModuleInterface } from '@framework/core/app';
-import type { LoggerFactoryInterface, LoggerInterface } from '@module/logger';
+import type { LoggerInterface } from '@module/logger';
 import type { RedisClientType } from 'redis';
 import pkg from '#root/package.json';
 import type { RedisConfig } from '#src/config/types';
@@ -44,8 +44,8 @@ export default class RedisModule implements ModuleInterface {
     });
 
     app.container.singleton('redis.logger', async (container) => {
-      const loggerFactory: LoggerFactoryInterface = await container.make('logger.factory');
-      return loggerFactory.createLogger(this.id);
+      const logger: LoggerInterface = await container.make('logger');
+      return logger.copy(this.id);
     });
   }
 

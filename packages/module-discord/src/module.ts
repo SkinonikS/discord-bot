@@ -1,5 +1,5 @@
 import type { Application, ConfigRepository, ModuleInterface } from '@framework/core/app';
-import type { LoggerFactoryInterface, LoggerInterface } from '@module/logger';
+import type { LoggerInterface } from '@module/logger';
 import { Client, Events } from 'discord.js';
 import { debug } from '#root/debug';
 import pkg from '#root/package.json';
@@ -19,9 +19,9 @@ declare module '@framework/core/app' {
 }
 
 export default class DiscordModule implements ModuleInterface {
-  readonly id = pkg.name;
-  readonly author = pkg.author;
-  readonly version = pkg.version;
+  public readonly id = pkg.name;
+  public readonly author = pkg.author;
+  public readonly version = pkg.version;
 
   public register(app: Application): void {
     app.container.singleton('discord.connector', async (container) => {
@@ -72,8 +72,8 @@ export default class DiscordModule implements ModuleInterface {
     });
 
     app.container.singleton('discord.logger', async (container) => {
-      const factory: LoggerFactoryInterface = await container.make('logger.factory');
-      return factory.createLogger(this.id);
+      const logger: LoggerInterface = await container.make('logger');
+      return logger.copy(this.id);
     });
   }
 
