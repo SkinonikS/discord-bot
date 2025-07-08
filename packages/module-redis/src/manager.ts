@@ -8,7 +8,7 @@ export default class Manager {
   protected readonly _resolved = new Map<string, RedisClientType>();
 
   public constructor(
-    protected readonly config: RedisConfig,
+    protected readonly _config: RedisConfig,
   ) { }
 
   public get(name?: string): Result<RedisClientType, Error> {
@@ -44,10 +44,15 @@ export default class Manager {
   }
 
   public async connect(): Promise<Result<void, Error>> {
-    for (const [name, client] of this._resolved.entries()) {
-      if (! client.isOpen) {
-        const connectResult = await fromPromise(client.connect(), (e) => {
-          return new RedisConnectionException(name, e);
+    for (const clientName of Object.keys(this._config.clients)) {
+      const client = this.redis(clientName);
+      if (client.isErr()) {
+        return err(client.error);
+      }
+
+      if (! client.value.isOpen) {
+        const connectResult = await fromPromise(client.value.connect(), (e) => {
+          return new RedisConnectionException(clientName, e);
         });
 
         if (connectResult.isErr()) {
@@ -81,7 +86,7 @@ export default class Manager {
   }
 
   protected _getClientConfig(name: string): Result<RedisClientConfig, Error> {
-    const config = this.config.clients[name];
+    const config = this._config.clients[name];
 
     if (! config) {
       return err(new RedisClientConfigurationNotFoundException(name));
@@ -91,6 +96,6 @@ export default class Manager {
   }
 
   protected _getDefaultClientName(): string {
-    return this.config.default;
+    return this._config.default;
   }
 }
