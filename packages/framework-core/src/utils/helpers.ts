@@ -5,6 +5,16 @@ import { ImportNotFoundException } from '#src/utils/exceptions';
 
 export const safeJsonParse = fromThrowable(JSON.parse, () => new Error('Invalid JSON format'));
 
+export const tap = <T>(value: T, fn: (value: T) => void): T => {
+  fn(value);
+  return value;
+};
+
+export const tapAsync = async <T>(value: T, fn: (value: T) => Promise<void>): Promise<T> => {
+  await fn(value);
+  return value;
+};
+
 export async function importModule<T = never>(resolver: BaseResolver<T>, ...args: unknown[]): Promise<T> {
   const module = await resolver(...args);
 
