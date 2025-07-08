@@ -27,7 +27,7 @@ export const Env = cleanEnv(process.env, {
   LOG_SHOW_STACK_TRACES: bool({ default: false }),
   LOG_LOKI_URL: str({ default: 'http://localhost:3100' }),
 
-  I18N_LOCALE: str({ default: 'en' }),
-  I18N_FALLBACK_LOCALE: str({ default: 'en' }),
+  I18N_LOCALE: str({ default: 'en-US' }),
+  I18N_FALLBACK_LOCALE: str({ default: 'en-US' }),
   I18N_DEBUG: bool({ default: false }),
 });
