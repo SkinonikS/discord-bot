@@ -1,18 +1,17 @@
 import type { Application } from '@framework/core/app';
-import type { transport as Transport } from 'winston';
+import type { LoggerInterface } from '#src/types';
 
-export interface TransportFactoryCreateOptions {
-  module: string;
-}
-
-export interface TransportFactoryInterface {
-  create(app: Application, options: TransportFactoryCreateOptions): Promise<Transport> | Transport;
-}
+export type LogLevel = 'debug' | 'info' | 'warning' | 'error' | 'fatal';
 
 export interface LoggerConfig {
-  label: string;
-  defaultMeta: Record<string, string>;
-  showStackTraces: boolean;
-  level: 'debug' | 'info' | 'notice' | 'warning' | 'error' | 'critical' | 'emergency';
-  transports: TransportFactoryInterface[];
+  defaultTags: Record<string, string>;
+  driver: LoggerDriverInterface;
+}
+
+export interface LoggerDriverOptions {
+  defaultTags: Record<string, string>;
+}
+
+export interface LoggerDriverInterface {
+  create(app: Application, options: LoggerDriverOptions): Promise<LoggerInterface> | LoggerInterface;
 }

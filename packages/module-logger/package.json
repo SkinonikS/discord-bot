@@ -16,10 +16,25 @@
       "node": "./dist/src/config/index.js",
       "types": "./dist/src/config/index.d.ts"
     },
-    "./winston": {
-      "import": "./dist/src/winston/index.js",
-      "node": "./dist/src/winston/index.js",
-      "types": "./dist/src/winston/index.d.ts"
+    "./config/logger-driver": {
+      "import": "./dist/src/config/logger-driver/index.js",
+      "node": "./dist/src/config/logger-driver/index.js",
+      "types": "./dist/src/config/logger-driver/index.d.ts"
+    },
+    "./config/logger-driver/*": {
+      "import": "./dist/src/config/logger-driver/*.js",
+      "node": "./dist/src/config/logger-driver/*.js",
+      "types": "./dist/src/config/logger-driver/*.d.ts"
+    },
+    "./pino": {
+      "import": "./dist/src/pino/index.js",
+      "node": "./dist/src/pino/index.js",
+      "types": "./dist/src/pino/index.d.ts"
+    },
+    "./pino/transports/*": {
+      "import": "./dist/src/pino/transports/*.js",
+      "node": "./dist/src/pino/transports/*.js",
+      "types": "./dist/src/pino/transports/*.d.ts"
     },
     "./module": {
       "import": "./dist/src/module.js",
@@ -42,7 +57,8 @@
   },
   "dependencies": {
     "@framework/core": "workspace:*",
-    "winston": "^3.17.0"
+    "pino": "^9.7.0",
+    "pino-pretty": "^13.0.0"
   },
   "packageManager": "pnpm@10.6.3"
 }

@@ -1,10 +1,8 @@
 import { defineBaseConfig } from '@framework/core/config';
+import NullLoggerDriver from '#src/config/logger-drivers/null-logger-driver';
 import type { LoggerConfig } from '#src/config/types';
 
 export const defineLoggerConfig = (config: Partial<LoggerConfig>) => defineBaseConfig<LoggerConfig>('logger', {
-  label: config.label ?? 'DiscordBOT',
-  defaultMeta: config.defaultMeta ?? {},
-  level: config.level ?? 'info',
-  showStackTraces: config.showStackTraces ?? false,
-  transports: config.transports ?? [],
+  defaultTags: config.defaultTags ?? {},
+  driver: config.driver ?? new NullLoggerDriver(),
 });
