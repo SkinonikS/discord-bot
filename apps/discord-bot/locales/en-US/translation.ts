@@ -1,11 +1,15 @@
 export default {
   slashCommands: {
+    // Commands
     ping: {
       metadata: {
         name: 'ping',
         description: 'Check the bot\'s latency',
       },
-      success: 'Pong! Latency is {{latency}}ms.',
+      responses: {
+        pinging: 'Pinging...',
+        pingMs: 'Pong! Latency is {{latency}}ms.',
+      },
     },
 
     purge: {
@@ -19,18 +23,18 @@ export default {
           },
         },
       },
-      validation: {
-        amount: 'Please provide a number between 1 and 100.',
-        guild: 'This command can only be used in a server.',
-        textChannel: 'This command can only be used in text channels.',
+      responses: {
+        onlyInGuild: 'This command can only be used in a server.',
+        onlyInTextChannel: 'This command can only be used in text channels.',
+        fetchMessagesError: 'There was an error trying to fetch messages in this channel. Try again.',
+        bulkDeleteError: 'There was an error trying to delete messages in this channel. Try again.',
+        deleted_zero: 'Deleted {{count}} messages.',
+        deleted_one: 'Deleted {{count}} message.',
+        deleted_other: 'Deleted {{count}} messages.',
       },
-      errors: {
-        fetchMessages: 'There was an error trying to fetch messages in this channel. Try again.',
-        bulkDelete: 'There was an error trying to delete messages in this channel. Try again.',
-      },
-      success_zero: 'Deleted {{count}} messages.',
-      success_one: 'Deleted {{count}} message.',
-      success_other: 'Deleted {{count}} messages.',
     },
+
+    // Not a command, used for rate limiting
+    rateLimit: 'Whoa there, you\'re sending commands too fast. You can use commands again <t:{{timestamp}}:R>',
   },
 };
