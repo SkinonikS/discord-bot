@@ -8,7 +8,7 @@ import type { LoggerInterface } from '@module/logger';
 import { DateTime } from 'luxon';
 import type { SlashCommandResolver } from '#src/config/types';
 import { DiscordClientNotReadyException, SlashCommandCooldownException, SlashCommandNotFoundException } from '#src/exceptions';
-import type { RateLimiterInterface, SlashCommandInterface } from '#src/types';
+import type { RateLimiterInterface, RateLimitMessage, SlashCommandInterface } from '#src/types';
 
 export default class Manager {
   protected readonly _commands = new Collection<string, SlashCommandInterface>();
@@ -18,6 +18,7 @@ export default class Manager {
     protected readonly _discord: Client,
     protected readonly _rateLimiter: RateLimiterInterface,
     protected readonly _logger: LoggerInterface,
+    protected readonly _rateLimitMessage: RateLimitMessage,
   ) {
     //
   }
@@ -57,10 +58,10 @@ export default class Manager {
 
     if (! rateLimitResult.value.isFirst && rateLimitResult.value.remaining <= 0) {
       const expiredTimestamp = Math.round(DateTime.now().plus({ millisecond: rateLimitResult.value.resetInMs }).toSeconds());
+      const message = await this._rateLimitMessage(this._app, expiredTimestamp, interaction.locale);
 
       await interaction.reply({
-        // TODO: Add localization support for this message
-        content: `Please wait, you are on a cooldown for \`${command.name}\`. You can use it again <t:${expiredTimestamp}:R>.`,
+        content: message,
         flags: MessageFlags.Ephemeral,
       });
 
@@ -70,7 +71,7 @@ export default class Manager {
 
     const executeResult = await command.execute(interaction);
     if (executeResult.isErr()) {
-      this._logger.error(executeResult.error, { command: command.name, user: interaction.user.id });
+      this._logger.error({ err: executeResult.error, command: command.name, user: interaction.user.id }, executeResult.error.message);
       return err(executeResult.error);
     }
 
@@ -89,7 +90,7 @@ export default class Manager {
     if (command.autocomplete) {
       const autocompleteResult = await command.autocomplete(interaction);
       if (autocompleteResult.isErr()) {
-        this._logger.error(autocompleteResult.error, { command: command.name, user: interaction.user.id });
+        this._logger.error({ err: autocompleteResult.error, command: command.name, user: interaction.user.id }, autocompleteResult.error.message);
         return err(autocompleteResult.error);
       }
     } else {

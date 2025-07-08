@@ -27,7 +27,6 @@ export default class SlashCommandModule implements ModuleInterface {
     app.container.singleton('slash-commands.rate-limiter', async (container) => {
       const app = await container.make('app');
       const config: ConfigRepository = await container.make('config');
-
       const slashCommandConfig = config.get('slash-commands');
       if (slashCommandConfig.isErr()) {
         throw slashCommandConfig.error;
@@ -40,11 +39,18 @@ export default class SlashCommandModule implements ModuleInterface {
     });
 
     app.container.singleton('slash-commands', async (container) => {
+      const config: ConfigRepository = await container.make('config');
+      const slashCommandConfig = config.get('slash-commands');
+      if (slashCommandConfig.isErr()) {
+        throw slashCommandConfig.error;
+      }
+
       return new Manager(
         await container.make('app'),
         await container.make('discord.client'),
         await container.make('slash-commands.rate-limiter'),
         await container.make('slash-commands.logger'),
+        slashCommandConfig.value.rateLimiter.message,
       );
     });
 

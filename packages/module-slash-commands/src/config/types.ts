@@ -10,6 +10,7 @@ export interface SlashCommandConfig extends Record<string, unknown> {
     driver: RateLimiterDriverInterface;
     points: number;
     durationMs: number;
+    message: (app: Application, expiredTimestamp: number, locale: string) => Promise<string> | string;
   };
 }
 
