@@ -5,12 +5,21 @@ export default defineI18nConfig({
   locale: Env.I18N_LOCALE,
   fallbackLocale: Env.I18N_FALLBACK_LOCALE,
   debug: Env.I18N_DEBUG,
-  translations: {
-    en: {
-      'slash-commands': () => import('#locales/en/slash-commands'),
+  preloadNamespaces: ['translation'],
+  defaultNamespace: 'translation',
+  // https://discord.com/developers/docs/reference#locales
+  supportedLocales: {
+    'en-US': {
+      name: 'English (US)',
+      namespaces: {
+        translation: () => import('#locales/en-US/translation'),
+      },
     },
     ru: {
-      'slash-commands': () => import('#locales/ru/slash-commands'),
+      name: 'Русский',
+      namespaces: {
+        translation: () => import('#locales/ru/translation'),
+      },
     },
   },
 });
