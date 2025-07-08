@@ -1,14 +1,16 @@
-
 export type TranslationString = string | { [key: string]: TranslationString };
-export type TranslationResolver = () => Promise<{ default: Record<string, TranslationString> }>;
+export type TranslationNamespaceResolver = () => Promise<{ default: Record<string, TranslationString> }>;
 
-// locale => namespace => resolver
-// eg: { 'en-US': { 'slash-commands': () => import('./locales/en-US/slash-commands.ts') } }
-export type TranslationResolverMap = Record<string, Record<string, TranslationResolver>>;
+export interface SupportedLocales {
+  name: string;
+  namespaces: Record<string, TranslationNamespaceResolver>;
+}
 
 export interface I18nConfig {
+  debug: boolean;
   locale: string;
   fallbackLocale: string;
-  debug: boolean;
-  translations: TranslationResolverMap;
+  defaultNamespace?: string;
+  preloadNamespaces: string[];
+  supportedLocales: Record<string, SupportedLocales>;
 }

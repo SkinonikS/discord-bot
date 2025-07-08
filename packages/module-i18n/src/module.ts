@@ -1,5 +1,5 @@
 import type { ModuleInterface, Application, ConfigRepository } from '@framework/core/app';
-import type { LoggerFactoryInterface, LoggerInterface } from '@module/logger';
+import type { LoggerInterface } from '@module/logger';
 import { createInstance } from 'i18next';
 import type { i18n } from 'i18next';
 import pkg from '#root/package.json';
@@ -31,9 +31,11 @@ export default class I18nModule implements ModuleInterface {
         throw i18nConfig.error;
       }
 
+      const supportedLocales = Object.keys(i18nConfig.value.supportedLocales);
+
       const i18nInstance = createInstance();
 
-      i18nInstance.use(new I18nLoader(i18nConfig.value.translations));
+      i18nInstance.use(new I18nLoader(i18nConfig.value.supportedLocales));
       i18nInstance.on('languageChanged', (lng) => logger.debug(`Language changed to: ${lng}`));
       i18nInstance.on('initialized', () => logger.debug(`i18n initialized with locale: ${i18nConfig.value.locale}, fallbackLocale: ${i18nConfig.value.fallbackLocale}`));
       i18nInstance.on('failedLoading', (lng, ns, msg) => logger.error(msg));
@@ -45,8 +47,11 @@ export default class I18nModule implements ModuleInterface {
         partialBundledLanguages: true,
         lng: i18nConfig.value.locale,
         fallbackLng: i18nConfig.value.fallbackLocale,
+        supportedLngs: supportedLocales,
         debug: i18nConfig.value.debug,
-        ns: [],
+        preload: supportedLocales,
+        defaultNS: i18nConfig.value.defaultNamespace,
+        ns: i18nConfig.value.preloadNamespaces,
         resources: {},
       });
 
