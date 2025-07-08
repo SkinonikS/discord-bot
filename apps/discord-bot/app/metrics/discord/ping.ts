@@ -13,6 +13,7 @@ export default class PingMetric implements MetricInterface {
   public constructor(protected readonly _discord: Client) { }
 
   public get metadata(): Metric {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
     return new Gauge({
       name: 'discord_ping',
