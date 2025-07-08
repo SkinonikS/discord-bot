@@ -96,9 +96,9 @@ export default class ErrorHandler {
   protected async _logFatal(message: Error | string): Promise<void> {
     try {
       const logger = await this._resolveLogger();
-      logger.critical(message);
-    } catch {
-      console.error('Logger is not available. Please ensure the logger module is registered.');
+      logger.fatal(message);
+    } catch (e) {
+      console.error(e);
     }
   }
 
@@ -106,8 +106,8 @@ export default class ErrorHandler {
     try {
       const logger = await this._resolveLogger();
       logger.error(message);
-    } catch {
-      console.error('Logger is not available. Please ensure the logger module is registered.');
+    } catch (e) {
+      console.error(e);
     }
   }
 
