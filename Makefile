@@ -15,18 +15,18 @@ OPERATOR_IMAGE_NAME ?= discord-bot-k8s-operator:latest
 OPERATOR_TARGET ?= discord-bot-k8s-operator
 
 .PHONY: help \
-	cluster-install cluster-uninstall cluster-build \
-	operator-install operator-uninstall operator-build
+	cluster-deploy cluster-undeploy cluster-build \
+	operator-deploy operator-undeploy operator-build
 
 ## Show available commands
 help:
 	@echo "Available targets:"
-	@echo "  cluster-install        Install or upgrade the Discord bot cluster release"
-	@echo "  cluster-uninstall      Uninstall the Discord bot cluster release"
+	@echo "  cluster-deploy         Install or upgrade the Discord bot cluster release"
+	@echo "  cluster-undeploy       Uninstall the Discord bot cluster release"
 	@echo "  cluster-build          Build the Docker image for the Discord bot cluster"
 	@echo ""
-	@echo "  operator-install       Install or upgrade the Discord bot operator release"
-	@echo "  operator-uninstall     Uninstall the Discord bot operator release"
+	@echo "  operator-deploy        Install or upgrade the Discord bot operator release"
+	@echo "  operator-undeploy      Uninstall the Discord bot operator release"
 	@echo "  operator-build         Build the Docker image for the Discord bot operator"
 	@echo ""
 	@echo "Available variable overrides:"
@@ -47,10 +47,10 @@ help:
 
 ## Cluster targets
 
-cluster-install:
+cluster-deploy:
 	helm upgrade --install $(RELEASE_NAME) $(CLUSTER_CHARTS_DIR) --namespace $(CLUSTER_NAMESPACE) --create-namespace
 
-cluster-uninstall:
+cluster-undeploy:
 	helm uninstall $(RELEASE_NAME) --namespace $(CLUSTER_NAMESPACE)
 
 cluster-build:
@@ -62,10 +62,10 @@ cluster-build:
 
 ## Operator targets
 
-operator-install:
+operator-deploy:
 	helm upgrade --install $(RELEASE_NAME) $(OPERATOR_CHARTS_DIR) --namespace $(OPERATOR_NAMESPACE) --create-namespace
 
-operator-uninstall:
+operator-undeploy:
 	helm uninstall $(RELEASE_NAME) --namespace $(OPERATOR_NAMESPACE)
 
 operator-build:
