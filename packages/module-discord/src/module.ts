@@ -1,4 +1,4 @@
-import type { Application, ConfigRepository, ModuleInterface } from '@framework/core/app';
+import type { Application, ConfigRepository, ErrorHandler, ModuleInterface } from '@framework/core/app';
 import type { LoggerInterface } from '@module/logger';
 import { Client, Events } from 'discord.js';
 import { debug } from '#root/debug';
@@ -55,6 +55,7 @@ export default class DiscordModule implements ModuleInterface {
         throw discordConfig.error;
       }
 
+      const errorHandler: ErrorHandler = await container.make('errorHandler');
       const logger = await container.make('discord.logger');
 
       const discord = new Client({
@@ -66,7 +67,7 @@ export default class DiscordModule implements ModuleInterface {
 
       discord.on(Events.ClientReady, (client) => logger.info(`Discord client is ready as ${client.user.tag}`));
       discord.on(Events.Debug, (message) => logger.debug(message));
-      discord.on(Events.Error, (error) => logger.error(error));
+      discord.on(Events.Error, (error) => errorHandler.handle(error));
 
       return discord;
     });
