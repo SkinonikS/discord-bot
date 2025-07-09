@@ -1,5 +1,6 @@
 import type { ConfigRepository, ModuleInterface, Application } from '@framework/core/app';
-import { type Client, Events } from '@module/discord/vendors/discordjs';
+import { Events } from '@module/discord/vendors/discordjs';
+import type { Client } from '@module/discord/vendors/discordjs';
 import type { LoggerInterface } from '@module/logger';
 import pkg from '#root/package.json';
 import type { SlashCommandConfig } from '#src/config/types';
