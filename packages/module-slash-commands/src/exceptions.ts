@@ -1,6 +1,6 @@
 import { Exception } from '@framework/core/vendors/exceptions';
 
-export class SlashCommandNotFoundException extends Exception {
+export class CommandNotFoundException extends Exception {
   public static status = 404;
   public static code = 'E_SLASH_COMMAND_NOT_FOUND';
 
@@ -9,9 +9,9 @@ export class SlashCommandNotFoundException extends Exception {
   }
 }
 
-export class SlashCommandCooldownException extends Exception {
+export class RateLimitExceededException extends Exception {
   public static status = 429;
-  public static code = 'E_SLASH_COMMAND_COOLDOWN';
+  public static code = 'E_RATE_LIMIT_EXCEEDED';
 
   public constructor(
     public readonly userId: string,
@@ -31,3 +31,15 @@ export class DiscordClientNotReadyException extends Exception {
   }
 }
 
+export class RateLimitRetrievalException extends Exception {
+  public static status = 500;
+  public static code = 'E_RATE_LIMIT_RETRIEVAL_ERROR';
+
+  public constructor(
+    public readonly userId: string,
+    public readonly commandName: string,
+    cause?: unknown,
+  ) {
+    super(`Failed to get rate limits for user '${userId}' for command '${commandName}'.`, { cause });
+  }
+}

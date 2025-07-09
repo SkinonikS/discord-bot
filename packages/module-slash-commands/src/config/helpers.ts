@@ -8,5 +8,6 @@ export const defineSlashCommandsConfig = (config: Partial<SlashCommandConfig>) =
     driver: new NullRateLimiterDriver(),
     points: 5,
     durationMs: 6000,
+    message: () => 'You are sending commands too fast. Please wait a moment before trying again.',
   },
 });
