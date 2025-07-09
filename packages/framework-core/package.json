@@ -52,8 +52,8 @@
   "dependencies": {
     "@adonisjs/fold": "^10.2.0",
     "@module/logger": "workspace:*",
-    "@poppinss/exception": "^1.2.1",
-    "@poppinss/hooks": "^7.2.5",
+    "@poppinss/exception": "^1.2.2",
+    "@poppinss/hooks": "^7.2.6",
     "dotenv": "16.5.0",
     "envalid": "^8.0.0",
     "neverthrow": "^8.2.0",
