@@ -1,9 +1,10 @@
 import type { Application, ConfigRepository, ModuleInterface } from '@framework/core/app';
 import { importModule, ImportNotFoundException, instantiateIfNeeded } from '@framework/core/utils';
 import type { LoggerInterface } from '@module/logger';
-import { Registry } from 'prom-client';
+import { Registry, Gauge, Summary, Histogram, Counter } from 'prom-client';
 import pkg from '#root/package.json';
 import type { PrometheusConfig } from '#src/config/types';
+import { UnsupportedMetricTypeException } from '#src/exceptions';
 
 declare module '@framework/core/app' {
   interface ContainerBindings {
@@ -46,7 +47,20 @@ export default class PrometheusModule implements ModuleInterface{
         const resolvedMetric = await importModule(() => metricResolver());
         const metric = await instantiateIfNeeded(resolvedMetric, app);
 
-        registry.registerMetric(metric.metadata);
+        const MetricClass = { Gauge, Counter, Histogram, Summary }[metric.type];
+        if (! MetricClass) {
+          throw new UnsupportedMetricTypeException(metric.type);
+        }
+
+        registry.registerMetric(new MetricClass({
+          name: metric.name,
+          help: metric.help,
+          labelNames: metric.labels,
+          registers: [],
+          collect() {
+            return metric.collect(this);
+          },
+        }));
       } catch (e) {
         if (e instanceof ImportNotFoundException) {
           logger.error(e);
