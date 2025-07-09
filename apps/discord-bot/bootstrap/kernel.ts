@@ -10,6 +10,7 @@ export default defineKernelConfig({
     // () => import('#config/distube'),
     () => import('#config/prometheus'),
     () => import('#config/i18n'),
+    () => import('#config/cron'),
   ],
   modules: [
     // Core modules
@@ -20,6 +21,7 @@ export default defineKernelConfig({
     // () => import('@module/distube/module'),
     () => import('@module/slash-commands/module'),
     () => import('@module/i18n/module'),
+    () => import('@module/cron/module'),
     // Application modules
     () => import('#app/internal/slash-commands/module'),
   ],
