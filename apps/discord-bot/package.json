@@ -24,6 +24,7 @@
     "@framework/core": "workspace:*",
     "@module/discord": "workspace:*",
     "@module/distube": "workspace:*",
+    "@module/cron": "workspace:*",
     "@module/http-api": "workspace:*",
     "@module/i18n": "workspace:*",
     "@module/logger": "workspace:*",
