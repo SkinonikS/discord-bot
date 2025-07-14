@@ -24,6 +24,7 @@ export default {
         },
       },
       responses: {
+        noMessages: 'There are no messages to delete in this channel. Keep in mind that messages older than 14 days cannot be deleted.',
         onlyInGuild: 'This command can only be used in a server.',
         onlyInTextChannel: 'This command can only be used in text channels.',
         fetchMessagesError: 'There was an error trying to fetch messages in this channel. Try again.',
