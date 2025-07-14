@@ -1,5 +1,6 @@
 # Discord Bot Application
-The main Discord bot application built on the Discord Bot Framework. This is a complete bot implementation showcasing the framework's capabilities with slash commands, music functionality, and monitoring features.
+The main Discord bot application built on the Discord Bot Framework. 
+This is a complete bot implementation showcasing the framework's capabilities.
 
 ## Quick Start
 ```bash
@@ -24,7 +25,7 @@ HTTP_API_HOST=localhost
 REDIS_URL=redis://localhost:6379
 LOG_LEVEL=info
 NODE_ENV=production
-# ... Other environment variables as needed
+# ... Other environment variables as needed, full list in `bootstrap/env.ts`
 ```
 
 ### Module Configuration
@@ -35,23 +36,32 @@ Configuration files are located in the `config/` directory:
 - `config/http-api.ts` - HTTP API settings
 - `config/distube.ts` - Music bot configuration
 - `config/prometheus.ts` - Metrics configuration
-- `config/redis-commands.ts` - Redis queue settings
+- `config/redis.ts` - Redis settings
+- `config/cron.ts` - Cron jobs configuration
+- `config/my-module.ts` - Other module configurations
 
 ## Project Structure
 ```
-apps/bot/
-├── commands/           # Slash commands
-│   ├── ping.ts        # Basic ping command
-│   └── ...            # Additional commands
-├── config/            # Module configurations
-│   ├── discord.ts     # Discord client config
-│   ├── slash-commands.ts
-│   └── ...            # Other module configs
-├── bootstrap/         # Application bootstrapping
-│   └── kernel.ts      # Kernel configuration
-├── bin/              # Entry points
-│   └── start.ts      # Main application entry
-└── .env.example      # Environment template
+apps/discord-bot/
+├── start/                # Application start scripts
+│   └── kernel.ts         # Kernel bootstrap
+├── config/               # Module configurations
+│   ├── discord.ts        # Discord client config
+│   └── ...               # Other module configs
+├── bootstrap/            # Application bootstrapping
+│   ├── kernel.ts         # Kernel configuration
+│   └── env.ts            # Environment variables
+├── bin/                  # Entry points
+│   └── start-bot.ts      # Main application entry
+├── app/                  # Application logic
+│   ├── cronjobs/         # Cron jobs
+│   ├── http/             # HTTP API handlers
+│   ├── metrics/          # Prometheus metrics
+│   ├── slash-commands/   # Slash commands
+│   └── ...               # Other application logic
+├── logs/                 # Log files
+├── locales/              # Localization files
+└── .env.example          # Environment template
 ```
 
 # License

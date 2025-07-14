@@ -1,88 +1,80 @@
-# Discord Slash Commands Module
+# Discord Slash-Commands Module
+A slash commands module which provides a structured way to create and manage slash commands for bot.
 
-A comprehensive Discord slash commands module for the Discord Bot Framework, providing command registration, execution, cooldown management, and autocomplete functionality.
+## Registering Module
+To use the slash commands module, you need to register it in your application. You can do this by adding the module to your application's configuration file, typically located at `bootstrap/kernel.ts`. Here's how to register the module:
 
-## Quick Start
-### Basic Setup
-```typescript
-import { defineSlashCommandsConfig } from '@module/slash-commands';
-
-export default defineSlashCommandsConfig({
-  commands: [
-    () => import('./commands/ping'),
-    () => import('./commands/stats'),
-    () => import('./commands/help'),
-  ],
-});
-```
-
-### Module Registration
-```typescript
-import { defineKernelConfig, LazyModuleLoader } from '@framework/core';
+```ts
+import { defineKernelConfig } from '@framework/core/config';
 
 export default defineKernelConfig({
-  configFiles: [
-    () => import('/path/to/your/slash-commands/config.ts'), // Should return the `SlashCommandConfig` object
+  config: [
+    () => import('path/to/your/config/slash-commands'),
   ],
-  modules: new LazyModuleLoader([
+  modules: [
     () => import('@module/slash-commands/module'),
-  ]),
-});
-```
-
-### Creating Commands
-Create slash commands by implementing the `SlashCommandInterface`:
-
-```typescript
-import { SlashCommandInterface } from '@module/slash-commands';
-import { SlashCommandBuilder, ChatInputCommandInteraction } from 'discord.js';
-
-export default class PingCommand implements SlashCommandInterface {
-  public readonly name = 'ping';
-  public readonly cooldown = 5; // 5 seconds cooldown
-  
-  public get metadata(): SlashCommandBuilder {
-    return new SlashCommandBuilder()
-      .setName(this.name)
-      .setDescription('Replies with Pong!');
-  }
-  
-  public async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-    await interaction.reply('Pong!');
-  }
-}
-```
-
-## Configuration
-### Slash Commands Configuration Interface
-```typescript
-interface SlashCommandConfig {
-  commands: SlashCommandResolver[];  // Array of command resolvers
-}
-```
-
-### Registering Commands
-```typescript
-import { defineSlashCommandsConfig } from '@module/slash-commands';
-
-export default defineSlashCommandsConfig({
-  commands: [
-    () => import('./commands/ping'),
-    () => import('./commands/userinfo'),
-    () => import('./commands/serverinfo'),
+    // other modules...
   ],
 });
 ```
 
-## Creating Commands
-### Simple
-```typescript
+Configuration also SHOULD be provided, otherwise application will rise an exception if it wont find an `slash-commands` configuration file.
+
+If you do not want to use this module, you can simply remove it from the `modules` array in your configuration file, just make sure that other modules that depend on it are also removed.
+
+## Registering Slash Commands
+This module allows you to define and register slash commands easily, with support for autocomplete and dependency injection
+
+There are two main ways to register slash commands:
+* Manually, adding command import in your `config/slash-commands.ts` file.
+* Programmatically, using the `SlashCommandManager` class.
+
+### Programmatically
+To register slash commands programmatically, you can create a custom module that implements the `ModuleInterface` and uses the `SlashCommandManager` to register commands. Here's an example of how to do this:
+```ts
+import { SlashCommandManager } from '@module/slash-commands';
+import { Application } from '@framework/core/app';
+
+export default class MyModule implements ModuleInterface {
+  // We are registering the module in the `boot` method.
+  // Its because the `boot` method is called after every module is registered.
+  public async boot(app: Application): Promise<void> {
+    const manager = await app.container.make('slash-commands');
+    
+    // Register your commands here
+    await manager.register([
+      () => import('path/to/your/command'),
+      // ...
+    ]);
+  }
+}
+```
+
+### Manual
+To manually register slash commands, you can use the `registerSlashCommands` function in your `start/kernel.ts` file. Here's an example of how to do this:
+```ts
+import { defineSlashCommandConfig } from '@module/slash-commands/config';
+
+export default defineSlashCommandConfig({
+  commands: [
+    () => import('path/to/your/command'),
+    // ...
+  ],
+});
+```
+
+## Example Usage
+This module allows you to define and register slash commands easily, with support for autocomplete and dependency injection
+
+### Creating Slash-Commands
+Creating a slash command is straightforward. You need to implement the `SlashCommandInterface` and define the command metadata using `SlashCommandBuilder`. Here's an example of a simple slash command:
+
+```ts
 import { SlashCommandInterface } from '@module/slash-commands';
-import { SlashCommandBuilder, ChatInputCommandInteraction } from 'discord.js';
+import { SlashCommandBuilder, ChatInputCommandInteraction } from '@framework/core/vendors/discordjs';
 
 export default class ExampleCommand implements SlashCommandInterface {
   public readonly name = 'example';
-  public readonly cooldown = 3; // seconds
   
   public get metadata(): SlashCommandBuilder {
     return new SlashCommandBuilder()
@@ -96,50 +88,19 @@ export default class ExampleCommand implements SlashCommandInterface {
 }
 ```
 
-### Custom Options
-```typescript
-import { SlashCommandInterface } from '@module/slash-commands';
-import { SlashCommandBuilder, ChatInputCommandInteraction } from 'discord.js';
-
-export default class UserInfoCommand implements SlashCommandInterface {
-  public readonly name = 'userinfo';
-  public readonly cooldown = 10;
-  
-  public get metadata(): SlashCommandBuilder {
-    return new SlashCommandBuilder()
-      .setName(this.name)
-      .setDescription('Get information about a user')
-      .addUserOption(option =>
-        option
-          .setName('user')
-          .setDescription('The user to get info about')
-          .setRequired(false)
-      );
-  }
-  
-  public async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-    const user = interaction.options.getUser('user') ?? interaction.user;
-    
-    await interaction.reply({
-      content: `User: ${user.tag}\nID: ${user.id}\nCreated: ${user.createdAt.toDateString()}`,
-      ephemeral: true
-    });
-  }
-}
-```
-
 ### Autocomplete
-```typescript
+If you want to add autocomplete functionality to your command, you can implement the `autocomplete` method. Here's an example of a command with autocomplete:
+
+```ts
 import { SlashCommandInterface } from '@module/slash-commands';
 import { 
   SlashCommandBuilder, 
   ChatInputCommandInteraction, 
   AutocompleteInteraction 
-} from 'discord.js';
+} from '@framework/core/vendors/discordjs';
 
 export default class SearchCommand implements SlashCommandInterface {
   public readonly name = 'search';
-  public readonly cooldown = 5;
   
   private readonly searchOptions = [
     'JavaScript tutorials',
@@ -153,7 +114,7 @@ export default class SearchCommand implements SlashCommandInterface {
     return new SlashCommandBuilder()
       .setName(this.name)
       .setDescription('Search for something')
-      .addStringOption(option =>
+      .addStringOption((option) =>
         option
           .setName('query')
           .setDescription('What to search for')
@@ -182,7 +143,9 @@ export default class SearchCommand implements SlashCommandInterface {
 ```
 
 ### Dependency Injection
-```typescript
+You can inject dependencies into your command classes using the `containerInjections` static property. Here's an example of a command that uses dependency injection to access the application instance:
+
+```ts
 import type { Application } from '@framework/core';
 import { SlashCommandInterface } from '@module/slash-commands';
 import { SlashCommandBuilder, ChatInputCommandInteraction } from 'discord.js';
@@ -195,9 +158,10 @@ export default class DatabaseCommand implements SlashCommandInterface {
   };
 
   public readonly name = 'database';
-  public readonly cooldown = 15;
   
-  public constructor(protected readonly _app: Application) {}
+  public constructor(
+    protected readonly _app: Application,
+  ) { }
   
   public get metadata(): SlashCommandBuilder {
     return new SlashCommandBuilder()
@@ -214,60 +178,73 @@ export default class DatabaseCommand implements SlashCommandInterface {
 }
 ```
 
-### Cooldown Management
-Built-in cooldown system prevents command spam:
 
-```typescript
-export default class MyCommand implements SlashCommandInterface {
-  public readonly cooldown = 30; // 30 second cooldown
-  
-  // When a user tries to use the command before cooldown expires,
-  // they get an automatic error message
+### Helper Functions
+You can use helper functions to get the slash command manager from the application without needing to inject them into your classes:
+```ts
+import { getSlashCommandManager } from '@module/slash-commands';
+
+// Get default Redis client directly
+// Same as resolving 'slash-commands'
+const manager = await getSlashCommandManager();
+await manager.register([
+  () => import('path/to/your/command'),
+]);
+```
+
+## API Reference
+
+```ts
+interface SlashCommandInterface {
+  readonly name: string;
+  get metadata(): SlashCommandBuilder;
+  execute(interaction: ChatInputCommandInteraction): Promise<void>;
+  autocomplete?(interaction: AutocompleteInteraction): Promise<void>;
+}
+
+export interface RateLimiterInterface {
+  hit(userId: Snowflake): Promise<RateLimitResponse> | RateLimitResponse;
+}
+
+export type RateLimitMessage = (app: Application, expiredTimestamp: number, locale: string) => Promise<string> | string;
+
+export interface RateLimitResponse {
+  isFirst: boolean;
+  remaining: number;
+  resetInMs: number;
+}
+
+export type SlashCommandResolver = BaseResolver<new (...args: unknown[]) => SlashCommandInterface>;
+
+export interface SlashCommandConfig extends Record<string, unknown> {
+  commands: SlashCommandResolver[];
+  rateLimiter: {
+    driver: RateLimiterDriverInterface;
+    points: number;
+    durationMs: number;
+    message: (app: Application, expiredTimestamp: number, locale: string) => Promise<string> | string;
+  };
+}
+
+export interface RateLimiterGlobalConfig {
+  points: number;
+  durationMs: number;
+}
+
+export interface RateLimiterDriverInterface {
+  create(app: Application, config: RateLimiterGlobalConfig): Promise<RateLimiterInterface>;
 }
 ```
 
 ## Container Bindings
-The module registers the following container bindings:
-
-```typescript
-declare module '@framework/core' {
+```ts
+declare module '@framework/core/app' {
   interface ContainerBindings {
-    'slash-commands': SlashCommandManager; // Main command manager
-    'slash-commands.logger': LoggerInterface; // Module-specific logger
+    'slash-commands': Manager;
   }
 
   interface ConfigBindings {
-    'slash-commands': SlashCommandConfig; // Commands configuration
+    'slash-commands': SlashCommandConfig;
   }
 }
 ```
-
-## API Reference
-### SlashCommandInterface
-
-```typescript
-interface SlashCommandInterface {
-  readonly name: string; // Command name
-  readonly cooldown: number; // Cooldown in seconds
-  get metadata(): SlashCommandBuilder; // Command metadata
-  execute(interaction: ChatInputCommandInteraction): Promise<void>; // Execute handler
-  autocomplete?(interaction: AutocompleteInteraction): Promise<void>; // Optional autocomplete
-}
-```
-
-### SlashCommandManager
-The main manager class that handles command registration and execution:
-
-#### Methods
-
-* `register(commands: SlashCommandResolver[]): Promise<void>` - Register commands
-* `execute(interaction: ChatInputCommandInteraction): Promise<Result<void, Error>>` - Execute command
-* `autocomplete(interaction: AutocompleteInteraction): Promise<Result<void, Error>>` - Handle autocomplete
-* `deployToGuilds(guilds: Guild[]): Promise<Result<void, Error>>` - Deploy commands to guilds
-
-### Helper Functions
-* `defineSlashCommandsConfig(config: Partial<SlashCommandConfig>): SlashCommandConfig` - Creates a type-safe slash commands configuration:
-* `getSlashCommandManager(app?: Application): Promise<SlashCommandManager>` - Retrieves the command manager from the container.
-
-# License
-This module is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
