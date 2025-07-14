@@ -35,7 +35,7 @@
     "@module/discord": "workspace:*",
     "@module/logger": "workspace:*",
     "@module/redis": "workspace:*",
-    "luxon": "^3.6.1",
+    "luxon": "^3.7.1",
     "rate-limiter-flexible": "^7.1.1"
   },
   "devDependencies": {
