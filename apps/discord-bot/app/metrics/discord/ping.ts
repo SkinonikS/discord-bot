@@ -1,33 +1,25 @@
 import type { Client } from '@module/discord/vendors/discordjs';
-import type { MetricInterface } from '@module/prometheus';
-import type { Metric } from '@module/prometheus/vendors/prometheus';
-import { Gauge } from '@module/prometheus/vendors/prometheus';
+import type { GaugeMetricInterface } from '@module/prometheus';
+import type { Gauge } from '@module/prometheus/vendors/prom-client';
 
-export default class PingMetric implements MetricInterface {
-  static containerInjections = {
+export default class PingMetric implements GaugeMetricInterface  {
+  public static containerInjections = {
     _constructor: {
       dependencies: ['discord.client'],
     },
   };
 
-  public constructor(protected readonly _discord: Client) { }
+  public constructor(
+    protected readonly _discord: Client,
+  ) { }
 
-  public get metadata(): Metric {
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const self = this;
-    return new Gauge({
-      name: 'discord_ping',
-      help: 'Ping of the Discord bot in milliseconds',
-      labelNames: ['discord'],
-      registers: [],
-      collect() {
-        self.collect(this);
-      },
-    });
-  }
+  public readonly type = 'Gauge';
+  public readonly name = 'discord_ping';
+  public readonly help = 'Ping of the Discord bot in milliseconds';
+  public readonly labels = ['discord'];
 
-  protected async collect(gauge: Gauge): Promise<void> {
+  public async collect(metric: Gauge): Promise<void> {
     const ping = this._discord.ws.ping ?? 0;
-    gauge.set(ping);
+    metric.set(ping);
   }
 }
