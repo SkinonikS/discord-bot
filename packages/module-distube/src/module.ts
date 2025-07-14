@@ -30,7 +30,7 @@ export default class DistubeModule implements ModuleInterface {
       const config: ConfigRepository = await container.make('config');
       const distubeConfig = config.get('distube');
 
-      const plugins = distubeConfig.plugins.map(async (pluginFactory) => pluginFactory.create(app));
+      const plugins = distubeConfig.plugins.map((pluginFactory) => pluginFactory.create(app));
 
       const distube = new DisTube(discord, {
         emitNewSongOnly: true,
@@ -42,7 +42,7 @@ export default class DistubeModule implements ModuleInterface {
       });
 
       distube.on(Events.DEBUG, (message) => logger.debug(message));
-      distube.on(Events.ERROR, async (error) => errorHandler.handle(error));
+      distube.on(Events.ERROR, (error) => errorHandler.handle(error));
 
       return distube;
     });
