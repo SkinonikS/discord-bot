@@ -1,6 +1,6 @@
 services:
   app:
-    image: app/bot:latest
+    image: discord-bot-cluster:latest
     ports:
       - 3333:3333
     networks:
