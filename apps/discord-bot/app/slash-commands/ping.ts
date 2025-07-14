@@ -1,14 +1,12 @@
 import { tap } from '@framework/core/utils';
-import { err, fromSafePromise, ok } from '@framework/core/vendors/neverthrow';
-import type { Result } from '@framework/core/vendors/neverthrow';
 import type { ChatInputCommandInteraction } from '@module/discord/vendors/discordjs';
-import { SlashCommandBuilder, MessageFlags } from '@module/discord/vendors/discordjs';
+import { SlashCommandBuilder, MessageFlags, DiscordjsError } from '@module/discord/vendors/discordjs';
 import type { i18n } from '@module/i18n/vendors/i18next';
 import type { SlashCommandInterface } from '@module/slash-commands';
 import type LocalizationGenerator from '#app/internal/slash-commands/localization-generator';
 
 export default class PingCommand implements SlashCommandInterface {
-  static containerInjections = {
+  public static containerInjections = {
     _constructor: {
       dependencies: ['i18n', 'slash-commands.localization-generator'],
     },
@@ -33,24 +31,26 @@ export default class PingCommand implements SlashCommandInterface {
     });
   }
 
-  public async execute(interaction: ChatInputCommandInteraction): Promise<Result<void, Error>> {
-    const replyResult = await fromSafePromise(interaction.reply({
-      content: this._i18n.t('slashCommands.ping.responses.pinging', { lng: interaction.locale }),
-      flags: MessageFlags.Ephemeral,
-      withResponse: true,
-    }));
-    if (replyResult.isErr()) {
-      return err(replyResult.error);
-    }
+  public async execute(interaction: ChatInputCommandInteraction): Promise<void> {
+    try {
+      const message = this._i18n.t('slashCommands.ping.responses.pinging', { lng: interaction.locale });
+      const replyResult = await interaction.reply({
+        content: message,
+        flags: MessageFlags.Ephemeral,
+        withResponse: true,
+      });
 
-    const latency = (replyResult.value.resource?.message?.createdTimestamp ?? 0) - replyResult.value.interaction.createdTimestamp;
-    const editReplyResult = await fromSafePromise(interaction.editReply({
-      content: this._i18n.t('slashCommands.ping.responses.pingMs', { lng: interaction.locale, latency }),
-    }));
-    if (editReplyResult.isErr()) {
-      return err(editReplyResult.error);
-    }
+      const latency = (replyResult.resource?.message?.createdTimestamp ?? 0) - replyResult.interaction.createdTimestamp;
+      const message2 = this._i18n.t('slashCommands.ping.responses.pingMs', { lng: interaction.locale, latency });
+      await interaction.editReply({
+        content: message2,
+      });
+    } catch (e) {
+      if (e instanceof DiscordjsError) {
+        return;
+      }
 
-    return ok();
+      throw e;
+    }
   }
 }

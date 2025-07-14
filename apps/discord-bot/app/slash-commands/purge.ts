@@ -1,14 +1,25 @@
 import { tap } from '@framework/core/utils';
-import { err, fromSafePromise } from '@framework/core/vendors/neverthrow';
-import type { Result } from '@framework/core/vendors/neverthrow';
+import { Exception } from '@framework/core/vendors/exceptions';
 import { MessageFlags, PermissionFlagsBits, SlashCommandBuilder } from '@module/discord/vendors/discordjs';
 import type { ChatInputCommandInteraction } from '@module/discord/vendors/discordjs';
 import type { i18n } from '@module/i18n/vendors/i18next';
 import type { SlashCommandInterface } from '@module/slash-commands';
 import type LocalizationGenerator from '#app/internal/slash-commands/localization-generator';
 
+export class BuilkMessagesFetchException extends Exception {
+  public static readonly status = 500;
+  public static readonly code = 'E_BULK_EDIT_ERROR';
+
+  public constructor(
+    public readonly commandName: string,
+    cause?: unknown,
+  ) {
+    super(`Failed to fetch messages using command ${commandName}`, { cause });
+  }
+}
+
 export default class PurgeSlashCommand implements SlashCommandInterface {
-  static containerInjections = {
+  public static containerInjections = {
     _constructor: {
       dependencies: ['i18n', 'slash-commands.localization-generator'],
     },
@@ -45,46 +56,39 @@ export default class PurgeSlashCommand implements SlashCommandInterface {
     });
   }
 
-  public async execute(interaction: ChatInputCommandInteraction): Promise<Result<void, Error>> {
-    const deferReply = await fromSafePromise(interaction.deferReply({
-      flags: MessageFlags.Ephemeral,
-    }));
-
-    if (deferReply.isErr()) {
-      return err(deferReply.error);
-    }
-
-    const amount = interaction.options.getInteger('amount', true);
+  public async execute(interaction: ChatInputCommandInteraction): Promise<void> {
+    const deferReplyResult = await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     if (! interaction.inGuild()) {
-      return fromSafePromise(deferReply.value.edit({
-        content: this._i18n.t('slashCommands.purge.responses.onlyInGuild', { lng: interaction.locale }),
-      })).map(() => void 0);
+      const message = this._i18n.t('slashCommands.purge.responses.onlyInGuild', { lng: interaction.locale });
+      await deferReplyResult.edit({ content: message });
+      return;
     }
 
     const channel = interaction.channel;
     if (! channel || ! channel.isTextBased()) {
-      return fromSafePromise(deferReply.value.edit({
-        content: this._i18n.t('slashCommands.purge.responses.onlyInTextChannel', { lng: interaction.locale }),
-      })).map(() => void 0);
+      const message = this._i18n.t('slashCommands.purge.responses.onlyInTextChannel', { lng: interaction.locale });
+      await deferReplyResult.edit({ content: message });
+      return;
     }
 
-    const messagesResult = await fromSafePromise(interaction.channel.messages.fetch({ limit: amount }));
-    if (messagesResult.isErr()) {
-      return fromSafePromise(deferReply.value.edit({
-        content: this._i18n.t('slashCommands.purge.responses.fetchMessagesError', { lng: interaction.locale }),
-      })).map(() => void 0);
+    const amount = interaction.options.getInteger('amount', true);
+
+    const messages = await channel.messages.fetch({ limit: amount });
+
+    if (messages.size === 0) {
+      const message = this._i18n.t('slashCommands.purge.responses.noMessages', { lng: interaction.locale });
+      await deferReplyResult.edit({ content: message });
+      return;
     }
 
-    const bulkDeleteResult = await fromSafePromise(channel.bulkDelete(messagesResult.value, true));
-    if (bulkDeleteResult.isErr()) {
-      return fromSafePromise(deferReply.value.edit({
-        content: this._i18n.t('slashCommands.purge.responses.bulkDeleteError', { lng: interaction.locale }),
-      })).map(() => void 0);
-    }
-
-    return fromSafePromise(deferReply.value.edit({
-      content: this._i18n.t('slashCommands.purge.responses.deleted', { lng: interaction.locale, count: bulkDeleteResult.value.size }),
-    })).map(() => void 0);
+    await channel.bulkDelete(messages, true)
+      .then((messages) => {
+        const message = this._i18n.t('slashCommands.purge.responses.deleted', { lng: interaction.locale, count: messages.size });
+        return deferReplyResult.edit({ content: message });
+      }).catch(() => {
+        const message = this._i18n.t('slashCommands.purge.responses.fetchMessagesError', { lng: interaction.locale });
+        return deferReplyResult.edit({ content: message });
+      });
   }
 }
