@@ -9,8 +9,8 @@ export default class Scheduler {
 
   public constructor(
     protected readonly _app: Application,
-    protected readonly _errorHandler: ErrorHandler,
     protected readonly _logger: LoggerInterface,
+    protected readonly _errorHandler: ErrorHandler,
   ) { }
 
   public async register(cronJobs: CronJobResolver[]): Promise<void> {
@@ -20,28 +20,35 @@ export default class Scheduler {
         const cronJob = await instantiateIfNeeded(resolvedCronJob, this._app);
 
         if (this._cronJobs.has(cronJob.name)) {
-          this._logger.warn(`Cron job with name "${cronJob.name}" already exists. Skipping.`);
-          return;
+          this._logger.warn(`Cron job with name "${cronJob.name}" already exists`);
+          continue;
         }
 
         const baseCronJob = CronJob.from({
           name: cronJob.name,
           cronTime: cronJob.cronTime,
-          onTick: () => cronJob.onTick(),
-          onComplete: () => cronJob.onComplete && cronJob.onComplete(),
+          onTick: async () => {
+            this._logger.debug(`Executing cron job: ${cronJob.name}`);
+            await cronJob.onTick();
+          },
+          onComplete: async () => {
+            this._logger.debug(`Cron job completed: ${cronJob.name}`);
+            if (cronJob.onExit) {
+              await cronJob.onExit();
+            }
+          },
           runOnInit: false,
           start: false,
-          errorHandler: (error: Error) => {
-            this._logger.error(error);
-            this._errorHandler.report(error);
+          errorHandler: async (e: Error) => {
+            this._errorHandler.handle(e);
           },
         });
 
         this._cronJobs.set(cronJob.name, baseCronJob);
-        this._logger.debug(`Registered slash command: ${cronJob.name}`);
+        this._logger.debug(`Registered cronjob: ${cronJob.name}`);
       } catch (e) {
         if (e instanceof ImportNotFoundException) {
-          this._logger.error(e as ImportNotFoundException);
+          this._logger.warn({ err: e }, `Failed to import cron job: ${cronJobsResolver.name}`);
           continue;
         }
 
@@ -56,11 +63,11 @@ export default class Scheduler {
         continue;
       }
 
-      this._logger.debug(`Starting cron job: ${cronJob.name}`);
+      this._logger.debug(`Scheduling cron job: ${cronJob.name}`);
       cronJob.start();
     }
 
-    this._logger.info(`Started ${this._cronJobs.size} cron jobs.`);
+    this._logger.info(`Scheduled ${this._cronJobs.size} cron jobs`);
   }
 
   public stopCronJobs(): void {
@@ -71,6 +78,6 @@ export default class Scheduler {
       }
     }
 
-    this._logger.info('Stopped all cron jobs.');
+    this._logger.info('Stopped all cron jobs');
   }
 }

@@ -1,23 +1,28 @@
-import { Exception, RuntimeException } from '@poppinss/exception';
+import { Exception } from '@poppinss/exception';
 
-export abstract class FatalErrorException extends Exception {
+export class FatalErrorException extends Exception {
   //
 }
 
-export class ConfigNotFoundException extends RuntimeException {
-  public static status = 500;
-  public static code = 'E_CONFIG_NOT_FOUND';
+export class ConfigNotFoundException extends FatalErrorException {
+  public static readonly code = 'ConfigNotFound';
+  public static readonly status = 500;
 
   public constructor(public readonly configName: string, cause?: unknown) {
-    super(`Configuration for '${configName}' is missing. Maybe you forgot to add it into 'bootstrap/kernel.ts'?`, { cause });
+    super(`Configuration for '${configName}' is missing.`, { cause });
+    this.help = 'Maybe you forgot to add it into \'bootstrap/kernel.ts\'?';
   }
 }
 
-export class InvalidStateTransitionException extends RuntimeException {
-  public static status = 500;
-  public static code = 'E_INVALID_STATE_TRANSITION';
+export class InvalidAppStateTransitionException extends FatalErrorException {
+  public static readonly code = 'InvalidAppStateTransition';
+  public static readonly status = 500;
 
-  public constructor(public readonly currentState: string, public readonly targetState: string, cause?: unknown) {
+  public constructor(
+    public readonly currentState: string,
+    public readonly targetState: string,
+    cause?: unknown,
+  ) {
     super(`Invalid state transition from '${currentState}' to '${targetState}'.`, { cause });
   }
 }

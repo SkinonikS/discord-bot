@@ -3,7 +3,7 @@ import { Container } from '@adonisjs/fold';
 import Hooks from '@poppinss/hooks';
 import type { HookHandler } from '@poppinss/hooks/types';
 import debug from '#root/debug';
-import { InvalidStateTransitionException } from '#src/app/exceptions';
+import { InvalidAppStateTransitionException } from '#src/app/exceptions';
 import ModuleManager from '#src/app/module-manager';
 import Path from '#src/app/path';
 import { ApplicationState } from '#src/app/types';
@@ -198,7 +198,7 @@ export default class Application
   protected _ensureState(expectedState: ApplicationState): void {
     if (this._state !== expectedState) {
       debug(`Invalid state transition from ${this._state} to ${expectedState}`);
-      throw new InvalidStateTransitionException(ApplicationState[this._state], ApplicationState[expectedState]);
+      throw new InvalidAppStateTransitionException(ApplicationState[this._state], ApplicationState[expectedState]);
     }
   }
 

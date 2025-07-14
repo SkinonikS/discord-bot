@@ -22,12 +22,9 @@ export default class LoggerModule implements ModuleInterface {
     app.container.singleton('logger', async (container) => {
       const config: ConfigRepository = await container.make('config');
       const loggerConfig = config.get('logger');
-      if (loggerConfig.isErr()) {
-        throw loggerConfig.error;
-      }
 
-      return loggerConfig.value.driver.create(app, {
-        defaultTags: loggerConfig.value.defaultTags,
+      return loggerConfig.driver.create(app, {
+        defaultTags: loggerConfig.defaultTags,
       });
     });
   }

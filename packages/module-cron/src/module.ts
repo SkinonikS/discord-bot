@@ -1,13 +1,11 @@
-import type { Application, ConfigRepository, ErrorHandler, ModuleInterface } from '@framework/core/app';
-import type { LoggerInterface } from '../../module-logger/dist/src/types';
-import type { CronJobConfig } from './config/types';
+import type { Application, ConfigRepository, ModuleInterface } from '@framework/core/app';
 import pkg from '#root/package.json';
+import type { CronJobConfig } from '#src/config/types';
 import Scheduler from '#src/scheduler';
 
 declare module '@framework/core/app' {
   interface ContainerBindings {
     'cron.scheduler': Scheduler;
-    'cron.logger': LoggerInterface;
   }
 
   interface ConfigBindings {
@@ -24,22 +22,15 @@ export default class CronModule implements ModuleInterface {
     app.container.singleton('cron.scheduler', async (container) => {
       const config: ConfigRepository = await container.make('config');
       const cronJobConfig = config.get('cron');
-      if (cronJobConfig.isErr()) {
-        throw cronJobConfig.error;
-      }
 
-      const app = await container.make('app');
-      const errorHandler: ErrorHandler = await container.make('errorHandler');
-      const logger = await container.make('cron.logger');
-      const scheduler = new Scheduler(app, errorHandler, logger);
+      const scheduler = new Scheduler(
+        await container.make('app'),
+        await container.make('logger'),
+        await container.make('errorHandler'),
+      );
 
-      await scheduler.register(cronJobConfig.value.jobs);
+      await scheduler.register(cronJobConfig.jobs);
       return scheduler;
-    });
-
-    app.container.singleton('cron.logger', async (container) => {
-      const logger: LoggerInterface = await container.make('logger');
-      return logger.copy(this.id);
     });
   }
 

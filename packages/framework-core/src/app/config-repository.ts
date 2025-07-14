@@ -1,5 +1,3 @@
-import { err, ok } from 'neverthrow';
-import type { Result } from 'neverthrow';
 import { ConfigNotFoundException } from '#src/app/exceptions';
 import type { ConfigBindings } from '#src/app/types';
 
@@ -7,12 +5,12 @@ export default class ConfigRepository
 {
   protected readonly _config: Record<string, unknown> = {};
 
-  public get<K extends keyof ConfigBindings | string = keyof ConfigBindings>(key: K): Result<K extends keyof ConfigBindings ? ConfigBindings[K] : unknown, ConfigNotFoundException> {
+  public get<K extends keyof ConfigBindings | string = keyof ConfigBindings>(key: K): K extends keyof ConfigBindings ? ConfigBindings[K] : unknown {
     if (! this.has(key)) {
-      return err(new ConfigNotFoundException(key));
+      throw new ConfigNotFoundException(key);
     }
 
-    return ok(this._config[key] as K extends keyof ConfigBindings ? ConfigBindings[K] : unknown);
+    return this._config[key] as K extends keyof ConfigBindings ? ConfigBindings[K] : unknown;
   }
 
   public set<K extends keyof ConfigBindings | string = keyof ConfigBindings>(key: K, value: K extends keyof ConfigBindings ? [K] : unknown): this {
@@ -28,6 +26,7 @@ export default class ConfigRepository
     for (const [key, value] of Object.entries(config)) {
       this.set(key, value);
     }
+
     return this;
   }
 

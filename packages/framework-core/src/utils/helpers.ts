@@ -1,9 +1,6 @@
-import { fromThrowable } from 'neverthrow';
 import Application from '#src/app/application';
 import type { BaseResolver } from '#src/kernel/types';
 import { ImportNotFoundException } from '#src/utils/exceptions';
-
-export const safeJsonParse = fromThrowable(JSON.parse, () => new Error('Invalid JSON format'));
 
 export const tap = <T>(value: T, fn: (value: T) => void): T => {
   fn(value);

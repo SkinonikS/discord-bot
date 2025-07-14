@@ -64,15 +64,15 @@ export default class ModuleManager {
   }
 
   protected async _shutdownModule(module: ModuleInterface): Promise<void> {
-    return this._callModuleMethod(module, 'shutdown');
+    await this._callModuleMethod(module, 'shutdown');
   }
 
   protected async _startModule(module: ModuleInterface): Promise<void> {
-    return this._callModuleMethod(module, 'start');
+    await this._callModuleMethod(module, 'start');
   }
 
   protected async _bootModule(module: ModuleInterface): Promise<void> {
-    return this._callModuleMethod(module, 'boot');
+    await this._callModuleMethod(module, 'boot');
   }
 
   protected async _callModuleMethod(module: ModuleInterface, method: 'boot' | 'start' | 'shutdown' | 'register'): Promise<void> {

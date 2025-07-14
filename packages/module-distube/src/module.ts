@@ -1,4 +1,5 @@
-import type { Application, ConfigRepository, ModuleInterface } from '@framework/core/app';
+import type { ErrorHandler } from '@framework/core/app';
+import { type Application, type ConfigRepository, type ModuleInterface } from '@framework/core/app';
 import type { Client } from '@module/discord/vendors/discordjs';
 import type { LoggerInterface } from '@module/logger';
 import { DisTube, Events } from 'distube';
@@ -8,7 +9,6 @@ import type { DisTubeConfig } from '#src/config/types';
 declare module '@framework/core/app' {
   interface ContainerBindings {
     'distube': DisTube;
-    'distube.logger': LoggerInterface;
   }
 
   interface ConfigBindings {
@@ -22,35 +22,29 @@ export default class DistubeModule implements ModuleInterface {
   public readonly version = pkg.version;
 
   public register(app: Application): void {
-    app.container.singleton('distube', async () => {
-      const logger = await app.container.make('distube.logger');
-      const discord: Client = await app.container.make('discord.client');
-      const config: ConfigRepository = await app.container.make('config');
+    app.container.singleton('distube', async (container) => {
+      const app = await container.make('app');
+      const errorHandler: ErrorHandler = await container.make('errorHandler');
+      const logger: LoggerInterface = await container.make('logger');
+      const discord: Client = await container.make('discord.client');
+      const config: ConfigRepository = await container.make('config');
       const distubeConfig = config.get('distube');
-      if (distubeConfig.isErr()) {
-        throw distubeConfig.error;
-      }
 
-      const plugins = distubeConfig.value.plugins.map((pluginFactory) => pluginFactory.create(app));
+      const plugins = distubeConfig.plugins.map(async (pluginFactory) => pluginFactory.create(app));
 
       const distube = new DisTube(discord, {
         emitNewSongOnly: true,
         plugins: await Promise.all(plugins),
-        nsfw: distubeConfig.value.nsfw,
+        nsfw: distubeConfig.nsfw,
         ffmpeg: {
-          path: distubeConfig.value.ffmpeg?.path,
+          path: distubeConfig.ffmpeg?.path,
         },
       });
 
       distube.on(Events.DEBUG, (message) => logger.debug(message));
-      distube.on(Events.ERROR, (error) => logger.error(error));
+      distube.on(Events.ERROR, async (error) => errorHandler.handle(error));
 
       return distube;
-    });
-
-    app.container.singleton('distube.logger', async (container) => {
-      const logger: LoggerInterface = await container.make('logger');
-      return logger.copy(this.id);
     });
   }
 }

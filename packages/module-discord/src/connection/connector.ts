@@ -1,9 +1,7 @@
-import { err, fromPromise, ok } from '@framework/core/vendors/neverthrow';
-import type { Result } from '@framework/core/vendors/neverthrow';
+import { FatalErrorException, type ErrorHandler } from '@framework/core/app';
 import type { LoggerInterface } from '@module/logger';
+import { ClientClosedError } from '@module/redis/vendors/redis';
 import type { Client } from 'discord.js';
-import { debug } from '#root/debug';
-import { DiscordConnectionException } from '#src/connection/exceptions';
 import type { RateLimiterInterface } from '#src/connection/types';
 
 export default class Connector {
@@ -11,58 +9,48 @@ export default class Connector {
     protected readonly _discord: Client,
     protected readonly _rateLimiter: RateLimiterInterface,
     protected readonly _logger: LoggerInterface,
+    protected readonly _errorHandler: ErrorHandler,
     protected readonly _token: string,
   ) {
     //
   }
 
-  public async disconnect(): Promise<Result<void, Error>> {
-    debug('Disconnecting Discord client...');
-
+  public async disconnect(): Promise<void> {
     if (! this._discord.isReady()) {
-      return ok();
+      return;
     }
 
-    return fromPromise(
-      this._discord.destroy(),
-      (e) => e instanceof Error ? e : new Error('Unknown error'),
-    );
+    await this._discord.destroy();
+    this._logger.info('Successfully disconnected from Discord');
   }
 
-  public async connect(): Promise<Result<void, Error>> {
-    debug('Connecting to Discord...');
-
+  public async connect(): Promise<void> {
     if (this._discord.isReady()) {
-      debug('Discord client is already connected, skipping connection attempt');
-      return ok();
+      return;
     }
 
+    this._logger.debug('Initiating connection to Discord');
     return this._tryConnect(this._token);
   }
 
-  protected async _tryConnect(token: string): Promise<Result<void, Error>> {
-    const consumeResult = await this._rateLimiter.consume();
-    if (consumeResult.isErr()) {
-      debug(`Discord rate limiter error: ${consumeResult.error.message}`);
-      return err(consumeResult.error);
+  protected async _tryConnect(token: string): Promise<void> {
+    let rateLimit;
+    try {
+      rateLimit = await this._rateLimiter.consume();
+    } catch (e) {
+      if (e instanceof ClientClosedError) {
+        throw new FatalErrorException('Failed to consume rate-limiter', { cause: e });
+      }
+
+      throw e;
     }
 
-    if (! consumeResult.value.isFirst && consumeResult.value.remaining <= 0) {
-      debug('Rate limit window reset, retrying connection...');
-      this._logger.warn(`Rate limit exceeded, retrying connection in ${consumeResult.value.resetInMs}ms`);
-
-      await new Promise(r => setTimeout(r, consumeResult.value.resetInMs));
+    if (! rateLimit.isFirst && rateLimit.remaining <= 0) {
+      this._logger.warn(`Rate limit exceeded, retrying connection in ${rateLimit.resetInMs}ms`);
+      await new Promise(r => setTimeout(r, rateLimit.resetInMs));
       return this._tryConnect(token);
     }
 
-    return this._loginToDiscord(token);
-  }
-
-  protected async _loginToDiscord(token: string): Promise<Result<void, Error>> {
-    const loginResult = await fromPromise(this._discord.login(token), (e) => {
-      return new DiscordConnectionException(e);
-    });
-
-    return loginResult.isErr() ? err(loginResult.error) : ok();
+    await this._discord.login(token);
   }
 }

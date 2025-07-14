@@ -1,4 +1,5 @@
 import type { Container } from '@adonisjs/fold';
+import type { Exception } from '@poppinss/exception';
 import type Application from '#src/app/application';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -48,7 +49,7 @@ export type HooksMap = {
   shutdown: HooksState<Application>;
 };
 
-export interface ReportableException extends Error {
+export interface ReportableException extends Exception {
   shouldReport?: boolean;
 }
 

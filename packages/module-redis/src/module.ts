@@ -9,7 +9,6 @@ declare module '@framework/core/app' {
   interface ContainerBindings {
     'redis': Manager;
     'redis.client': RedisClientType;
-    'redis.logger': LoggerInterface;
   }
 
   interface ConfigBindings {
@@ -24,41 +23,21 @@ export default class RedisModule implements ModuleInterface {
 
   public register(app: Application): void {
     app.container.singleton('redis', async (container) => {
+      const logger: LoggerInterface = await container.make('logger');
       const config: ConfigRepository = await container.make('config');
       const redisConfig = config.get('redis');
-      if (redisConfig.isErr()) {
-        throw redisConfig.error;
-      }
-
-      return new Manager(redisConfig.value);
+      return new Manager(redisConfig, logger);
     });
 
     app.container.bind('redis.client', async (container) => {
       const manager = await container.make('redis');
-      const redis = manager.client();
-      if (redis.isErr()) {
-        throw redis.error;
-      }
-
-      return redis.value;
-    });
-
-    app.container.singleton('redis.logger', async (container) => {
-      const logger: LoggerInterface = await container.make('logger');
-      return logger.copy(this.id);
+      return manager.client();
     });
   }
 
   public async start(app: Application): Promise<void> {
     const manager = await app.container.make('redis');
-    const logger = await app.container.make('redis.logger');
-
-    const connectResult = await manager.connect();
-    if (connectResult.isErr()) {
-      throw connectResult.error;
-    } else {
-      logger.info('Successfully connected to Redis');
-    }
+    await manager.connect(); // Here we await the connection to ensure Redis is ready before proceeding
   }
 
   public async shutdown(app: Application): Promise<void> {

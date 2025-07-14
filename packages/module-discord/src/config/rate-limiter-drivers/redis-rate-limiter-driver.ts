@@ -17,12 +17,9 @@ export default class RedisRateLimiterDriver implements RateLimiterDriverInterfac
     const { default: RedisRateLimiter } = await import('#src/connection/rate-limiters/redis-rate-limiter');
     const redisManager: Manager = await app.container.make('redis');
     const redis = redisManager.client(this._config.client);
-    if (redis.isErr()) {
-      throw redis.error;
-    }
 
     const rateLimiter = new RateLimiterRedis({
-      storeClient: redis.value,
+      storeClient: redis,
       points: config.points,
       duration: config.durationMs / 1000,
       keyPrefix: '',

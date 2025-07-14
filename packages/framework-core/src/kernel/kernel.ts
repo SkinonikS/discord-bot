@@ -23,20 +23,11 @@ export default class Kernel {
     debug('Bootstrapping application');
 
     for (const bootstrapperResolver of bootstrappers) {
-      try {
-        const reolvedBootstrapper = await importModule(() => bootstrapperResolver());
-        const bootstrapper = await instantiateIfNeeded(reolvedBootstrapper, this._app);
+      const reolvedBootstrapper = await importModule(() => bootstrapperResolver());
+      const bootstrapper = await instantiateIfNeeded(reolvedBootstrapper, this._app);
 
-        await bootstrapper.bootstrap(this._app);
-        debug(`Bootstrapped '${bootstrapper.constructor.name}'`);
-      } catch (e) {
-        if (e instanceof ImportNotFoundException) {
-          console.error(`Failed to resolve bootstrapper: ${e.message}`);
-          process.exit(1);
-        }
-
-        throw e;
-      }
+      await bootstrapper.bootstrap(this._app);
+      debug(`Bootstrapped '${bootstrapper.constructor.name}'`);
     }
 
     debug('Application bootstrapped successfully');

@@ -1,17 +1,25 @@
 import pretty from 'pino-pretty';
 
-export default function (options: Record<string, unknown>): pretty.PrettyStream {
-  return pretty({
-    ...options,
-    messageFormat: (log, messageKey) => {
-      const message = log[messageKey];
-      const module = log.module ? `[${log.module}]` : '';
-      const app = log.app ? `{${log.app}}` : '';
+export interface PrettyOptions {
+  ignoreTags?: string[];
+  showStackTraces?: boolean;
+  colorize?: boolean;
+  singleLine?: boolean;
+  timeFormat?: string;
+}
 
-      return `${module}${app} ${message}`;
-    },
-    ignore: 'module,app,version,pid,hostname',
-    errorLikeObjectKeys: options.showStackTrace ? ['err', 'error'] : [],
-    errorProps: options.showStackTrace ? '' : 'message',
+export default function (options: PrettyOptions): pretty.PrettyStream {
+  const ignoreKeys = options.ignoreTags ?? [];
+
+  if (options.showStackTraces === false) {
+    ignoreKeys.push('err', 'error');
+  }
+
+  return pretty({
+    errorLikeObjectKeys: ['err', 'error'],
+    ignore: ignoreKeys.join(','),
+    colorize: options.colorize ?? true,
+    singleLine: options.singleLine ?? true,
+    translateTime: options.timeFormat ?? 'HH:MM:ss.l',
   });
 }

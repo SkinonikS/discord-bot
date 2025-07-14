@@ -1,10 +1,14 @@
-import { RuntimeException } from '@poppinss/exception';
+import { FatalErrorException } from '#src/app';
 
-export class ImportNotFoundException extends RuntimeException {
-  public static status = 500;
-  public static code = 'E_IMPORT_NOT_FOUND';
+export class ImportNotFoundException extends FatalErrorException {
+  public static readonly code = 'ImportNotFound';
+  public static readonly status = 500;
 
-  public constructor(public readonly moduleName: string, cause?: Error) {
-    super(`Module '${moduleName}' could not be imported. Maybe it is missing or the path is incorrect?`, { cause });
+  public constructor(
+    public readonly importModuleName: string,
+    cause?: unknown,
+  ) {
+    super(`Module '${importModuleName}' could not be imported.`, { cause });
+    this.help = 'Maybe it is missing or the path is incorrect?';
   }
 }

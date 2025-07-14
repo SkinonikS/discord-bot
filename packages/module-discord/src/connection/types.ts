@@ -1,7 +1,5 @@
-import type { Result } from '@framework/core/vendors/neverthrow';
-
 export interface RateLimiterInterface {
-  consume(): Promise<Result<RateLimitResponse, Error>> | Result<RateLimitResponse, Error>;
+  consume(): Promise<RateLimitResponse> | RateLimitResponse;
 }
 
 export interface RateLimitResponse {

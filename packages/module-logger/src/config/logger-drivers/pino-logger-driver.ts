@@ -7,7 +7,7 @@ import type { LoggerInterface } from '#src/types';
 
 export interface PinoLoggerDriverConfig {
   level: LogLevel;
-  stackTraces: boolean;
+  showStackTraces: boolean;
   transports: TransportFactoryInterface[];
 }
 
@@ -19,7 +19,7 @@ export default class PinoLoggerDriver implements LoggerDriverInterface {
   public async create(app: Application, options: LoggerDriverOptions): Promise<LoggerInterface> {
     const targets = this._config.transports.map((transport) => transport.create(app, {
       level: this._config.level,
-      stackTraces: this._config.stackTraces,
+      showStackTraces: this._config.showStackTraces,
     }));
 
     const pinoLogger = pino({

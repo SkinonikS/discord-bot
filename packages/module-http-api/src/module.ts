@@ -5,12 +5,12 @@ import type { LoggerInterface } from '@module/logger';
 import { toNodeListener, createApp } from 'h3';
 import pkg from '#root/package.json';
 import type { HttpApiConfig } from '#src/config/types';
+import { DNSLookupException, PortAccessDeniedException, PortAlreadyInUseException } from '#src/exceptions';
 
 declare module '@framework/core/app' {
   interface ContainerBindings {
     'http.api.app': ReturnType<typeof createApp>;
     'http.api.server': ReturnType<typeof createServer>;
-    'http.api.logger': LoggerInterface;
   }
 
   interface ConfigBindings {
@@ -31,58 +31,64 @@ export default class HttpApiModule implements ModuleInterface {
   public readonly version = pkg.version;
 
   public register(app: Application): void {
-    app.container.singleton('http.api.app', (container) => {
-      return createApp({
+    app.container.singleton('http.api.app', async (container) => {
+      const config: ConfigRepository = await container.make('config');
+      const httpApiConfig = config.get('http.api');
+
+      const app = createApp({
         onRequest: async (event) => {
           const app = await container.make('app');
           event.context.app = app;
           event.context.container = app.container;
         },
       });
+
+      for (const routerResolver of httpApiConfig.routes) {
+        const router = await importModule(() => routerResolver());
+        app.use(router);
+      }
+
+      return app;
     });
 
     app.container.singleton('http.api.server', async (container) => {
       const app = await container.make('http.api.app');
       return createServer(toNodeListener(app));
     });
-
-    app.container.singleton('http.api.logger', async (container) => {
-      const logger: LoggerInterface = await container.make('logger');
-      return logger.copy(this.id);
-    });
-  }
-
-  public async boot(app: Application): Promise<void> {
-    const h3 = await app.container.make('http.api.app');
-    const config: ConfigRepository = await app.container.make('config');
-    const httpApiConfig = config.get('http.api');
-    if (httpApiConfig.isErr()) {
-      throw httpApiConfig.error;
-    }
-
-    for (const routerResolver of httpApiConfig.value.routes) {
-      const router = await importModule(() => routerResolver());
-      h3.use(router);
-    }
   }
 
   public async start(app: Application): Promise<void> {
-    const errorHandler: ErrorHandler = await app.container.make('errorHandler');
     const server = await app.container.make('http.api.server');
-    const logger = await app.container.make('http.api.logger');
+    const logger: LoggerInterface = await app.container.make('logger');
+    const errorHandler: ErrorHandler = await app.container.make('errorHandler');
     const config: ConfigRepository = await app.container.make('config');
     const httpApiConfig = config.get('http.api');
-    if (httpApiConfig.isErr()) {
-      throw httpApiConfig.error;
-    }
 
     server.on('error', (error) => {
+      if ('code' in error) {
+        const code = String(error.code).toUpperCase();
+
+        if (code === 'EADDRINUSE' || code === 'EACCES') {
+          const address = 'address' in error ? String(error.address) : httpApiConfig.host;
+          const port = 'port' in error ? Number(error.port) : httpApiConfig.port;
+
+          if (code === 'EADDRINUSE') {
+            error = new PortAlreadyInUseException(port, address, error);
+          } else {
+            error = new PortAccessDeniedException(port, address, error);
+          }
+        } else if (code === 'ENOTFOUND') {
+          const hostname = 'hostname' in error ? String(error.hostname) : 'unknown';
+          error = new DNSLookupException(hostname, error);
+        }
+      }
+
       errorHandler.handle(error);
     });
 
     server.listen({
-      port: httpApiConfig.value.port,
-      host: httpApiConfig.value.host,
+      port: httpApiConfig.port,
+      host: httpApiConfig.host,
     }, () => {
       const address = server.address();
       const port = typeof address === 'string' ? address : address?.port;
@@ -93,7 +99,7 @@ export default class HttpApiModule implements ModuleInterface {
 
   public async shutdown(app: Application): Promise<void> {
     const server = await app.container.make('http.api.server');
-    const logger = await app.container.make('http.api.logger');
+    const logger: LoggerInterface = await app.container.make('logger');
 
     server.close(() => {
       logger.info('HTTP API server closed');

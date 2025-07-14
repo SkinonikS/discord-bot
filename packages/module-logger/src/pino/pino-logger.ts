@@ -9,37 +9,37 @@ export default class PinoLogger implements LoggerInterface {
   }
 
   public info(message: string | Error, ...args: unknown[]): void;
-  public info(object: object, message?: string, ...args: unknown[]): void;
+  public info(object: unknown, message?: string, ...args: unknown[]): void;
   public info(message: string | object, ...args: unknown[]): void {
     this._log('info', message, ...args);
   }
 
   public warn(message: string | Error, ...args: unknown[]): void;
-  public warn(object: object, message?: string, ...args: unknown[]): void;
+  public warn(object: unknown, message?: string, ...args: unknown[]): void;
   public warn(message: string | object, ...args: unknown[]): void {
     this._log('error', message, ...args);
   }
 
   public error(message: string | Error, ...args: unknown[]): void;
-  public error(object: object, message?: string, ...args: unknown[]): void;
+  public error(object: unknown, message?: string, ...args: unknown[]): void;
   public error(message: string | object, ...args: unknown[]): void {
     this._log('error', message, ...args);
   }
 
   public debug(message: string | Error, ...args: unknown[]): void;
-  public debug(object: object, message?: string, ...args: unknown[]): void;
+  public debug(object: unknown, message?: string, ...args: unknown[]): void;
   public debug(message: string | object, ...args: unknown[]): void {
     this._log('debug', message, ...args);
   }
 
   public fatal(message: string | Error, ...args: unknown[]): void;
-  public fatal(object: object, message?: string, ...args: unknown[]): void;
+  public fatal(object: unknown, message?: string, ...args: unknown[]): void;
   public fatal(message: string | object, ...args: unknown[]): void {
     this._log('fatal', message, ...args);
   }
 
   public copy(label: string): LoggerInterface {
-    return new PinoLogger(this._logger.child({ module: label, err: undefined, error: undefined }));
+    return new PinoLogger(this._logger.child({ module: label }));
   }
 
   protected _log(level: keyof Logger, message: string | object, ...args: unknown[]): void {

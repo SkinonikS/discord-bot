@@ -4,13 +4,14 @@ import type { Client } from '@module/discord/vendors/discordjs';
 import type { LoggerInterface } from '@module/logger';
 import pkg from '#root/package.json';
 import type { SlashCommandConfig } from '#src/config/types';
+import AutocompleteHandler from '#src/handlers/autocomplete-handler';
+import ExecuteHandler from '#src/handlers/execute-handler';
 import Manager from '#src/manager';
 import type { RateLimiterInterface } from '#src/types';
 
 declare module '@framework/core/app' {
   interface ContainerBindings {
     'slash-commands': Manager;
-    'slash-commands.logger': LoggerInterface;
     'slash-commands.rate-limiter': RateLimiterInterface;
   }
 
@@ -29,66 +30,51 @@ export default class SlashCommandModule implements ModuleInterface {
       const app = await container.make('app');
       const config: ConfigRepository = await container.make('config');
       const slashCommandConfig = config.get('slash-commands');
-      if (slashCommandConfig.isErr()) {
-        throw slashCommandConfig.error;
-      }
 
-      return slashCommandConfig.value.rateLimiter.driver.create(app, {
-        points: slashCommandConfig.value.rateLimiter.points,
-        durationMs: slashCommandConfig.value.rateLimiter.durationMs,
+      return slashCommandConfig.rateLimiter.driver.create(app, {
+        points: slashCommandConfig.rateLimiter.points,
+        durationMs: slashCommandConfig.rateLimiter.durationMs,
       });
     });
 
     app.container.singleton('slash-commands', async (container) => {
-      const config: ConfigRepository = await container.make('config');
+      const config: ConfigRepository = await app.container.make('config');
       const slashCommandConfig = config.get('slash-commands');
-      if (slashCommandConfig.isErr()) {
-        throw slashCommandConfig.error;
-      }
 
-      return new Manager(
+      const manager = new Manager(
         await container.make('app'),
         await container.make('discord.client'),
-        await container.make('slash-commands.rate-limiter'),
-        await container.make('slash-commands.logger'),
-        slashCommandConfig.value.rateLimiter.message,
+        await container.make('logger'),
       );
-    });
 
-    app.container.singleton('slash-commands.logger', async (container) => {
-      const logger: LoggerInterface = await container.make('logger');
-      return logger.copy(this.id);
+      await manager.register(slashCommandConfig.commands);
+      return manager;
     });
   }
 
   public async boot(app: Application): Promise<void> {
     const discord: Client = await app.container.make('discord.client');
     const manager = await app.container.make('slash-commands');
+    const config: ConfigRepository = await app.container.make('config');
+    const slashCommandConfig = config.get('slash-commands');
 
     discord.on(Events.ClientReady, async (discord) => {
       const guilds = Array.from(discord.guilds.cache.values());
-      // TODO: Added just for testing purposes, remove later
       manager.deployToGuilds(guilds);
     });
 
-    discord.on(Events.InteractionCreate, async (interaction) => {
-      if (interaction.isChatInputCommand()) {
-        await manager.execute(interaction);
-      }
+    const logger: LoggerInterface = await app.container.make('logger');
+    const rateLimiter = await app.container.make('slash-commands.rate-limiter');
 
-      if (interaction.isAutocomplete()) {
-        await manager.autocomplete(interaction);
+    const executeHandler = new ExecuteHandler(app, manager, logger, rateLimiter, slashCommandConfig.rateLimiter.message);
+    const autocompleteHandler =  new AutocompleteHandler(manager, logger);
+
+    discord.on(Events.InteractionCreate, (interaction) => {
+      if (interaction.isChatInputCommand()) {
+        executeHandler.handle(interaction);
+      } else if (interaction.isAutocomplete()) {
+        autocompleteHandler.handle(interaction);
       }
     });
-
-    const config: ConfigRepository = await app.container.make('config');
-    const slashCommandConfig = config.get('slash-commands');
-    if (slashCommandConfig.isErr()) {
-      throw slashCommandConfig.error;
-    }
-
-    if (slashCommandConfig) {
-      await manager.register(slashCommandConfig.value.commands);
-    }
   }
 }

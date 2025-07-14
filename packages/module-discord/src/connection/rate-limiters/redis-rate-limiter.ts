@@ -1,6 +1,5 @@
-import type { Result } from '@framework/core/vendors/neverthrow';
-import { ok, err, fromPromise } from '@framework/core/vendors/neverthrow';
-import { RateLimiterRes, type RateLimiterRedis } from 'rate-limiter-flexible';
+import { RateLimiterRes } from 'rate-limiter-flexible';
+import type { RateLimiterRedis } from 'rate-limiter-flexible';
 import type { RateLimiterInterface, RateLimitResponse } from '#src/connection/types';
 
 export default class RedisRateLimiter implements RateLimiterInterface {
@@ -10,26 +9,25 @@ export default class RedisRateLimiter implements RateLimiterInterface {
     //
   }
 
-  public async consume(): Promise<Result<RateLimitResponse, Error>> {
-    const consumeResult = await fromPromise(
-      this._redisRateLimiter.consume('discord:connection:rate-limiter'),
-      (e) => {
-        if (e instanceof RateLimiterRes) {
-          return e;
-        }
+  public async consume(): Promise<RateLimitResponse> {
+    const consume = await this._consume();
 
-        return new Error(`Unknown error occurred while hitting rate limit: ${String(e)}`, { cause: e });
-      },
-    ).orElse((e) => e instanceof RateLimiterRes ? ok(e) : err(e));
+    return {
+      isFirst: consume.isFirstInDuration,
+      remaining: consume.remainingPoints,
+      resetInMs: consume.msBeforeNext,
+    };
+  }
 
-    if (consumeResult.isErr()) {
-      return err(consumeResult.error);
+  protected async _consume(): Promise<RateLimiterRes> {
+    try {
+      return await this._redisRateLimiter.consume('discord:connection:rate-limiter');
+    } catch (e) {
+      if (e instanceof RateLimiterRes) {
+        return e;
+      }
+
+      throw e;
     }
-
-    return ok({
-      isFirst: consumeResult.value.isFirstInDuration,
-      remaining: consumeResult.value.remainingPoints,
-      resetInMs: consumeResult.value.msBeforeNext,
-    });
   }
 }

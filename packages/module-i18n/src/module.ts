@@ -9,7 +9,6 @@ import I18nLoader from '#src/loader';
 declare module '@framework/core/app' {
   interface ContainerBindings {
     'i18n': i18n;
-    'i18n.logger': LoggerInterface;
   }
 
   interface ConfigBindings {
@@ -24,20 +23,16 @@ export default class I18nModule implements ModuleInterface {
 
   public register(app: Application): void {
     app.container.singleton('i18n', async (container) => {
-      const logger: LoggerInterface = await container.make('i18n.logger');
+      const logger: LoggerInterface = await container.make('logger');
       const config: ConfigRepository = await container.make('config');
       const i18nConfig = config.get('i18n');
-      if (i18nConfig.isErr()) {
-        throw i18nConfig.error;
-      }
 
-      const supportedLocales = Object.keys(i18nConfig.value.supportedLocales);
-
+      const supportedLocales = Object.keys(i18nConfig.supportedLocales);
       const i18nInstance = createInstance();
 
-      i18nInstance.use(new I18nLoader(i18nConfig.value.supportedLocales));
+      i18nInstance.use(new I18nLoader(i18nConfig.supportedLocales));
       i18nInstance.on('languageChanged', (lng) => logger.debug(`Language changed to: ${lng}`));
-      i18nInstance.on('initialized', () => logger.debug(`i18n initialized with locale: ${i18nConfig.value.locale}, fallbackLocale: ${i18nConfig.value.fallbackLocale}`));
+      i18nInstance.on('initialized', () => logger.debug(`i18n initialized with locale: ${i18nConfig.locale}, fallbackLocale: ${i18nConfig.fallbackLocale}`));
       i18nInstance.on('failedLoading', (lng, ns, msg) => logger.error(msg));
       i18nInstance.on('loaded', (loaded) => logger.debug(`Translations loaded: ${JSON.stringify(loaded)}`));
       i18nInstance.on('added', (lng, ns) => logger.debug(`Translations added for language: ${lng}, namespace: ${ns}`));
@@ -45,22 +40,17 @@ export default class I18nModule implements ModuleInterface {
 
       await i18nInstance.init({
         partialBundledLanguages: true,
-        lng: i18nConfig.value.locale,
-        fallbackLng: i18nConfig.value.fallbackLocale,
+        lng: i18nConfig.locale,
+        fallbackLng: i18nConfig.fallbackLocale,
         supportedLngs: supportedLocales,
-        debug: i18nConfig.value.debug,
+        debug: i18nConfig.debug,
         preload: supportedLocales,
-        defaultNS: i18nConfig.value.defaultNamespace,
-        ns: i18nConfig.value.preloadNamespaces,
+        defaultNS: i18nConfig.defaultNamespace,
+        ns: i18nConfig.preloadNamespaces,
         resources: {},
       });
 
       return i18nInstance;
-    });
-
-    app.container.singleton('i18n.logger', async (container) => {
-      const logger: LoggerInterface = await container.make('logger');
-      return logger.copy(this.id);
     });
   }
 }

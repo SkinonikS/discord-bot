@@ -6,8 +6,8 @@ export const getDefaultLogger = async (app?: Application): Promise<LoggerInterfa
   return app.container.make('logger');
 };
 
-export const createLogSource = async (label: string, app?: Application): Promise<LoggerInterface> => {
+export const createLogChild = async (label: string, app?: Application): Promise<LoggerInterface> => {
   app ??= Application.getInstance();
-  const loggerFactory = await app.container.make('logger.factory');
-  return loggerFactory.createLogger(label);
+  const logger: LoggerInterface = await app.container.make('logger');
+  return logger.copy(label);
 };

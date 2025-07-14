@@ -1,117 +1,88 @@
 import type { LoggerInterface } from '@module/logger';
 import { Exception } from '@poppinss/exception';
-import debug from '#root/debug';
 import type Application from '#src/app/application';
-import { ConfigNotFoundException, FatalErrorException, InvalidStateTransitionException } from '#src/app/exceptions';
-import type { ReportableException, ReportCallback } from '#src/app/types';
+import { FatalErrorException } from '#src/app/exceptions';
 
 export default class ErrorHandler {
-  protected readonly _reporters: Map<string, Set<ReportCallback>> = new Map();
-
-  protected readonly _fatalErrors: Set<string> = new Set([
-    ConfigNotFoundException.code,
-    InvalidStateTransitionException.code,
+  protected readonly _fatalErrorCodes: Set<string> = new Set([
+    'ECONNREFUSED',
     'ERRCONNECT',
+    'EADDRINUSE',
+    'EACCES',
+    'ENOTFOUND',
   ]);
 
-  public constructor(protected readonly _app: Application) { }
+  public constructor(
+    protected readonly _app: Application,
+  ) { }
 
   public isFatalError(error: string | Error): boolean {
-    if (typeof error === 'string') {
-      return this._fatalErrors.has(error);
-    }
-
     if (error instanceof FatalErrorException) {
       return true;
     }
 
-    if (error instanceof Exception) {
-      const code = error.code ?? error.name;
-      return this._fatalErrors.has(code);
+    if (typeof error === 'string') {
+      return this._fatalErrorCodes.has(error);
     }
 
-    return this._fatalErrors.has(error.name);
+    const code = 'code' in error ? String(error.code) : error.name.endsWith('Exception') ? error.name.slice(0, -9) : error.name;
+    return this._fatalErrorCodes.has(code);
   }
 
-  public addFatalError(error: string): this {
-    this._fatalErrors.add(error);
+  public addFatalErrorCode(error: string | string[]): this {
+    if (! Array.isArray(error)) {
+      error = [error];
+    }
+
+    for (const err of error) {
+      this._fatalErrorCodes.add(err);
+    }
+
     return this;
   }
 
-  public async handle(error: Error): Promise<void> {
-    const e = this._convertToException(error);
-    await this.report(e);
+  public async handle(error: unknown): Promise<void> {
+    const e = this._normalizeError(error);
+    const logger = await this._resolveLogger();
 
     if (this.isFatalError(e)) {
-      debug('Due to a fatal error, the application will shutdown:', error);
-      await this._logFatal(e);
-      await this._app.shutdown();
+      logger.fatal(e);
+
+      try {
+        await this._app.shutdown();
+      } catch (e) {
+        logger.fatal({ err: e }, 'Failed to shutdown the application. This could lead to data loss');
+      }
+
       process.exit(1);
     }
 
-    await this._logError(e);
+    logger.error(e);
   }
 
-  public reportUsing(error: string, callback: ReportCallback): this {
-    if (! this._reporters.has(error)) {
-      this._reporters.set(error, new Set());
-    }
-
-    this._reporters.get(error)?.add(callback);
-    return this;
-  }
-
-  public async report(error: ReportableException): Promise<void> {
-    if (! error.shouldReport) {
-      return;
-    }
-
-    const reporters = this._reporters.get(error.name) ?? [];
-    for (const reporter of reporters) {
-      try {
-        await reporter(error, this._app);
-      } catch (error) {
-        this._logError(new Error(String(error), { cause: error }));
-      }
-    }
-  }
-
-  protected _convertToException(error: Error): Exception {
-    if (error instanceof Exception) {
+  protected _normalizeError(error: unknown): Error {
+    if (error instanceof Error) {
       return error;
     }
 
-    // @ts-expect-error Check if the error has a code property (some error has it)
-    const code = Object.hasOwn(error, 'code') ? error.code : error.name;
-    // @ts-expect-error Check if the error has a status property (some error has it)
-    const status = Object.hasOwn(error, 'status') ? error.status : 500;
-
-    return new Exception(error.message, {
+    return new Exception('Unknown error', {
       cause: error,
-      code: code,
-      status: status,
+      status: 500,
+      code: 'UnknownError',
     });
   }
 
-  protected async _logFatal(message: Error | string): Promise<void> {
-    try {
-      const logger = await this._resolveLogger();
-      logger.fatal(message);
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  protected async _logError(message: Error | string): Promise<void> {
-    try {
-      const logger = await this._resolveLogger();
-      logger.error(message);
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
   protected async _resolveLogger(): Promise<LoggerInterface> {
-    return this._app.container.make('logger');
+    return this._app.container.make('logger').catch(() => {
+      const fallbackLogger = {
+        error: console.error,
+        fatal: console.error,
+        info: console.info,
+        debug: console.debug,
+        warn: console.warn,
+        copy: () => fallbackLogger,
+      };
+      return fallbackLogger;
+    });
   }
 }
