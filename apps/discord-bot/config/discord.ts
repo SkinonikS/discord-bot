@@ -4,12 +4,12 @@ import { Env } from '#bootstrap/env';
 
 export default defineDiscordConfig({
   token: Env.DISCORD_TOKEN,
+  // TODO: make this configurable?
   intents: new IntentsBitField([
     'Guilds',
     'GuildMessages',
     'GuildVoiceStates',
     'DirectMessages',
-    'MessageContent',
   ]),
   richPresence: {
     afk: false,
